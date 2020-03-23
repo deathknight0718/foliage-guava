@@ -39,7 +39,7 @@
     </dependencies>
     <distributionManagement>
         <repository>
-            <id>github</id>
+            <id>github.foliage-guava</id>
             <url>https://maven.pkg.github.com/deathknight0718/foliage-guava</url>
         </repository>
     </distributionManagement>
