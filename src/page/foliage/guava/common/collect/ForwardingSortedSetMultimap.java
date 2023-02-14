@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.SortedSet;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A sorted set multimap which forwards all its method calls to another sorted set multimap.

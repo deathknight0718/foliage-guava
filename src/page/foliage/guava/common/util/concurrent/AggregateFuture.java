@@ -14,17 +14,15 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.ForOverride;
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableCollection;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.util.concurrent.Futures.getDone;
 import static page.foliage.guava.common.util.concurrent.MoreExecutors.directExecutor;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableCollection;
+import com.google.errorprone.annotations.ForOverride;
+import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -46,7 +44,7 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
    * In certain circumstances, this field might theoretically not be visible to an afterDone() call
    * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
    */
-  private RunningState runningState;
+  @NullableDecl private RunningState runningState;
 
   @Override
   protected final void afterDone() {

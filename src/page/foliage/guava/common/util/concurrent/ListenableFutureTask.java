@@ -14,12 +14,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * A {@link FutureTask} that also implements the {@link ListenableFuture} interface. Unlike {@code

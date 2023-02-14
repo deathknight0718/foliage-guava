@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.cache;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.cache.LocalCache.ValueReference;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An entry in a reference map.

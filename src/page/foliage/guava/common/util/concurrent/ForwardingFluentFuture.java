@@ -16,12 +16,11 @@ package page.foliage.guava.common.util.concurrent;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * {@link FluentFuture} that forwards all calls to a delegate.

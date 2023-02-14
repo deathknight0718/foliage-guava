@@ -16,14 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.primitives.Ints;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.primitives.Ints;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.NoSuchElementException;

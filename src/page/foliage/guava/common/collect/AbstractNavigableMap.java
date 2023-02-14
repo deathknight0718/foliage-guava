@@ -16,6 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
 import java.util.Iterator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
@@ -23,9 +25,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
 
 /**
  * Skeletal implementation of {@link NavigableMap}.

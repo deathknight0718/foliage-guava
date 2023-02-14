@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RunnableFuture;
@@ -106,7 +104,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     if (localTask != null) {
       return "task=[" + localTask + "]";
     }
-    return null;
+    return super.pendingToString();
   }
 
   @WeakOuter
@@ -137,7 +135,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }
@@ -174,7 +172,7 @@ class TrustedListenableFutureTask<V> extends AbstractFuture.TrustedFuture<V>
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }

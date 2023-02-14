@@ -16,15 +16,8 @@
 
 package page.foliage.guava.common.graph;
 
-import static java.util.Collections.unmodifiableSet;
 import static page.foliage.guava.common.graph.GraphConstants.MULTIPLE_EDGES_CONNECTING;
-
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import static java.util.Collections.unmodifiableSet;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Function;
@@ -34,6 +27,12 @@ import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.collect.Sets;
 import page.foliage.guava.common.math.IntMath;
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides a skeletal implementation of {@link Network}. It is recommended to extend

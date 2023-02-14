@@ -16,17 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.base.Preconditions;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.base.Preconditions;
 
 /**
  * Implementation of {@link Multimap} using hash tables.

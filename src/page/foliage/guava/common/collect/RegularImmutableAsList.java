@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.function.Consumer;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.function.Consumer;
 
 /**
  * An {@link ImmutableAsList} implementation specialized for when the delegate collection is already

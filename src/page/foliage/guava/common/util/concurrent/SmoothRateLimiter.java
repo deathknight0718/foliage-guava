@@ -17,10 +17,9 @@ package page.foliage.guava.common.util.concurrent;
 import static java.lang.Math.min;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import java.util.concurrent.TimeUnit;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.math.LongMath;
+import java.util.concurrent.TimeUnit;
 
 @GwtIncompatible
 abstract class SmoothRateLimiter extends RateLimiter {

@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.reflect;
 
+import page.foliage.guava.common.annotations.Beta;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
 
 /**
  * Abstract implementation of {@link InvocationHandler} that handles {@link Object#equals}, {@link

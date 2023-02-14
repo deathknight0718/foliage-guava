@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import static page.foliage.guava.common.collect.Sets.newConcurrentHashSet;
 import static java.util.concurrent.atomic.AtomicIntegerFieldUpdater.newUpdater;
 import static java.util.concurrent.atomic.AtomicReferenceFieldUpdater.newUpdater;
-import static page.foliage.guava.common.collect.Sets.newConcurrentHashSet;
-
-import com.google.j2objc.annotations.ReflectionSupport;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
-
+import com.google.j2objc.annotations.ReflectionSupport;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;

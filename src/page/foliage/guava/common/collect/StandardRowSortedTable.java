@@ -16,13 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Supplier;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;

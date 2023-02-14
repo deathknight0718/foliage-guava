@@ -14,15 +14,6 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.LazyInit;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.collect.SortedLists.KeyAbsentBehavior;
-import page.foliage.guava.common.collect.SortedLists.KeyPresentBehavior;
-import page.foliage.guava.common.primitives.Ints;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkElementIndex;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
@@ -30,6 +21,13 @@ import static page.foliage.guava.common.collect.SortedLists.KeyAbsentBehavior.NE
 import static page.foliage.guava.common.collect.SortedLists.KeyAbsentBehavior.NEXT_LOWER;
 import static page.foliage.guava.common.collect.SortedLists.KeyPresentBehavior.ANY_PRESENT;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.collect.SortedLists.KeyAbsentBehavior;
+import page.foliage.guava.common.collect.SortedLists.KeyPresentBehavior;
+import page.foliage.guava.common.primitives.Ints;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,6 +35,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collector;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -76,12 +75,6 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
     return (ImmutableRangeSet<C>) EMPTY;
   }
 
-  /** Returns an immutable range set containing the single range {@link Range#all()}. */
-  @SuppressWarnings("unchecked")
-  static <C extends Comparable> ImmutableRangeSet<C> all() {
-    return (ImmutableRangeSet<C>) ALL;
-  }
-
   /**
    * Returns an immutable range set containing the specified single range. If {@link Range#isEmpty()
    * range.isEmpty()}, this is equivalent to {@link ImmutableRangeSet#of()}.
@@ -95,6 +88,12 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
     } else {
       return new ImmutableRangeSet<C>(ImmutableList.of(range));
     }
+  }
+
+  /** Returns an immutable range set containing the single range {@link Range#all()}. */
+  @SuppressWarnings("unchecked")
+  static <C extends Comparable> ImmutableRangeSet<C> all() {
+    return (ImmutableRangeSet<C>) ALL;
   }
 
   /** Returns an immutable copy of the specified {@code RangeSet}. */
@@ -116,18 +115,6 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
   }
 
   /**
-   * Returns an {@code ImmutableRangeSet} representing the union of the specified ranges.
-   *
-   * <p>This is the smallest {@code RangeSet} which encloses each of the specified ranges. Duplicate
-   * or connected ranges are permitted, and will be coalesced in the result.
-   *
-   * @since 21.0
-   */
-  public static <C extends Comparable<?>> ImmutableRangeSet<C> unionOf(Iterable<Range<C>> ranges) {
-    return copyOf(TreeRangeSet.create(ranges));
-  }
-
-  /**
    * Returns an {@code ImmutableRangeSet} containing each of the specified disjoint ranges.
    * Overlapping ranges and empty ranges are forbidden, though adjacent ranges are permitted and
    * will be merged.
@@ -137,6 +124,18 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
    */
   public static <C extends Comparable<?>> ImmutableRangeSet<C> copyOf(Iterable<Range<C>> ranges) {
     return new ImmutableRangeSet.Builder<C>().addAll(ranges).build();
+  }
+
+  /**
+   * Returns an {@code ImmutableRangeSet} representing the union of the specified ranges.
+   *
+   * <p>This is the smallest {@code RangeSet} which encloses each of the specified ranges. Duplicate
+   * or connected ranges are permitted, and will be coalesced in the result.
+   *
+   * @since 21.0
+   */
+  public static <C extends Comparable<?>> ImmutableRangeSet<C> unionOf(Iterable<Range<C>> ranges) {
+    return copyOf(TreeRangeSet.create(ranges));
   }
 
   ImmutableRangeSet(ImmutableList<Range<C>> ranges) {
@@ -543,7 +542,7 @@ public final class ImmutableRangeSet<C extends Comparable> extends AbstractRange
       this.domain = domain;
     }
 
-    private transient Integer size;
+    @MonotonicNonNullDecl private transient Integer size;
 
     @Override
     public int size() {

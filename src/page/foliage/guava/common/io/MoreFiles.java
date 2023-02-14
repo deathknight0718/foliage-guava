@@ -16,10 +16,8 @@
 
 package page.foliage.guava.common.io;
 
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
-import com.google.j2objc.annotations.J2ObjCIncompatible;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -30,7 +28,7 @@ import page.foliage.guava.common.collect.TreeTraverser;
 import page.foliage.guava.common.graph.SuccessorsFunction;
 import page.foliage.guava.common.graph.Traverser;
 import page.foliage.guava.common.io.ByteSource.AsCharSource;
-
+import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -367,6 +365,14 @@ public final class MoreFiles {
         return "MoreFiles.isDirectory(" + Arrays.toString(optionsCopy) + ")";
       }
     };
+  }
+
+  /** Returns whether or not the file with the given name in the given dir is a directory. */
+  private static boolean isDirectory(
+      SecureDirectoryStream<Path> dir, Path name, LinkOption... options) throws IOException {
+    return dir.getFileAttributeView(name, BasicFileAttributeView.class, options)
+        .readAttributes()
+        .isDirectory();
   }
 
   /**
@@ -776,14 +782,6 @@ public final class MoreFiles {
     if (!Arrays.asList(options).contains(RecursiveDeleteOption.ALLOW_INSECURE)) {
       throw new InsecureRecursiveDeleteException(path.toString());
     }
-  }
-
-  /** Returns whether or not the file with the given name in the given dir is a directory. */
-  private static boolean isDirectory(
-      SecureDirectoryStream<Path> dir, Path name, LinkOption... options) throws IOException {
-    return dir.getFileAttributeView(name, BasicFileAttributeView.class, options)
-        .readAttributes()
-        .isDirectory();
   }
 
   /**

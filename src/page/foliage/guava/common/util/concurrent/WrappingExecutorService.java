@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.collect.ImmutableList;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Throwables.throwIfUnchecked;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -81,7 +79,7 @@ abstract class WrappingExecutorService implements ExecutorService {
    *
    * @throws NullPointerException if any element of {@code tasks} is null
    */
-  private final <T> ImmutableList<Callable<T>> wrapTasks(Collection<? extends Callable<T>> tasks) {
+  private <T> ImmutableList<Callable<T>> wrapTasks(Collection<? extends Callable<T>> tasks) {
     ImmutableList.Builder<Callable<T>> builder = ImmutableList.builder();
     for (Callable<T> task : tasks) {
       builder.add(wrapTask(task));

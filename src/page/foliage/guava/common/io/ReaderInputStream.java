@@ -18,6 +18,8 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.primitives.UnsignedBytes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -29,9 +31,6 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.util.Arrays;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.primitives.UnsignedBytes;
 
 /**
  * An {@link InputStream} that converts characters from a {@link Reader} into bytes using an

@@ -18,6 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,9 +29,6 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An immutable sorted set with one or more elements. TODO(jlevy): Consider separate class for a

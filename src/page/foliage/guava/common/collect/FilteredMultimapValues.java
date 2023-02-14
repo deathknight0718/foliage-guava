@@ -14,15 +14,13 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.Weak;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Objects;
 import page.foliage.guava.common.base.Predicate;
 import page.foliage.guava.common.base.Predicates;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.Weak;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;

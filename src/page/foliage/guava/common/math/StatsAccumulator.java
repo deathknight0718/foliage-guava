@@ -14,16 +14,15 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Double.NaN;
-import static java.lang.Double.isNaN;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.math.DoubleUtils.ensureNonNegative;
 import static page.foliage.guava.common.primitives.Doubles.isFinite;
-
-import java.util.Iterator;
+import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.Iterator;
 
 /**
  * A mutable object which accumulates double values and tracks some basic statistics over all the

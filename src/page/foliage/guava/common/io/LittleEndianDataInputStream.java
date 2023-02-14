@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.io;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Preconditions;
 import page.foliage.guava.common.primitives.Ints;
 import page.foliage.guava.common.primitives.Longs;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;

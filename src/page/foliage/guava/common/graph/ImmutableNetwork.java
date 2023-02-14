@@ -16,15 +16,13 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.Immutable;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.collect.Maps;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
 
 /**

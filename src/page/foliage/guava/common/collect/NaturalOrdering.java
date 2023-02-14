@@ -18,9 +18,9 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.io.Serializable;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.io.Serializable;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /** An ordering that uses the natural order of the values. */
 @GwtCompatible(serializable = true)
@@ -28,8 +28,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
 final class NaturalOrdering extends Ordering<Comparable> implements Serializable {
   static final NaturalOrdering INSTANCE = new NaturalOrdering();
 
-  private transient Ordering<Comparable> nullsFirst;
-  private transient Ordering<Comparable> nullsLast;
+  @MonotonicNonNullDecl private transient Ordering<Comparable> nullsFirst;
+  @MonotonicNonNullDecl private transient Ordering<Comparable> nullsLast;
 
   @Override
   public int compare(Comparable left, Comparable right) {

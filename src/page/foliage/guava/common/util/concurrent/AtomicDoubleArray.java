@@ -16,11 +16,9 @@ package page.foliage.guava.common.util.concurrent;
 import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.primitives.ImmutableLongArray;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**

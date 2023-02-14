@@ -14,14 +14,13 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Double.NaN;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.math.DoubleUtils.isFinite;
-
-import com.google.errorprone.annotations.concurrent.LazyInit;
+import static java.lang.Double.NaN;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 
 /**
  * The representation of a linear transformation between real numbers {@code x} and {@code y}.

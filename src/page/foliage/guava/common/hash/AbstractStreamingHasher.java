@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

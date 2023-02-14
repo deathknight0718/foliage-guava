@@ -22,6 +22,11 @@ import static page.foliage.guava.common.base.Predicates.compose;
 import static page.foliage.guava.common.base.Predicates.in;
 import static page.foliage.guava.common.base.Predicates.not;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,12 +38,6 @@ import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
 
 /**
  * An implementation of {@code RangeMap} based on a {@code TreeMap}, supporting all optional

@@ -16,17 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.Weak;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.Weak;
 import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
@@ -40,9 +35,13 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
   static final class RegularEntrySet<K, V> extends ImmutableMapEntrySet<K, V> {
     @Weak private final transient ImmutableMap<K, V> map;
-    private final transient Entry<K, V>[] entries;
+    private final transient ImmutableList<Entry<K, V>> entries;
 
     RegularEntrySet(ImmutableMap<K, V> map, Entry<K, V>[] entries) {
+      this(map, ImmutableList.<Entry<K, V>>asImmutableList(entries));
+    }
+
+    RegularEntrySet(ImmutableMap<K, V> map, ImmutableList<Entry<K, V>> entries) {
       this.map = map;
       this.entries = entries;
     }
@@ -53,21 +52,24 @@ abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
     }
 
     @Override
+    @GwtIncompatible("not used in GWT")
+    int copyIntoArray(Object[] dst, int offset) {
+      return entries.copyIntoArray(dst, offset);
+    }
+
+    @Override
     public UnmodifiableIterator<Entry<K, V>> iterator() {
-      return Iterators.forArray(entries);
+      return entries.iterator();
     }
 
     @Override
     public Spliterator<Entry<K, V>> spliterator() {
-      return Spliterators.spliterator(entries, ImmutableSet.SPLITERATOR_CHARACTERISTICS);
+      return entries.spliterator();
     }
 
     @Override
     public void forEach(Consumer<? super Entry<K, V>> action) {
-      checkNotNull(action);
-      for (Entry<K, V> entry : entries) {
-        action.accept(entry);
-      }
+      entries.forEach(action);
     }
 
     @Override

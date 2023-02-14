@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.stream.Collector;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.stream.Collector;
 
 /**
  * "Overrides" the {@link ImmutableSet} static methods that lack {@link ImmutableSortedSet}

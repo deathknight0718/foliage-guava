@@ -16,11 +16,10 @@ package page.foliage.guava.common.hash;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import page.foliage.guava.common.annotations.Beta;
 
 /**
  * An {@link OutputStream} that maintains a hash of the data written to it.

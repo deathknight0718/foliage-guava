@@ -17,6 +17,8 @@ package page.foliage.guava.common.hash;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import com.google.errorprone.annotations.Immutable;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +29,6 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.crypto.spec.SecretKeySpec;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.Supplier;
 
 /**
  * Static methods to obtain {@link HashFunction} instances, and other static hashing-related
@@ -386,7 +385,8 @@ public final class Hashing {
     return ChecksumType.ADLER_32.hashFunction;
   }
 
-  enum ChecksumType implements Supplier<Checksum> {
+  @Immutable
+  enum ChecksumType implements ImmutableSupplier<Checksum> {
     CRC_32("Hashing.crc32()") {
       @Override
       public Checksum get() {

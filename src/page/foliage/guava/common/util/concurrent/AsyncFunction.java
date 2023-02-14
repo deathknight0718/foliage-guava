@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.Future;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Transforms a value, possibly asynchronously. For an example usage and more information, see

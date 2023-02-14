@@ -18,9 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /** Precondition checks useful in collection implementations. */
 @GwtCompatible

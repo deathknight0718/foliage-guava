@@ -14,10 +14,8 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.base.Preconditions;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 

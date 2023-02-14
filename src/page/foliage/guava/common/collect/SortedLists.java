@@ -16,15 +16,14 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.RandomAccess;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
 
 /**
  * Static methods pertaining to sorted {@link List} instances.

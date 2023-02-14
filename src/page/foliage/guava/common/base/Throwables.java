@@ -14,17 +14,15 @@
 
 package page.foliage.guava.common.base;
 
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;

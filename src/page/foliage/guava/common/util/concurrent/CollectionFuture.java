@@ -14,18 +14,17 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import static java.util.Collections.unmodifiableList;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.collect.Lists.newArrayListWithCapacity;
-
-import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import static java.util.Collections.unmodifiableList;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Optional;
 import page.foliage.guava.common.collect.ImmutableCollection;
 import page.foliage.guava.common.collect.ImmutableList;
 import page.foliage.guava.common.collect.Lists;
+import java.util.List;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /** Aggregate future that collects (stores) results of each future. */
 @GwtCompatible(emulated = true)

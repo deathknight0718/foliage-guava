@@ -14,15 +14,14 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -117,7 +116,7 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
     return Multisets.iteratorImpl(descendingMultiset());
   }
 
-  private transient SortedMultiset<E> descendingMultiset;
+  @MonotonicNonNullDecl private transient SortedMultiset<E> descendingMultiset;
 
   @Override
   public SortedMultiset<E> descendingMultiset() {

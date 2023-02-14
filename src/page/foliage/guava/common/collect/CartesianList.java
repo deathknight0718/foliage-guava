@@ -16,14 +16,13 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkElementIndex;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.math.IntMath;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.RandomAccess;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.math.IntMath;
 
 /**
  * Implementation of {@link Lists#cartesianProduct(List)}.

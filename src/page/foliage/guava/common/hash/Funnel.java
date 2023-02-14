@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.hash;
 
-import java.io.Serializable;
-
 import page.foliage.guava.common.annotations.Beta;
+import java.io.Serializable;
 
 /**
  * An object which can send data from an object of type {@code T} into a {@code PrimitiveSink}.

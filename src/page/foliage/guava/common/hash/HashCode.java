@@ -14,17 +14,15 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Preconditions.checkState;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Preconditions;
 import page.foliage.guava.common.primitives.Ints;
 import page.foliage.guava.common.primitives.UnsignedInts;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.base.Preconditions.checkState;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

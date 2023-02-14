@@ -14,8 +14,7 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.Weak;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -27,9 +26,8 @@ import page.foliage.guava.common.collect.Lists;
 import page.foliage.guava.common.collect.MapMaker;
 import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.collect.Sets;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.Weak;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

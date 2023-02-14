@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /** A regex pattern implementation which is backed by the {@link Pattern}. */
 @GwtIncompatible

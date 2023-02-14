@@ -14,12 +14,11 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
 
 /**
  * Useful suppliers.

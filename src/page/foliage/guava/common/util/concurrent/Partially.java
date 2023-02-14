@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Outer class that exists solely to let us write {@code Partially.GwtIncompatible} instead of plain

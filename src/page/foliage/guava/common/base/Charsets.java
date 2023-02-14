@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.base;
 
-import java.nio.charset.Charset;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.nio.charset.Charset;
 
 /**
  * Contains constant definitions for the six standard {@link Charset} instances, which are

@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.io;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * Utility methods for working with {@link Flushable} objects.

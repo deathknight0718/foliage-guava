@@ -14,6 +14,7 @@
 
 package page.foliage.guava.common.math;
 
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static java.lang.Double.MAX_EXPONENT;
 import static java.lang.Double.MIN_EXPONENT;
 import static java.lang.Double.POSITIVE_INFINITY;
@@ -21,12 +22,10 @@ import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.isNaN;
 import static java.lang.Double.longBitsToDouble;
 import static java.lang.Math.getExponent;
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-
-import java.math.BigInteger;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
+import java.math.BigInteger;
 
 /**
  * Utilities for {@code double} primitives.

@@ -14,13 +14,11 @@
 
 package page.foliage.guava.common.primitives;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.math.BigInteger;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

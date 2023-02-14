@@ -16,11 +16,10 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collections;
 import java.util.Set;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** Implementation of an {@link Optional} containing a reference. */
 @GwtCompatible

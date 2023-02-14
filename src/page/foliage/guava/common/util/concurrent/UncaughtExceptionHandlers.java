@@ -16,12 +16,11 @@ package page.foliage.guava.common.util.concurrent;
 
 import static java.util.logging.Level.SEVERE;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Locale;
 import java.util.logging.Logger;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
 
 /**
  * Factories for {@link UncaughtExceptionHandler} instances.

@@ -17,11 +17,9 @@ package page.foliage.guava.common.util.concurrent;
 import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.j2objc.annotations.ReflectionSupport;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 
 /**

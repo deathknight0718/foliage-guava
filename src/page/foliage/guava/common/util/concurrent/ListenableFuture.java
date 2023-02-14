@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A {@link Future} that accepts completion listeners. Each listener has an associated executor, and

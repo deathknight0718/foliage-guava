@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Supplier;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

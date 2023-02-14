@@ -16,12 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Predicate;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Predicate;
 
 /**
  * Implementation of {@link Multimaps#filterKeys(SetMultimap, Predicate)}.

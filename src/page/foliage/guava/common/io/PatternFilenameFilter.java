@@ -14,15 +14,14 @@
 
 package page.foliage.guava.common.io;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Preconditions;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
 
 /**
  * File name filter that only accepts files matching a regular expression. This class is thread-safe

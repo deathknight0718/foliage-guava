@@ -14,7 +14,9 @@
 
 package page.foliage.guava.common.cache;
 
-import com.google.errorprone.annotations.CheckReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Preconditions.checkState;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -27,11 +29,7 @@ import page.foliage.guava.common.base.Ticker;
 import page.foliage.guava.common.cache.AbstractCache.SimpleStatsCounter;
 import page.foliage.guava.common.cache.AbstractCache.StatsCounter;
 import page.foliage.guava.common.cache.LocalCache.Strength;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.base.Preconditions.checkState;
-
+import com.google.errorprone.annotations.CheckReturnValue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
@@ -41,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * A builder of {@link LoadingCache} and {@link Cache} instances having any combination of the
@@ -143,8 +142,12 @@ import java.util.logging.Logger;
  * href="https://github.com/google/guava/wiki/CachesExplained">caching</a> for a higher-level
  * explanation.
  *
- * @param <K> the base key type for all caches created by this builder
- * @param <V> the base value type for all caches created by this builder
+ * @param <K> the most general key type this builder will be able to create caches for. This is
+ *     normally {@code Object} unless it is constrained by using a method like {@code
+ *     #removalListener}
+ * @param <V> the most general value type this builder will be able to create caches for. This is
+ *     normally {@code Object} unless it is constrained by using a method like {@code
+ *     #removalListener}
  * @author Charles Fry
  * @author Kevin Bourrillion
  * @since 10.0
@@ -223,20 +226,20 @@ public final class CacheBuilder<K, V> {
   int concurrencyLevel = UNSET_INT;
   long maximumSize = UNSET_INT;
   long maximumWeight = UNSET_INT;
-  Weigher<? super K, ? super V> weigher;
+  @MonotonicNonNullDecl Weigher<? super K, ? super V> weigher;
 
-  Strength keyStrength;
-  Strength valueStrength;
+  @MonotonicNonNullDecl Strength keyStrength;
+  @MonotonicNonNullDecl Strength valueStrength;
 
   long expireAfterWriteNanos = UNSET_INT;
   long expireAfterAccessNanos = UNSET_INT;
   long refreshNanos = UNSET_INT;
 
-  Equivalence<Object> keyEquivalence;
-  Equivalence<Object> valueEquivalence;
+  @MonotonicNonNullDecl Equivalence<Object> keyEquivalence;
+  @MonotonicNonNullDecl Equivalence<Object> valueEquivalence;
 
-  RemovalListener<? super K, ? super V> removalListener;
-  Ticker ticker;
+  @MonotonicNonNullDecl RemovalListener<? super K, ? super V> removalListener;
+  @MonotonicNonNullDecl Ticker ticker;
 
   Supplier<? extends StatsCounter> statsCounterSupplier = NULL_STATS_COUNTER;
 
@@ -245,6 +248,9 @@ public final class CacheBuilder<K, V> {
   /**
    * Constructs a new {@code CacheBuilder} instance with default settings, including strong keys,
    * strong values, and no automatic eviction of any kind.
+   *
+   * <p>Note that while this return type is {@code CacheBuilder<Object, Object>}, type parameters on
+   * the {@link #build} methods allow you to create a cache of any key and value type desired.
    */
   public static CacheBuilder<Object, Object> newBuilder() {
     return new CacheBuilder<>();

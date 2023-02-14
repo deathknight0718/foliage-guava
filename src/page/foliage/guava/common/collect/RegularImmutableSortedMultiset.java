@@ -18,13 +18,12 @@ import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 import static page.foliage.guava.common.collect.BoundType.CLOSED;
 
-import java.util.Comparator;
-import java.util.function.ObjIntConsumer;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.primitives.Ints;
+import java.util.Comparator;
+import java.util.function.ObjIntConsumer;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable sorted multiset with one or more distinct elements.

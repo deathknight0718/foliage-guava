@@ -18,12 +18,11 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.stream.Collector;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /** Collectors utilities for {@code common.collect} internals. */
 @GwtCompatible

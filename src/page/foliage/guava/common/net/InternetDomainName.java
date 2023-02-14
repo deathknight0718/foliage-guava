@@ -19,7 +19,10 @@ import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
 import java.util.List;
+
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import com.google.errorprone.annotations.Immutable;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
@@ -73,6 +76,7 @@ import page.foliage.guava.thirdparty.publicsuffix.PublicSuffixType;
  */
 @Beta
 @GwtCompatible
+@Immutable
 public final class InternetDomainName {
 
   private static final CharMatcher DOTS_MATCHER = CharMatcher.anyOf(".\u3002\uFF0E\uFF61");

@@ -16,12 +16,11 @@ package page.foliage.guava.common.escape;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.Map;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * An implementation-specific parameter class suitable for initializing {@link

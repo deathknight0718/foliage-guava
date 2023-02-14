@@ -16,12 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
 
 /**
  * Implementation of {@link ImmutableSet} with two or more elements.

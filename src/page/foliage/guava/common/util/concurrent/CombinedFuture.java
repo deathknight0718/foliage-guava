@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableCollection;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableCollection;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -161,7 +159,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }
@@ -187,7 +185,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    public String toString() {
+    String toPendingString() {
       return callable.toString();
     }
   }

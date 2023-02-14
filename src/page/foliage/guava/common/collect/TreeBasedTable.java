@@ -19,6 +19,9 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Supplier;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -29,10 +32,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Supplier;
 
 /**
  * Implementation of {@code Table} whose row keys and column keys are ordered by their natural
@@ -244,7 +243,7 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
       return backingRowMap().lastKey();
     }
 
-    transient SortedMap<C, V> wholeRow;
+    @NullableDecl transient SortedMap<C, V> wholeRow;
 
     /*
      * If the row was previously empty, we check if there's a new row here every
@@ -328,7 +327,7 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
             comparator);
 
     return new AbstractIterator<C>() {
-      C lastValue;
+      @NullableDecl C lastValue;
 
       @Override
       protected C computeNext() {

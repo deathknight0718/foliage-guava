@@ -16,8 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -25,12 +27,8 @@ import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.collect.Serialization.FieldSetter;
 import page.foliage.guava.common.math.IntMath;
 import page.foliage.guava.common.primitives.Ints;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
-import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -477,6 +475,11 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
     };
   }
 
+  @Override
+  Iterator<E> elementIterator() {
+    throw new AssertionError("should never be called");
+  }
+
   /** @deprecated Internal method, use {@link #entrySet()}. */
   @Deprecated
   @Override
@@ -519,7 +522,7 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
         };
 
     return new ForwardingIterator<Entry<E>>() {
-      private Entry<E> last;
+      @NullableDecl private Entry<E> last;
 
       @Override
       protected Iterator<Entry<E>> delegate() {
@@ -539,6 +542,11 @@ public final class ConcurrentHashMultiset<E> extends AbstractMultiset<E> impleme
         last = null;
       }
     };
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    return Multisets.iteratorImpl(this);
   }
 
   @Override

@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A callback for accepting the results of a {@link java.util.concurrent.Future} computation

@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.reflect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.collect.ForwardingMap;
 import page.foliage.guava.common.collect.ImmutableMap;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Map;
 
 /**
@@ -107,6 +105,11 @@ public final class ImmutableTypeToInstanceMap<B> extends ForwardingMap<TypeToken
     return trustedGet(type.rejectTypeVariables());
   }
 
+  @Override
+  public <T extends B> T getInstance(Class<T> type) {
+    return trustedGet(TypeToken.of(type));
+  }
+
   /**
    * Guaranteed to throw an exception and leave the map unmodified.
    *
@@ -118,11 +121,6 @@ public final class ImmutableTypeToInstanceMap<B> extends ForwardingMap<TypeToken
   @Override
   public <T extends B> T putInstance(TypeToken<T> type, T value) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public <T extends B> T getInstance(Class<T> type) {
-    return trustedGet(TypeToken.of(type));
   }
 
   /**

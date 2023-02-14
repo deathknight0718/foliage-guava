@@ -16,12 +16,11 @@ package page.foliage.guava.common.io;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An {@link InputStream} that concatenates multiple substreams. At most one stream will be open at
@@ -34,7 +33,7 @@ import page.foliage.guava.common.annotations.GwtIncompatible;
 final class MultiInputStream extends InputStream {
 
   private Iterator<? extends ByteSource> it;
-  private InputStream in;
+  @NullableDecl private InputStream in;
 
   /**
    * Creates a new instance.

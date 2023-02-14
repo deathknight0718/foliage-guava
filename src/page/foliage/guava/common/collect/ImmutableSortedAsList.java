@@ -14,12 +14,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Comparator;
 import java.util.Spliterator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * List returned by {@code ImmutableSortedSet.asList()} when the set isn't empty.

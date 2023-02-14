@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.cache;
 
-import java.util.concurrent.ExecutionException;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Preconditions;
 import page.foliage.guava.common.collect.ImmutableMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A cache which forwards all its method calls to another cache. Subclasses should override one or

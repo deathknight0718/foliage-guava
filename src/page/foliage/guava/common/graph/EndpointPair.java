@@ -16,16 +16,14 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.Immutable;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.graph.GraphConstants.NOT_AVAILABLE_ON_UNDIRECTED;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Objects;
 import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.UnmodifiableIterator;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.graph.GraphConstants.NOT_AVAILABLE_ON_UNDIRECTED;
-
+import com.google.errorprone.annotations.Immutable;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**

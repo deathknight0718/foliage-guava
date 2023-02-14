@@ -16,12 +16,11 @@ package page.foliage.guava.common.primitives;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * Contains static utility methods pertaining to primitive types and their corresponding wrapper

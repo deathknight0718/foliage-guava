@@ -14,11 +14,6 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.copySign;
-import static java.lang.Math.getExponent;
-import static java.lang.Math.log;
-import static java.lang.Math.rint;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.math.DoubleUtils.IMPLICIT_BIT;
 import static page.foliage.guava.common.math.DoubleUtils.SIGNIFICAND_BITS;
@@ -29,14 +24,17 @@ import static page.foliage.guava.common.math.DoubleUtils.scaleNormalize;
 import static page.foliage.guava.common.math.MathPreconditions.checkInRange;
 import static page.foliage.guava.common.math.MathPreconditions.checkNonNegative;
 import static page.foliage.guava.common.math.MathPreconditions.checkRoundingUnnecessary;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static java.lang.Math.abs;
+import static java.lang.Math.copySign;
+import static java.lang.Math.getExponent;
+import static java.lang.Math.log;
+import static java.lang.Math.rint;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.primitives.Booleans;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Iterator;
@@ -178,7 +176,7 @@ public final class DoubleMath {
    *           RoundingMode#UNNECESSARY}
    *     </ul>
    */
-  // #roundIntermediate, java.lang.Math.getExponent, com.google.common.math.DoubleUtils
+  // #roundIntermediate, java.lang.Math.getExponent, page.foliage.guava.common.math.DoubleUtils
   @GwtIncompatible
   public static BigInteger roundToBigInteger(double x, RoundingMode mode) {
     x = roundIntermediate(x, mode);
@@ -195,7 +193,7 @@ public final class DoubleMath {
    * Returns {@code true} if {@code x} is exactly equal to {@code 2^k} for some finite integer
    * {@code k}.
    */
-  @GwtIncompatible // com.google.common.math.DoubleUtils
+  @GwtIncompatible // page.foliage.guava.common.math.DoubleUtils
   public static boolean isPowerOfTwo(double x) {
     if (x > 0.0 && isFinite(x)) {
       long significand = getSignificand(x);
@@ -224,8 +222,6 @@ public final class DoubleMath {
     return log(x) / LN_2; // surprisingly within 1 ulp according to tests
   }
 
-  private static final double LN_2 = log(2);
-
   /**
    * Returns the base 2 logarithm of a double value, rounded with the specified rounding mode to an
    * {@code int}.
@@ -235,7 +231,7 @@ public final class DoubleMath {
    * @throws IllegalArgumentException if {@code x <= 0.0}, {@code x} is NaN, or {@code x} is
    *     infinite
    */
-  @GwtIncompatible // java.lang.Math.getExponent, com.google.common.math.DoubleUtils
+  @GwtIncompatible // java.lang.Math.getExponent, page.foliage.guava.common.math.DoubleUtils
   @SuppressWarnings("fallthrough")
   public static int log2(double x, RoundingMode mode) {
     checkArgument(x > 0.0 && isFinite(x), "x must be positive and finite");
@@ -276,13 +272,15 @@ public final class DoubleMath {
     return increment ? exponent + 1 : exponent;
   }
 
+  private static final double LN_2 = log(2);
+
   /**
    * Returns {@code true} if {@code x} represents a mathematical integer.
    *
    * <p>This is equivalent to, but not necessarily implemented as, the expression {@code
    * !Double.isNaN(x) && !Double.isInfinite(x) && x == Math.rint(x)}.
    */
-  @GwtIncompatible // java.lang.Math.getExponent, com.google.common.math.DoubleUtils
+  @GwtIncompatible // java.lang.Math.getExponent, page.foliage.guava.common.math.DoubleUtils
   public static boolean isMathematicalInteger(double x) {
     return isFinite(x)
         && (x == 0.0
@@ -402,7 +400,7 @@ public final class DoubleMath {
    *     values.
    */
   @Deprecated
-  // com.google.common.math.DoubleUtils
+  // page.foliage.guava.common.math.DoubleUtils
   @GwtIncompatible
   public static double mean(double... values) {
     checkArgument(values.length > 0, "Cannot take mean of 0 values");
@@ -482,7 +480,7 @@ public final class DoubleMath {
    *     values.
    */
   @Deprecated
-  // com.google.common.math.DoubleUtils
+  // page.foliage.guava.common.math.DoubleUtils
   @GwtIncompatible
   public static double mean(Iterable<? extends Number> values) {
     return mean(values.iterator());
@@ -502,7 +500,7 @@ public final class DoubleMath {
    *     values.
    */
   @Deprecated
-  // com.google.common.math.DoubleUtils
+  // page.foliage.guava.common.math.DoubleUtils
   @GwtIncompatible
   public static double mean(Iterator<? extends Number> values) {
     checkArgument(values.hasNext(), "Cannot take mean of 0 values");
@@ -517,7 +515,7 @@ public final class DoubleMath {
     return mean;
   }
 
-  @GwtIncompatible // com.google.common.math.DoubleUtils
+  @GwtIncompatible // page.foliage.guava.common.math.DoubleUtils
   @CanIgnoreReturnValue
   private static double checkFinite(double argument) {
     checkArgument(isFinite(argument));

@@ -14,21 +14,19 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.RetainedWith;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Objects;
-import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 import static page.foliage.guava.common.collect.Hashing.smearedHash;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Objects;
+import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.RetainedWith;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,6 +39,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -106,8 +105,8 @@ public final class HashBiMap<K, V> extends IteratorBasedAbstractMap<K, V>
 
   private transient BiEntry<K, V>[] hashTableKToV;
   private transient BiEntry<K, V>[] hashTableVToK;
-  private transient BiEntry<K, V> firstInKeyInsertionOrder;
-  private transient BiEntry<K, V> lastInKeyInsertionOrder;
+  @NullableDecl private transient BiEntry<K, V> firstInKeyInsertionOrder;
+  @NullableDecl private transient BiEntry<K, V> lastInKeyInsertionOrder;
   private transient int size;
   private transient int mask;
   private transient int modCount;
@@ -262,12 +261,6 @@ public final class HashBiMap<K, V> extends IteratorBasedAbstractMap<K, V>
     return put(key, value, false);
   }
 
-  @CanIgnoreReturnValue
-  @Override
-  public V forcePut(@NullableDecl K key, @NullableDecl V value) {
-    return put(key, value, true);
-  }
-
   private V put(@NullableDecl K key, @NullableDecl V value, boolean force) {
     int keyHash = smearedHash(key);
     int valueHash = smearedHash(value);
@@ -301,6 +294,12 @@ public final class HashBiMap<K, V> extends IteratorBasedAbstractMap<K, V>
       rehashIfNecessary();
       return null;
     }
+  }
+
+  @CanIgnoreReturnValue
+  @Override
+  public V forcePut(@NullableDecl K key, @NullableDecl V value) {
+    return put(key, value, true);
   }
 
   @NullableDecl
@@ -551,7 +550,7 @@ public final class HashBiMap<K, V> extends IteratorBasedAbstractMap<K, V>
     }
   }
 
-  @RetainedWith private transient BiMap<V, K> inverse;
+  @MonotonicNonNullDecl @RetainedWith private transient BiMap<V, K> inverse;
 
   @Override
   public BiMap<V, K> inverse() {

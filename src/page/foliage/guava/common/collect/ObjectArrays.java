@@ -16,13 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;

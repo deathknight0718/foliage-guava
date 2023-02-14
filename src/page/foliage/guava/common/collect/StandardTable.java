@@ -16,17 +16,6 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.base.Supplier;
-import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
-import page.foliage.guava.common.collect.Maps.ViewCachingAbstractMap;
-import page.foliage.guava.common.collect.Sets.ImprovedAbstractSet;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Predicates.alwaysTrue;
 import static page.foliage.guava.common.base.Predicates.equalTo;
@@ -35,6 +24,15 @@ import static page.foliage.guava.common.base.Predicates.not;
 import static page.foliage.guava.common.collect.Maps.safeContainsKey;
 import static page.foliage.guava.common.collect.Maps.safeGet;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.base.Supplier;
+import page.foliage.guava.common.collect.Maps.IteratorBasedAbstractMap;
+import page.foliage.guava.common.collect.Maps.ViewCachingAbstractMap;
+import page.foliage.guava.common.collect.Sets.ImprovedAbstractSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,6 +42,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -236,7 +235,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
 
   private class CellIterator implements Iterator<Cell<R, C, V>> {
     final Iterator<Entry<R, Map<C, V>>> rowIterator = backingMap.entrySet().iterator();
-    Entry<R, Map<C, V>> rowEntry;
+    @NullableDecl Entry<R, Map<C, V>> rowEntry;
     Iterator<Entry<C, V>> columnIterator = Iterators.emptyModifiableIterator();
 
     @Override
@@ -259,6 +258,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
       columnIterator.remove();
       if (rowEntry.getValue().isEmpty()) {
         rowIterator.remove();
+        rowEntry = null;
       }
     }
   }
@@ -289,7 +289,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
       this.rowKey = checkNotNull(rowKey);
     }
 
-    Map<C, V> backingRowMap;
+    @NullableDecl Map<C, V> backingRowMap;
 
     Map<C, V> backingRowMap() {
       return (backingRowMap == null || (backingRowMap.isEmpty() && backingMap.containsKey(rowKey)))
@@ -619,7 +619,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
     return rowMap().keySet();
   }
 
-  private transient Set<C> columnKeySet;
+  @MonotonicNonNullDecl private transient Set<C> columnKeySet;
 
   /**
    * {@inheritDoc}
@@ -749,7 +749,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
     return super.values();
   }
 
-  private transient Map<R, Map<C, V>> rowMap;
+  @MonotonicNonNullDecl private transient Map<R, Map<C, V>> rowMap;
 
   @Override
   public Map<R, Map<C, V>> rowMap() {
@@ -828,7 +828,7 @@ class StandardTable<R, C, V> extends AbstractTable<R, C, V> implements Serializa
     }
   }
 
-  private transient ColumnMap columnMap;
+  @MonotonicNonNullDecl private transient ColumnMap columnMap;
 
   @Override
   public Map<C, Map<R, V>> columnMap() {

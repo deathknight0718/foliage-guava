@@ -16,11 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collection;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of a {@link SortedSetMultimap} with a sorted key set.
@@ -50,5 +50,10 @@ abstract class AbstractSortedKeySortedSetMultimap<K, V> extends AbstractSortedSe
   @Override
   public SortedSet<K> keySet() {
     return (SortedSet<K>) super.keySet();
+  }
+
+  @Override
+  Set<K> createKeySet() {
+    return createMaybeNavigableKeySet();
   }
 }

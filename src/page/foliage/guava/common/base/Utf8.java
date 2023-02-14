@@ -14,9 +14,9 @@
 
 package page.foliage.guava.common.base;
 
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 import static java.lang.Character.MAX_SURROGATE;
 import static java.lang.Character.MIN_SURROGATE;
-import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;

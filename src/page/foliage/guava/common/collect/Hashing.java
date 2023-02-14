@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.primitives.Ints;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Static methods for implementing hash-based collections.

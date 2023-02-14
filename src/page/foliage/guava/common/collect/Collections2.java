@@ -20,6 +20,13 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.base.Predicates;
+import page.foliage.guava.common.math.IntMath;
+import page.foliage.guava.common.primitives.Ints;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,14 +38,6 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.base.Predicates;
-import page.foliage.guava.common.math.IntMath;
-import page.foliage.guava.common.primitives.Ints;
 
 /**
  * Provides static methods for working with {@code Collection} instances.

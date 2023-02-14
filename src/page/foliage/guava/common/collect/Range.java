@@ -18,17 +18,16 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Equivalence;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Predicate;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Equivalence;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Predicate;
 
 /**
  * A range (or "interval") defines the <i>boundaries</i> around a contiguous span of values of some

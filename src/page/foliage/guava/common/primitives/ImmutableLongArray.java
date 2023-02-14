@@ -14,17 +14,15 @@
 
 package page.foliage.guava.common.primitives;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.CheckReturnValue;
-import com.google.errorprone.annotations.Immutable;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Preconditions;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
+import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -64,7 +62,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  *       APIs are offered that don't).
  *   <li>Can't be passed directly to methods that expect {@code long[]} (though the most common
  *       utilities do have replacements here).
- *   <li>Dependency on {@code page.foliage.guava.common} / Guava.
+ *   <li>Dependency on {@code com.google.common} / Guava.
  * </ul>
  *
  * <p>Advantages compared to {@link page.foliage.guava.common.collect.ImmutableList ImmutableList}{@code
@@ -130,10 +128,17 @@ public final class ImmutableLongArray implements Serializable {
 
   // TODO(kevinb): go up to 11?
 
-  /** Returns an immutable array containing the given values, in order. */
+  /**
+   * Returns an immutable array containing the given values, in order.
+   *
+   * <p>The array {@code rest} must not be longer than {@code Integer.MAX_VALUE - 1}.
+   */
   // Use (first, rest) so that `of(someLongArray)` won't compile (they should use copyOf), which is
   // okay since we have to copy the just-created array anyway.
   public static ImmutableLongArray of(long first, long... rest) {
+    checkArgument(
+        rest.length <= Integer.MAX_VALUE - 1,
+        "the total number of elements must fit in an int");
     long[] array = new long[rest.length + 1];
     array[0] = first;
     System.arraycopy(rest, 0, array, 1, rest.length);

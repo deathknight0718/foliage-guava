@@ -16,9 +16,8 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.concurrent.Executor;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.concurrent.Executor;
 
 /**
  * A collection of common removal listeners.

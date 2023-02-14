@@ -14,15 +14,13 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.LazyInit;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -473,6 +471,20 @@ public abstract class ImmutableSortedMultiset<E> extends ImmutableSortedMultiset
     }
 
     /**
+     * Adds each element of {@code elements} to the {@code ImmutableSortedMultiset}.
+     *
+     * @param elements the elements to add
+     * @return this {@code Builder} object
+     * @throws NullPointerException if {@code elements} is null or contains a null element
+     */
+    @CanIgnoreReturnValue
+    @Override
+    public Builder<E> add(E... elements) {
+      super.add(elements);
+      return this;
+    }
+
+    /**
      * Adds a number of occurrences of an element to this {@code ImmutableSortedMultiset}.
      *
      * @param element the element to add
@@ -504,20 +516,6 @@ public abstract class ImmutableSortedMultiset<E> extends ImmutableSortedMultiset
     @Override
     public Builder<E> setCount(E element, int count) {
       super.setCount(element, count);
-      return this;
-    }
-
-    /**
-     * Adds each element of {@code elements} to the {@code ImmutableSortedMultiset}.
-     *
-     * @param elements the elements to add
-     * @return this {@code Builder} object
-     * @throws NullPointerException if {@code elements} is null or contains a null element
-     */
-    @CanIgnoreReturnValue
-    @Override
-    public Builder<E> add(E... elements) {
-      super.add(elements);
       return this;
     }
 

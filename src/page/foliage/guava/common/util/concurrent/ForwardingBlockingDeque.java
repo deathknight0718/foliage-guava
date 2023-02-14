@@ -16,12 +16,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.collect.ForwardingDeque;
 import java.util.Collection;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.TimeUnit;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.collect.ForwardingDeque;
 
 /**
  * A {@link BlockingDeque} which forwards all its method calls to another {@code BlockingDeque}.

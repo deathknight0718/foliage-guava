@@ -14,10 +14,10 @@
 
 package page.foliage.guava.common.hash;
 
-import static java.lang.Long.rotateRight;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 import static page.foliage.guava.common.hash.LittleEndianByteArray.load32;
 import static page.foliage.guava.common.hash.LittleEndianByteArray.load64;
+import static java.lang.Long.rotateRight;
 
 import page.foliage.guava.common.annotations.VisibleForTesting;
 

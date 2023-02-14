@@ -20,12 +20,11 @@ import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_CAPACITY;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_LOAD_FACTOR;
 
+import page.foliage.guava.common.collect.ImmutableMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import page.foliage.guava.common.collect.ImmutableMap;
 
 /**
  * An implementation of {@link GraphConnections} for undirected graphs.

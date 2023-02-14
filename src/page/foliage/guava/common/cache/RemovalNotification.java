@@ -16,10 +16,9 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A notification of the removal of a single entry. The key and/or value may be null if they were

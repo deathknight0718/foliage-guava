@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * Phantom reference with a {@code finalizeReferent()} method which a background thread invokes

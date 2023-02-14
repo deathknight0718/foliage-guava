@@ -16,12 +16,11 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
-import java.util.concurrent.Callable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.MoreObjects;
 import page.foliage.guava.common.base.Objects;
+import java.util.concurrent.Callable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Statistics about the performance of a {@link Cache}. Instances of this class are immutable.

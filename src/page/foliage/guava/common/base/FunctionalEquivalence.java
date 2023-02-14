@@ -16,11 +16,10 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.io.Serializable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Equivalence applied on functional result.

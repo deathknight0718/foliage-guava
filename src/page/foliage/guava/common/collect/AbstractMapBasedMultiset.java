@@ -16,17 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.primitives.Ints;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.primitives.Ints;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -35,6 +33,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ObjIntConsumer;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -59,8 +58,8 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 
   /** Standard constructor. */
   protected AbstractMapBasedMultiset(Map<E, Count> backingMap) {
-    this.backingMap = checkNotNull(backingMap);
-    this.size = super.size();
+    checkArgument(backingMap.isEmpty());
+    this.backingMap = backingMap;
   }
 
   /** Used during deserialization only. The backing map must be empty. */
@@ -83,10 +82,38 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
   }
 
   @Override
+  Iterator<E> elementIterator() {
+    final Iterator<Map.Entry<E, Count>> backingEntries = backingMap.entrySet().iterator();
+    return new Iterator<E>() {
+      @NullableDecl Map.Entry<E, Count> toRemove;
+
+      @Override
+      public boolean hasNext() {
+        return backingEntries.hasNext();
+      }
+
+      @Override
+      public E next() {
+        final Map.Entry<E, Count> mapEntry = backingEntries.next();
+        toRemove = mapEntry;
+        return mapEntry.getKey();
+      }
+
+      @Override
+      public void remove() {
+        checkRemove(toRemove != null);
+        size -= toRemove.getValue().getAndSet(0);
+        backingEntries.remove();
+        toRemove = null;
+      }
+    };
+  }
+
+  @Override
   Iterator<Entry<E>> entryIterator() {
     final Iterator<Map.Entry<E, Count>> backingEntries = backingMap.entrySet().iterator();
     return new Iterator<Multiset.Entry<E>>() {
-      Map.Entry<E, Count> toRemove;
+      @NullableDecl Map.Entry<E, Count> toRemove;
 
       @Override
       public boolean hasNext() {
@@ -166,7 +193,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
    */
   private class MapBasedMultisetIterator implements Iterator<E> {
     final Iterator<Map.Entry<E, Count>> entryIterator;
-    Map.Entry<E, Count> currentEntry;
+    @MonotonicNonNullDecl Map.Entry<E, Count> currentEntry;
     int occurrencesLeft;
     boolean canRemove;
 

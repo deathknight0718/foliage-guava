@@ -14,11 +14,9 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.collect.ForwardingObject;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;

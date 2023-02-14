@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.SortedMap;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.SortedMap;
 
 /**
  * An object representing the differences between two sorted maps.

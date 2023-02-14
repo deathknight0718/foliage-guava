@@ -19,12 +19,11 @@ import static page.foliage.guava.common.base.Preconditions.checkElementIndex;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.BoundType.CLOSED;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.Serializable;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An implementation of {@link ContiguousSet} that contains one or more elements.

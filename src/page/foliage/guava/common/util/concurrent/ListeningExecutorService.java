@@ -14,6 +14,7 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -21,8 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An {@link ExecutorService} that returns {@link ListenableFuture} instances. To create an instance

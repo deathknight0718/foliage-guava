@@ -14,16 +14,14 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.collect.ObjectArrays;
 import page.foliage.guava.common.collect.Sets;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -105,6 +103,14 @@ public final class SimpleTimeLimiter implements TimeLimiter {
           }
         };
     return newProxy(interfaceType, handler);
+  }
+
+  // TODO: replace with version in common.reflect if and when it's open-sourced
+  private static <T> T newProxy(Class<T> interfaceType, InvocationHandler handler) {
+    Object object =
+        Proxy.newProxyInstance(
+            interfaceType.getClassLoader(), new Class<?>[] {interfaceType}, handler);
+    return interfaceType.cast(object);
   }
 
   private
@@ -257,14 +263,6 @@ public final class SimpleTimeLimiter implements TimeLimiter {
       }
     }
     return false;
-  }
-
-  // TODO: replace with version in common.reflect if and when it's open-sourced
-  private static <T> T newProxy(Class<T> interfaceType, InvocationHandler handler) {
-    Object object =
-        Proxy.newProxyInstance(
-            interfaceType.getClassLoader(), new Class<?>[] {interfaceType}, handler);
-    return interfaceType.cast(object);
   }
 
   private void wrapAndThrowExecutionExceptionOrError(Throwable cause) throws ExecutionException {

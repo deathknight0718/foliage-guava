@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.SortedSet;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.SortedSet;
 
 /**
  * Superinterface of {@link SortedMultiset} to introduce a bridge method for {@code elementSet()},

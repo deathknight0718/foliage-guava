@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * A subinterface of {@link Graph} which adds mutation methods. When mutation is not required, users

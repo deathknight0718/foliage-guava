@@ -25,17 +25,16 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
+import static page.foliage.guava.common.base.Preconditions.checkState;
+import static page.foliage.guava.common.primitives.UnsignedBytes.toInt;
 
 import page.foliage.guava.common.base.Charsets;
 import page.foliage.guava.common.primitives.Chars;
 import page.foliage.guava.common.primitives.Ints;
 import page.foliage.guava.common.primitives.Longs;
-
-import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
-import static page.foliage.guava.common.base.Preconditions.checkState;
-import static page.foliage.guava.common.primitives.UnsignedBytes.toInt;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -51,6 +50,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Dimitris Andreou
  * @author Kurt Alfred Kluever
  */
+@Immutable
 final class Murmur3_32HashFunction extends AbstractHashFunction implements Serializable {
   static final HashFunction MURMUR3_32 = new Murmur3_32HashFunction(0);
 

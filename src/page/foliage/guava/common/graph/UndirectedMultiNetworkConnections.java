@@ -16,16 +16,14 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.concurrent.LazyInit;
-
-import page.foliage.guava.common.collect.HashMultiset;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.Multiset;
-
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_CAPACITY;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_LOAD_FACTOR;
 
+import page.foliage.guava.common.collect.HashMultiset;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.Multiset;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Collections;

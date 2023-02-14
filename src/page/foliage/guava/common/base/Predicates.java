@@ -16,6 +16,9 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,10 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * Static utility methods pertaining to {@code Predicate} instances.
@@ -172,33 +171,6 @@ public final class Predicates {
   @GwtIncompatible // Class.isInstance
   public static Predicate<Object> instanceOf(Class<?> clazz) {
     return new InstanceOfPredicate(clazz);
-  }
-
-  /**
-   * Returns a predicate that evaluates to {@code true} if the class being tested is assignable
-   * <b>TO</b> {@code clazz}, that is, if it is a <b>subtype</b> of {@code clazz}. Yes, this method
-   * is named very incorrectly! Example:
-   *
-   * <pre>{@code
-   * List<Class<?>> classes = Arrays.asList(
-   *     Object.class, String.class, Number.class, Long.class);
-   * return Iterables.filter(classes, assignableFrom(Number.class));
-   * }</pre>
-   *
-   * The code above returns {@code Number.class} and {@code Long.class}, <b>not</b> {@code
-   * Number.class} and {@code Object.class} as the name implies!
-   *
-   * <p>The returned predicate does not allow null inputs.
-   *
-   * @deprecated Use the correctly-named method {@link #subtypeOf} instead. This method is scheduled
-   *     to be removed in January 2018.
-   * @since 10.0
-   */
-  @GwtIncompatible // Class.isAssignableFrom
-  @Beta
-  @Deprecated
-  public static Predicate<Class<?>> assignableFrom(Class<?> clazz) {
-    return subtypeOf(clazz);
   }
 
   /**

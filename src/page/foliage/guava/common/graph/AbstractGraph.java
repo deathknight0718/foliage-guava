@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.graph;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.Beta;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides a skeletal implementation of {@link Graph}. It is recommended to extend this

@@ -14,7 +14,8 @@
 
 package page.foliage.guava.common.eventbus;
 
-import com.google.j2objc.annotations.Weak;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.MoreObjects;
@@ -32,10 +33,7 @@ import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.collect.Multimap;
 import page.foliage.guava.common.reflect.TypeToken;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.Weak;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;

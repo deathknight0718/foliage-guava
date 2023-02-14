@@ -18,11 +18,10 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Comparator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** An ordering for a pre-existing comparator. */
 @GwtCompatible(serializable = true)

@@ -17,10 +17,9 @@ package page.foliage.guava.common.reflect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-
-import page.foliage.guava.common.annotations.Beta;
 
 /**
  * Static utilities relating to Java reflection.

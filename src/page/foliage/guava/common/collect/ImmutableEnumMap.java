@@ -18,14 +18,13 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableMap.IteratorBasedImmutableMap;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableMap.IteratorBasedImmutableMap;
 
 /**
  * Implementation of {@link ImmutableMap} backed by a non-empty {@link java.util.EnumMap}.

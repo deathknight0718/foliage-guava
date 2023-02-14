@@ -17,13 +17,12 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.Collections;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * A sorted set of contiguous values in a given {@link DiscreteDomain}. Example:

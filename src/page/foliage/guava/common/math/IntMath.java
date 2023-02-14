@@ -14,25 +14,24 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
-import static java.math.RoundingMode.HALF_EVEN;
-import static java.math.RoundingMode.HALF_UP;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.math.MathPreconditions.checkNoOverflow;
 import static page.foliage.guava.common.math.MathPreconditions.checkNonNegative;
 import static page.foliage.guava.common.math.MathPreconditions.checkPositive;
 import static page.foliage.guava.common.math.MathPreconditions.checkRoundingUnnecessary;
-
-import java.math.BigInteger;
-import java.math.RoundingMode;
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.math.RoundingMode.HALF_UP;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.primitives.Ints;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * A class for arithmetic on values of type {@code int}. Where possible, methods are defined and
@@ -454,7 +453,7 @@ public final class IntMath {
    */
   public static int checkedAdd(int a, int b) {
     long result = (long) a + b;
-    checkNoOverflow(result == (int) result);
+    checkNoOverflow(result == (int) result, "checkedAdd", a, b);
     return (int) result;
   }
 
@@ -465,7 +464,7 @@ public final class IntMath {
    */
   public static int checkedSubtract(int a, int b) {
     long result = (long) a - b;
-    checkNoOverflow(result == (int) result);
+    checkNoOverflow(result == (int) result, "checkedSubtract", a, b);
     return (int) result;
   }
 
@@ -476,7 +475,7 @@ public final class IntMath {
    */
   public static int checkedMultiply(int a, int b) {
     long result = (long) a * b;
-    checkNoOverflow(result == (int) result);
+    checkNoOverflow(result == (int) result, "checkedMultiply", a, b);
     return (int) result;
   }
 
@@ -498,10 +497,10 @@ public final class IntMath {
       case (-1):
         return ((k & 1) == 0) ? 1 : -1;
       case 2:
-        checkNoOverflow(k < Integer.SIZE - 1);
+        checkNoOverflow(k < Integer.SIZE - 1, "checkedPow", b, k);
         return 1 << k;
       case (-2):
-        checkNoOverflow(k < Integer.SIZE);
+        checkNoOverflow(k < Integer.SIZE, "checkedPow", b, k);
         return ((k & 1) == 0) ? 1 << k : -1 << k;
       default:
         // continue below to handle the general case
@@ -519,7 +518,7 @@ public final class IntMath {
           }
           k >>= 1;
           if (k > 0) {
-            checkNoOverflow(-FLOOR_SQRT_MAX_INT <= b & b <= FLOOR_SQRT_MAX_INT);
+            checkNoOverflow(-FLOOR_SQRT_MAX_INT <= b & b <= FLOOR_SQRT_MAX_INT, "checkedPow", b, k);
             b *= b;
           }
       }

@@ -16,11 +16,10 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Queue;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An Iterator implementation which draws elements from a queue, removing them from the queue as it

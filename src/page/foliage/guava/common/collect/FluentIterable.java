@@ -14,7 +14,7 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
@@ -23,9 +23,7 @@ import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.base.Joiner;
 import page.foliage.guava.common.base.Optional;
 import page.foliage.guava.common.base.Predicate;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -255,27 +253,6 @@ public abstract class FluentIterable<E> implements Iterable<E> {
     return concatNoDefensiveCopy(Arrays.copyOf(inputs, inputs.length));
   }
 
-  /** Concatenates a varargs array of iterables without making a defensive copy of the array. */
-  private static <T> FluentIterable<T> concatNoDefensiveCopy(
-      final Iterable<? extends T>... inputs) {
-    for (Iterable<? extends T> input : inputs) {
-      checkNotNull(input);
-    }
-    return new FluentIterable<T>() {
-      @Override
-      public Iterator<T> iterator() {
-        return Iterators.concat(
-            /* lazily generate the iterators on each input only as needed */
-            new AbstractIndexedListIterator<Iterator<? extends T>>(inputs.length) {
-              @Override
-              public Iterator<? extends T> get(int i) {
-                return inputs[i].iterator();
-              }
-            });
-      }
-    };
-  }
-
   /**
    * Returns a fluent iterable that combines several iterables. The returned iterable has an
    * iterator that traverses the elements of each iterable in {@code inputs}. The input iterators
@@ -298,6 +275,27 @@ public abstract class FluentIterable<E> implements Iterable<E> {
       @Override
       public Iterator<T> iterator() {
         return Iterators.concat(Iterators.transform(inputs.iterator(), Iterables.<T>toIterator()));
+      }
+    };
+  }
+
+  /** Concatenates a varargs array of iterables without making a defensive copy of the array. */
+  private static <T> FluentIterable<T> concatNoDefensiveCopy(
+      final Iterable<? extends T>... inputs) {
+    for (Iterable<? extends T> input : inputs) {
+      checkNotNull(input);
+    }
+    return new FluentIterable<T>() {
+      @Override
+      public Iterator<T> iterator() {
+        return Iterators.concat(
+            /* lazily generate the iterators on each input only as needed */
+            new AbstractIndexedListIterator<Iterator<? extends T>>(inputs.length) {
+              @Override
+              public Iterator<? extends T> get(int i) {
+                return inputs[i].iterator();
+              }
+            });
       }
     };
   }

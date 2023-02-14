@@ -16,18 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
-import static java.util.Collections.unmodifiableList;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
+import static java.util.Collections.unmodifiableList;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -109,12 +107,12 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
    */
 
   private static final class Node<K, V> extends AbstractMapEntry<K, V> {
-    final K key;
-    V value;
-    Node<K, V> next; // the next node (with any key)
-    Node<K, V> previous; // the previous node (with any key)
-    Node<K, V> nextSibling; // the next node with the same key
-    Node<K, V> previousSibling; // the previous node with the same key
+    @NullableDecl final K key;
+    @NullableDecl V value;
+    @NullableDecl Node<K, V> next; // the next node (with any key)
+    @NullableDecl Node<K, V> previous; // the previous node (with any key)
+    @NullableDecl Node<K, V> nextSibling; // the next node with the same key
+    @NullableDecl Node<K, V> previousSibling; // the previous node with the same key
 
     Node(@NullableDecl K key, @NullableDecl V value) {
       this.key = key;
@@ -153,8 +151,8 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
     }
   }
 
-  private transient Node<K, V> head; // the head for all keys
-  private transient Node<K, V> tail; // the tail for all keys
+  @NullableDecl private transient Node<K, V> head; // the head for all keys
+  @NullableDecl private transient Node<K, V> tail; // the tail for all keys
   private transient Map<K, KeyList<K, V>> keyToKeyList;
   private transient int size;
 
@@ -311,9 +309,9 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
   /** An {@code Iterator} over all nodes. */
   private class NodeIterator implements ListIterator<Entry<K, V>> {
     int nextIndex;
-    Node<K, V> next;
-    Node<K, V> current;
-    Node<K, V> previous;
+    @NullableDecl Node<K, V> next;
+    @NullableDecl Node<K, V> current;
+    @NullableDecl Node<K, V> previous;
     int expectedModCount = modCount;
 
     NodeIterator(int index) {
@@ -419,7 +417,7 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
   private class DistinctKeyIterator implements Iterator<K> {
     final Set<K> seenKeys = Sets.<K>newHashSetWithExpectedSize(keySet().size());
     Node<K, V> next = head;
-    Node<K, V> current;
+    @NullableDecl Node<K, V> current;
     int expectedModCount = modCount;
 
     private void checkForConcurrentModification() {
@@ -458,11 +456,11 @@ public class LinkedListMultimap<K, V> extends AbstractMultimap<K, V>
 
   /** A {@code ListIterator} over values for a specified key. */
   private class ValueForKeyIterator implements ListIterator<V> {
-    final Object key;
+    @NullableDecl final Object key;
     int nextIndex;
-    Node<K, V> next;
-    Node<K, V> current;
-    Node<K, V> previous;
+    @NullableDecl Node<K, V> next;
+    @NullableDecl Node<K, V> current;
+    @NullableDecl Node<K, V> previous;
 
     /** Constructs a new iterator over all values for the specified key. */
     ValueForKeyIterator(@NullableDecl Object key) {

@@ -14,13 +14,11 @@
 
 package page.foliage.guava.common.base;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -345,14 +343,6 @@ public class Joiner {
     }
 
     /**
-     * Returns a string containing the string representation of each entry of {@code map}, using the
-     * previously configured separator and key-value separator.
-     */
-    public String join(Map<?, ?> map) {
-      return join(map.entrySet());
-    }
-
-    /**
      * Appends the string representation of each entry in {@code entries}, using the previously
      * configured separator and key-value separator, to {@code appendable}.
      *
@@ -421,6 +411,14 @@ public class Joiner {
         throw new AssertionError(impossible);
       }
       return builder;
+    }
+
+    /**
+     * Returns a string containing the string representation of each entry of {@code map}, using the
+     * previously configured separator and key-value separator.
+     */
+    public String join(Map<?, ?> map) {
+      return join(map.entrySet());
     }
 
     /**

@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.Beta;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;

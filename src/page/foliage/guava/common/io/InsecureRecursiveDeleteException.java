@@ -16,11 +16,9 @@
 
 package page.foliage.guava.common.io;
 
-import com.google.j2objc.annotations.J2ObjCIncompatible;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-
+import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.nio.file.FileSystemException;
 import java.nio.file.SecureDirectoryStream;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

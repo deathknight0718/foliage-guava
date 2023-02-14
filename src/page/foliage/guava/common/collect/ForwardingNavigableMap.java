@@ -19,15 +19,14 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 import static page.foliage.guava.common.collect.Maps.keyOrNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Iterator;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.function.BiFunction;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * A navigable map which forwards all its method calls to another navigable map. Subclasses should

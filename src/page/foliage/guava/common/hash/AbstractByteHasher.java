@@ -14,16 +14,14 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
 import page.foliage.guava.common.primitives.Chars;
 import page.foliage.guava.common.primitives.Ints;
 import page.foliage.guava.common.primitives.Longs;
 import page.foliage.guava.common.primitives.Shorts;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -64,6 +62,16 @@ abstract class AbstractByteHasher extends AbstractHasher {
     }
   }
 
+  /** Updates the sink with the given number of bytes from the buffer. */
+  private Hasher update(int bytes) {
+    try {
+      update(scratch.array(), 0, bytes);
+    } finally {
+      scratch.clear();
+    }
+    return this;
+  }
+
   @Override
   public Hasher putByte(byte b) {
     update(b);
@@ -87,16 +95,6 @@ abstract class AbstractByteHasher extends AbstractHasher {
   @Override
   public Hasher putBytes(ByteBuffer bytes) {
     update(bytes);
-    return this;
-  }
-
-  /** Updates the sink with the given number of bytes from the buffer. */
-  private Hasher update(int bytes) {
-    try {
-      update(scratch.array(), 0, bytes);
-    } finally {
-      scratch.clear();
-    }
     return this;
   }
 

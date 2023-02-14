@@ -17,22 +17,23 @@ package page.foliage.guava.common.hash;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.zip.Checksum;
-
-import page.foliage.guava.common.base.Supplier;
 
 /**
  * {@link HashFunction} adapter for {@link Checksum} instances.
  *
  * @author Colin Decker
  */
+@Immutable
 final class ChecksumHashFunction extends AbstractHashFunction implements Serializable {
-  private final Supplier<? extends Checksum> checksumSupplier;
+  private final ImmutableSupplier<? extends Checksum> checksumSupplier;
   private final int bits;
   private final String toString;
 
-  ChecksumHashFunction(Supplier<? extends Checksum> checksumSupplier, int bits, String toString) {
+  ChecksumHashFunction(
+      ImmutableSupplier<? extends Checksum> checksumSupplier, int bits, String toString) {
     this.checksumSupplier = checkNotNull(checksumSupplier);
     checkArgument(bits == 32 || bits == 64, "bits (%s) must be either 32 or 64", bits);
     this.bits = bits;

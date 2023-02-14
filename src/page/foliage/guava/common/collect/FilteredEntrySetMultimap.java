@@ -16,11 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.Map.Entry;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Predicate;
-
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**

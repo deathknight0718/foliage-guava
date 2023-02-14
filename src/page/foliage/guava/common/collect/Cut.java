@@ -16,12 +16,11 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.primitives.Booleans;
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.primitives.Booleans;
 
 /**
  * Implementation detail for the internal structure of {@link Range} instances. Represents a unique
@@ -34,7 +33,7 @@ import page.foliage.guava.common.primitives.Booleans;
  */
 @GwtCompatible
 abstract class Cut<C extends Comparable> implements Comparable<Cut<C>>, Serializable {
-  final C endpoint;
+  @NullableDecl final C endpoint;
 
   Cut(@NullableDecl C endpoint) {
     this.endpoint = endpoint;

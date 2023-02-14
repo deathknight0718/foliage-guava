@@ -19,6 +19,8 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.math.IntMath;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,9 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.math.IntMath;
 
 /**
  * An accumulator that selects the "top" {@code k} elements added to it, relative to a provided
@@ -66,6 +65,16 @@ import page.foliage.guava.common.math.IntMath;
   }
 
   /**
+   * Returns a {@code TopKSelector} that collects the lowest {@code k} elements added to it,
+   * relative to the specified comparator, and returns them via {@link #topK} in ascending order.
+   *
+   * @throws IllegalArgumentException if {@code k < 0}
+   */
+  public static <T> TopKSelector<T> least(int k, Comparator<? super T> comparator) {
+    return new TopKSelector<T>(comparator, k);
+  }
+
+  /**
    * Returns a {@code TopKSelector} that collects the greatest {@code k} elements added to it,
    * relative to the natural ordering of the elements, and returns them via {@link #topK} in
    * descending order.
@@ -74,16 +83,6 @@ import page.foliage.guava.common.math.IntMath;
    */
   public static <T extends Comparable<? super T>> TopKSelector<T> greatest(int k) {
     return greatest(k, Ordering.natural());
-  }
-
-  /**
-   * Returns a {@code TopKSelector} that collects the lowest {@code k} elements added to it,
-   * relative to the specified comparator, and returns them via {@link #topK} in ascending order.
-   *
-   * @throws IllegalArgumentException if {@code k < 0}
-   */
-  public static <T> TopKSelector<T> least(int k, Comparator<? super T> comparator) {
-    return new TopKSelector<T>(comparator, k);
   }
 
   /**
@@ -111,7 +110,7 @@ import page.foliage.guava.common.math.IntMath;
    * The largest of the lowest k elements we've seen so far relative to this comparator. If
    * bufferSize ≥ k, then we can ignore any elements greater than this value.
    */
-  private T threshold;
+  @NullableDecl private T threshold;
 
   private TopKSelector(Comparator<? super T> comparator, int k) {
     this.comparator = checkNotNull(comparator, "comparator");

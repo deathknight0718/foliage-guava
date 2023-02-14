@@ -14,8 +14,7 @@
 
 package page.foliage.guava.common.io;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.MustBeClosed;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -26,9 +25,8 @@ import page.foliage.guava.common.collect.AbstractIterator;
 import page.foliage.guava.common.collect.ImmutableList;
 import page.foliage.guava.common.collect.Lists;
 import page.foliage.guava.common.collect.Streams;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.MustBeClosed;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

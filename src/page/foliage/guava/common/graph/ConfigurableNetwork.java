@@ -23,12 +23,11 @@ import static page.foliage.guava.common.graph.GraphConstants.DEFAULT_NODE_COUNT;
 import static page.foliage.guava.common.graph.GraphConstants.EDGE_NOT_IN_GRAPH;
 import static page.foliage.guava.common.graph.GraphConstants.NODE_NOT_IN_GRAPH;
 
+import page.foliage.guava.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.collect.ImmutableSet;
 
 /**
  * Configurable implementation of {@link Network} that supports the options supplied by {@link

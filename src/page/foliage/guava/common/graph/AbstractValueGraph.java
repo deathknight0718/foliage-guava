@@ -16,14 +16,13 @@
 
 package page.foliage.guava.common.graph;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.collect.Maps;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.collect.Maps;
 
 /**
  * This class provides a skeletal implementation of {@link ValueGraph}. It is recommended to extend

@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.NoSuchElementException;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * This class provides a skeletal implementation of the {@code Iterator} interface for sequences
@@ -42,7 +41,7 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 public abstract class AbstractSequentialIterator<T> extends UnmodifiableIterator<T> {
-  private T nextOrNull;
+  @NullableDecl private T nextOrNull;
 
   /**
    * Creates a new iterator with the given first element, or, if {@code firstOrNull} is null,

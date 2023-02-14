@@ -16,14 +16,13 @@ package page.foliage.guava.common.hash;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
+import page.foliage.guava.common.math.LongMath;
+import page.foliage.guava.common.primitives.Ints;
+import page.foliage.guava.common.primitives.Longs;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLongArray;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.math.LongMath;
-import page.foliage.guava.common.primitives.Ints;
-import page.foliage.guava.common.primitives.Longs;
 
 /**
  * Collections of strategies of generating the k * log(M) bits required for an element to be mapped

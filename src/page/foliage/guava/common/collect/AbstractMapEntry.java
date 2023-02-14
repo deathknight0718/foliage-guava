@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Objects;
+import java.util.Map.Entry;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Implementation of the {@code equals}, {@code hashCode}, and {@code toString} methods of {@code

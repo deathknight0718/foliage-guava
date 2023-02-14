@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.concurrent.LazyInit;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Preconditions;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 
 /**
  * Implementation of {@link ImmutableSet} with exactly one element.

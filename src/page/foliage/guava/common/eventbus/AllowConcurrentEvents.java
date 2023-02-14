@@ -14,12 +14,11 @@
 
 package page.foliage.guava.common.eventbus;
 
+import page.foliage.guava.common.annotations.Beta;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import page.foliage.guava.common.annotations.Beta;
 
 /**
  * Marks an event subscriber method as being thread-safe. This annotation indicates that EventBus

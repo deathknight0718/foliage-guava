@@ -16,15 +16,13 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.Weak;
+import static page.foliage.guava.common.collect.BoundType.CLOSED;
+import static page.foliage.guava.common.collect.BoundType.OPEN;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.collect.Multiset.Entry;
-
-import static page.foliage.guava.common.collect.BoundType.CLOSED;
-import static page.foliage.guava.common.collect.BoundType.OPEN;
-
+import com.google.j2objc.annotations.Weak;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
@@ -52,6 +50,11 @@ final class SortedMultisets {
     @Override
     final SortedMultiset<E> multiset() {
       return multiset;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+      return Multisets.elementIterator(multiset().entrySet().iterator());
     }
 
     @Override

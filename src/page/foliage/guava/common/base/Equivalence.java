@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.base;
 
-import com.google.errorprone.annotations.ForOverride;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.ForOverride;
 import java.io.Serializable;
 import java.util.function.BiPredicate;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

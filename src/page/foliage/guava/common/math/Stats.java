@@ -14,26 +14,25 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Double.NaN;
-import static java.lang.Double.doubleToLongBits;
-import static java.lang.Double.isNaN;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.math.DoubleUtils.ensureNonNegative;
 import static page.foliage.guava.common.math.StatsAccumulator.calculateNewMeanNonFinite;
 import static page.foliage.guava.common.primitives.Doubles.isFinite;
-
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Iterator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import static java.lang.Double.NaN;
+import static java.lang.Double.doubleToLongBits;
+import static java.lang.Double.isNaN;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.MoreObjects;
 import page.foliage.guava.common.base.Objects;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Iterator;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A bundle of statistical summary values -- sum, count, mean/average, min and max, and several

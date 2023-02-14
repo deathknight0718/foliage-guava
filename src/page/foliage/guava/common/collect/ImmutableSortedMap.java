@@ -16,17 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkEntryNotNull;
 import static page.foliage.guava.common.collect.Maps.keyOrNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -149,11 +147,6 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
         ImmutableList.of(v1));
   }
 
-  private static <K extends Comparable<? super K>, V> ImmutableSortedMap<K, V> ofEntries(
-      Entry<K, V>... entries) {
-    return fromEntries(Ordering.natural(), false, entries, entries.length);
-  }
-
   /**
    * Returns an immutable sorted map containing the given entries, sorted by the natural ordering of
    * their keys.
@@ -201,6 +194,11 @@ public final class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxveride
       K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
     return ofEntries(
         entryOf(k1, v1), entryOf(k2, v2), entryOf(k3, v3), entryOf(k4, v4), entryOf(k5, v5));
+  }
+
+  private static <K extends Comparable<? super K>, V> ImmutableSortedMap<K, V> ofEntries(
+      Entry<K, V>... entries) {
+    return fromEntries(Ordering.natural(), false, entries, entries.length);
   }
 
   /**

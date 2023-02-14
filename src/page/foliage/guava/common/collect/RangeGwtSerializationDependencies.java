@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.io.Serializable;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.io.Serializable;
 
 /**
  * A dummy superclass to support GWT serialization of the element type of a {@link Range}. The GWT

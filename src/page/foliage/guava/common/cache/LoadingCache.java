@@ -14,14 +14,13 @@
 
 package page.foliage.guava.common.cache;
 
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.util.concurrent.ExecutionError;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A semi-persistent mapping from keys to values. Values are automatically loaded by the cache, and

@@ -14,7 +14,10 @@
 
 package page.foliage.guava.common.io;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.io.ByteStreams.createBuffer;
+import static page.foliage.guava.common.io.ByteStreams.skipUpTo;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -25,12 +28,7 @@ import page.foliage.guava.common.hash.Funnels;
 import page.foliage.guava.common.hash.HashCode;
 import page.foliage.guava.common.hash.HashFunction;
 import page.foliage.guava.common.hash.Hasher;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.io.ByteStreams.createBuffer;
-import static page.foliage.guava.common.io.ByteStreams.skipUpTo;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -598,17 +596,17 @@ public abstract class ByteSource {
       return Arrays.copyOfRange(bytes, offset, offset + length);
     }
 
-    @Override
-    public long copyTo(OutputStream output) throws IOException {
-      output.write(bytes, offset, length);
-      return length;
-    }
-
     @SuppressWarnings("CheckReturnValue") // it doesn't matter what processBytes returns here
     @Override
     public <T> T read(ByteProcessor<T> processor) throws IOException {
       processor.processBytes(bytes, offset, length);
       return processor.getResult();
+    }
+
+    @Override
+    public long copyTo(OutputStream output) throws IOException {
+      output.write(bytes, offset, length);
+      return length;
     }
 
     @Override

@@ -16,16 +16,15 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.util.concurrent.MoreExecutors;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.util.concurrent.MoreExecutors;
 
 /**
  * Dispatches events to listeners, and provides ways for listeners to register themselves.

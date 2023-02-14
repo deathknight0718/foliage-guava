@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.ListIterator;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.ListIterator;
 
 /**
  * A list iterator that does not support {@link #remove}, {@link #add}, or {@link #set}.

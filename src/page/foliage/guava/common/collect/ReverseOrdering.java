@@ -18,11 +18,10 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Iterator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** An ordering that uses the reverse of a given order. */
 @GwtCompatible(serializable = true)

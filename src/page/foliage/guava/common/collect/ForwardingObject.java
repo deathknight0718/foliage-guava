@@ -16,9 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import java.io.Serializable;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.io.Serializable;
 
 /**
  * An abstract base class for implementing the <a

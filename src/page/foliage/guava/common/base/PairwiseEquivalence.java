@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Iterator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 @GwtCompatible(serializable = true)
 final class PairwiseEquivalence<T> extends Equivalence<Iterable<T>> implements Serializable {

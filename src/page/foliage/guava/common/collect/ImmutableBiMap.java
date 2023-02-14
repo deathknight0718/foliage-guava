@@ -16,13 +16,13 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkState;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
-
-import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
-
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
@@ -272,11 +272,11 @@ public abstract class ImmutableBiMap<K, V> extends ImmutableBiMapFauxverideShim<
           return of(entries[0].getKey(), entries[0].getValue());
         default:
           /*
-           * If entries is full, then this implementation may end up using the entries array
-           * directly and writing over the entry objects with non-terminal entries, but this is
-           * safe; if this Builder is used further, it will grow the entries array (so it can't
-           * affect the original array), and future build() calls will always copy any entry
-           * objects that cannot be safely reused.
+           * If entries is full, or if hash flooding is detected, then this implementation may end
+           * up using the entries array directly and writing over the entry objects with
+           * non-terminal entries, but this is safe; if this Builder is used further, it will grow
+           * the entries array (so it can't affect the original array), and future build() calls
+           * will always copy any entry objects that cannot be safely reused.
            */
           if (valueComparator != null) {
             if (entriesUsed) {
@@ -288,7 +288,24 @@ public abstract class ImmutableBiMap<K, V> extends ImmutableBiMapFauxverideShim<
                 size,
                 Ordering.from(valueComparator).onResultOf(Maps.<V>valueFunction()));
           }
-          entriesUsed = size == entries.length;
+          entriesUsed = true;
+          return RegularImmutableBiMap.fromEntryArray(size, entries);
+      }
+    }
+
+    @Override
+    @VisibleForTesting
+    ImmutableBiMap<K, V> buildJdkBacked() {
+      checkState(
+          valueComparator == null,
+          "buildJdkBacked is for tests only, doesn't support orderEntriesByValue");
+      switch (size) {
+        case 0:
+          return of();
+        case 1:
+          return of(entries[0].getKey(), entries[0].getValue());
+        default:
+          entriesUsed = true;
           return RegularImmutableBiMap.fromEntryArray(size, entries);
       }
     }

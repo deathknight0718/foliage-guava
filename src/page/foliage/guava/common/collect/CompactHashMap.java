@@ -16,18 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
+import static page.foliage.guava.common.collect.Hashing.smearedHash;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.Objects;
 import page.foliage.guava.common.base.Preconditions;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
-import static page.foliage.guava.common.collect.Hashing.smearedHash;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,6 +43,7 @@ import java.util.Spliterators;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -64,6 +63,11 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>If there are no removals, then iteration order for the {@link #entrySet}, {@link #keySet}, and
  * {@link #values} views is the same as insertion order. Any removal invalidates any ordering
  * guarantees.
+ *
+ * <p>This class should not be assumed to be universally superior to {@code java.util.HashMap}.
+ * Generally speaking, this class reduces object allocation and memory consumption at the price of
+ * moderately increased constant factors of CPU.  Only use this class when there is a specific
+ * reason to prioritize memory over CPU.
  *
  * @author Louis Wasserman
  */
@@ -121,7 +125,7 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
    *
    * <p>Its size must be a power of two.
    */
-  private transient int[] table;
+  @MonotonicNonNullDecl private transient int[] table;
 
   /**
    * Contains the logical entries, in the range of [0, size()). The high 32 bits of each long is the
@@ -129,19 +133,19 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
    * next entry in the bucket chain). The pointers in [size(), entries.length) are all "null"
    * (UNSET).
    */
-  @VisibleForTesting transient long[] entries;
+  @MonotonicNonNullDecl @VisibleForTesting transient long[] entries;
 
   /**
    * The keys of the entries in the map, in the range of [0, size()). The keys in [size(),
    * keys.length) are all {@code null}.
    */
-  @VisibleForTesting transient Object[] keys;
+  @MonotonicNonNullDecl @VisibleForTesting transient Object[] keys;
 
   /**
    * The values of the entries in the map, in the range of [0, size()). The values in [size(),
    * values.length) are all {@code null}.
    */
-  @VisibleForTesting transient Object[] values;
+  @MonotonicNonNullDecl @VisibleForTesting transient Object[] values;
 
   /** The load factor. */
   transient float loadFactor;
@@ -374,11 +378,6 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
     return remove(key, smearedHash(key));
   }
 
-  @CanIgnoreReturnValue
-  private V removeEntry(int entryIndex) {
-    return remove(keys[entryIndex], getHash(entries[entryIndex]));
-  }
-
   @NullableDecl
   private V remove(@NullableDecl Object key, int hash) {
     int tableIndex = hash & hashTableMask();
@@ -412,6 +411,11 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
       next = getNext(entries[next]);
     } while (next != UNSET);
     return null;
+  }
+
+  @CanIgnoreReturnValue
+  private V removeEntry(int entryIndex) {
+    return remove(keys[entryIndex], getHash(entries[entryIndex]));
   }
 
   /**
@@ -522,7 +526,7 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
     }
   }
 
-  private transient Set<K> keySetView;
+  @MonotonicNonNullDecl private transient Set<K> keySetView;
 
   @Override
   public Set<K> keySet() {
@@ -597,7 +601,7 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
     }
   }
 
-  private transient Set<Entry<K, V>> entrySetView;
+  @MonotonicNonNullDecl private transient Set<Entry<K, V>> entrySetView;
 
   @Override
   public Set<Entry<K, V>> entrySet() {
@@ -725,7 +729,7 @@ class CompactHashMap<K, V> extends AbstractMap<K, V> implements Serializable {
     return false;
   }
 
-  private transient Collection<V> valuesView;
+  @MonotonicNonNullDecl private transient Collection<V> valuesView;
 
   @Override
   public Collection<V> values() {

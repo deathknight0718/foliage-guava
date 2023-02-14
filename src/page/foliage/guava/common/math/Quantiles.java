@@ -14,22 +14,21 @@
 
 package page.foliage.guava.common.math;
 
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.NaN;
 import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.Arrays.sort;
 import static java.util.Collections.unmodifiableMap;
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-
-import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.primitives.Doubles;
 import page.foliage.guava.common.primitives.Ints;
+import java.math.RoundingMode;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides a fluent API for calculating <a

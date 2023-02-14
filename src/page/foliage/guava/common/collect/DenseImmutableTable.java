@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.Immutable;
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.collect.ImmutableMap.IteratorBasedImmutableMap;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-
+import com.google.errorprone.annotations.Immutable;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Map;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

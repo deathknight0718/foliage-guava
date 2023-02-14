@@ -16,18 +16,16 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.Immutable;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Objects;
-import page.foliage.guava.common.base.MoreObjects.ToStringHelper;
-import page.foliage.guava.common.collect.Maps;
-import page.foliage.guava.common.collect.Ordering;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.MoreObjects.ToStringHelper;
+import page.foliage.guava.common.base.Objects;
+import page.foliage.guava.common.collect.Maps;
+import page.foliage.guava.common.collect.Ordering;
+import com.google.errorprone.annotations.Immutable;
 import java.util.Comparator;
 import java.util.Map;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;

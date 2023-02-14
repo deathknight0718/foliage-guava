@@ -14,28 +14,28 @@
 
 package page.foliage.guava.common.io;
 
-import static java.math.RoundingMode.CEILING;
-import static java.math.RoundingMode.FLOOR;
-import static java.math.RoundingMode.UNNECESSARY;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.math.IntMath.divide;
 import static page.foliage.guava.common.math.IntMath.log2;
+import static java.math.RoundingMode.CEILING;
+import static java.math.RoundingMode.FLOOR;
+import static java.math.RoundingMode.UNNECESSARY;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Ascii;
+import page.foliage.guava.common.base.Objects;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Arrays;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Ascii;
-import page.foliage.guava.common.base.Objects;
 
 /**
  * A binary encoding scheme for reversibly translating between byte sequences and printable ASCII
@@ -810,8 +810,8 @@ public abstract class BaseEncoding {
       return new SeparatedBaseEncoding(this, separator, afterEveryChars);
     }
 
-    private transient BaseEncoding upperCase;
-    private transient BaseEncoding lowerCase;
+    @MonotonicNonNullDecl private transient BaseEncoding upperCase;
+    @MonotonicNonNullDecl private transient BaseEncoding lowerCase;
 
     @Override
     public BaseEncoding upperCase() {

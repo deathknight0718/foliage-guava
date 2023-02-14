@@ -16,18 +16,17 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.LazyInit;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkEntryNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.LazyInit;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -38,7 +37,6 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -47,6 +45,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -207,9 +206,14 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
   static void checkNoConflict(
       boolean safe, String conflictDescription, Entry<?, ?> entry1, Entry<?, ?> entry2) {
     if (!safe) {
-      throw new IllegalArgumentException(
-          "Multiple entries with same " + conflictDescription + ": " + entry1 + " and " + entry2);
+      throw conflictException(conflictDescription, entry1, entry2);
     }
+  }
+
+  static IllegalArgumentException conflictException(
+      String conflictDescription, Object entry1, Object entry2) {
+    return new IllegalArgumentException(
+        "Multiple entries with same " + conflictDescription + ": " + entry1 + " and " + entry2);
   }
 
   /**
@@ -242,7 +246,7 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
    * @since 2.0
    */
   public static class Builder<K, V> {
-    Comparator<? super V> valueComparator;
+    @MonotonicNonNullDecl Comparator<? super V> valueComparator;
     Entry<K, V>[] entries;
     int size;
     boolean entriesUsed;
@@ -366,11 +370,11 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
      */
     public ImmutableMap<K, V> build() {
       /*
-       * If entries is full, then this implementation may end up using the entries array
-       * directly and writing over the entry objects with non-terminal entries, but this is
-       * safe; if this Builder is used further, it will grow the entries array (so it can't
-       * affect the original array), and future build() calls will always copy any entry
-       * objects that cannot be safely reused.
+       * If entries is full, or if hash flooding is detected, then this implementation may end up
+       * using the entries array directly and writing over the entry objects with non-terminal
+       * entries, but this is safe; if this Builder is used further, it will grow the entries array
+       * (so it can't affect the original array), and future build() calls will always copy any
+       * entry objects that cannot be safely reused.
        */
       if (valueComparator != null) {
         if (entriesUsed) {
@@ -379,14 +383,29 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
         Arrays.sort(
             entries, 0, size, Ordering.from(valueComparator).onResultOf(Maps.<V>valueFunction()));
       }
-      entriesUsed = size == entries.length;
       switch (size) {
         case 0:
           return of();
         case 1:
           return of(entries[0].getKey(), entries[0].getValue());
         default:
+          entriesUsed = true;
           return RegularImmutableMap.fromEntryArray(size, entries);
+      }
+    }
+
+    @VisibleForTesting // only for testing JDK backed implementation
+    ImmutableMap<K, V> buildJdkBacked() {
+      checkState(
+          valueComparator == null, "buildJdkBacked is only for testing; can't use valueComparator");
+      switch (size) {
+        case 0:
+          return of();
+        case 1:
+          return of(entries[0].getKey(), entries[0].getValue());
+        default:
+          entriesUsed = true;
+          return JdkBackedImmutableMap.create(size, entries);
       }
     }
   }

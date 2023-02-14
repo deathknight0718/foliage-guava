@@ -14,16 +14,6 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.ForOverride;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.util.concurrent.Monitor.Guard;
-import page.foliage.guava.common.util.concurrent.Service.State;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
@@ -34,6 +24,14 @@ import static page.foliage.guava.common.util.concurrent.Service.State.STARTING;
 import static page.foliage.guava.common.util.concurrent.Service.State.STOPPING;
 import static page.foliage.guava.common.util.concurrent.Service.State.TERMINATED;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.util.concurrent.Monitor.Guard;
+import page.foliage.guava.common.util.concurrent.Service.State; // javadoc needs this
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.ForOverride;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

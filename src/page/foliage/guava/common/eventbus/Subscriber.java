@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.eventbus;
 
-import com.google.j2objc.annotations.Weak;
-
-import page.foliage.guava.common.annotations.VisibleForTesting;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import com.google.j2objc.annotations.Weak;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Executor;

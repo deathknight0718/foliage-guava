@@ -16,14 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.concurrent.LazyInit;
-import com.google.j2objc.annotations.RetainedWith;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkEntryNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.concurrent.LazyInit;
+import com.google.j2objc.annotations.RetainedWith;
 import java.util.function.BiConsumer;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 

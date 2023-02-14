@@ -11,9 +11,9 @@
 
 package page.foliage.guava.common.cache;
 
-import java.util.Random;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.Random;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A package-local class holding common representation and mechanics for classes supporting dynamic
@@ -134,7 +134,7 @@ abstract class Striped64 extends Number {
   static final int NCPU = Runtime.getRuntime().availableProcessors();
 
   /** Table of cells. When non-null, size is a power of 2. */
-  transient volatile Cell[] cells;
+  @NullableDecl transient volatile Cell[] cells;
 
   /**
    * Base value, used mainly when there is no contention, but also as a fallback during table

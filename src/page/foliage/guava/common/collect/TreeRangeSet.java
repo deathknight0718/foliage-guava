@@ -17,6 +17,10 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.base.MoreObjects;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,12 +30,8 @@ import java.util.NavigableMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeMap;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.base.MoreObjects;
 
 /**
  * An implementation of {@link RangeSet} backed by a {@link TreeMap}.
@@ -77,8 +77,8 @@ public class TreeRangeSet<C extends Comparable<?>> extends AbstractRangeSet<C>
     this.rangesByLowerBound = rangesByLowerCut;
   }
 
-  private transient Set<Range<C>> asRanges;
-  private transient Set<Range<C>> asDescendingSetOfRanges;
+  @MonotonicNonNullDecl private transient Set<Range<C>> asRanges;
+  @MonotonicNonNullDecl private transient Set<Range<C>> asDescendingSetOfRanges;
 
   @Override
   public Set<Range<C>> asRanges() {
@@ -270,7 +270,7 @@ public class TreeRangeSet<C extends Comparable<?>> extends AbstractRangeSet<C>
     }
   }
 
-  private transient RangeSet<C> complement;
+  @MonotonicNonNullDecl private transient RangeSet<C> complement;
 
   @Override
   public RangeSet<C> complement() {

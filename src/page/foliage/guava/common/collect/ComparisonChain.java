@@ -16,13 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.Comparator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.primitives.Booleans;
 import page.foliage.guava.common.primitives.Ints;
 import page.foliage.guava.common.primitives.Longs;
+import java.util.Comparator;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A utility for performing a chained comparison statement. For example:

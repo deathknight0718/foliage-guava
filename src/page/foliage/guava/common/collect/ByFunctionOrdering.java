@@ -18,12 +18,11 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.base.Objects;
+import java.io.Serializable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An ordering that orders elements by applying an order to the result of a function on those

@@ -18,29 +18,33 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
- * CompactLinkedHashSet is an implementation of a Set, which a predictable iteration order
- * that matches the insertion order. All optional operations (adding and
- * removing) are supported. All elements, including {@code null}, are permitted.
+ * CompactLinkedHashSet is an implementation of a Set, which a predictable iteration order that
+ * matches the insertion order. All optional operations (adding and removing) are supported. All
+ * elements, including {@code null}, are permitted.
  *
  * <p>{@code contains(x)}, {@code add(x)} and {@code remove(x)}, are all (expected and amortized)
- * constant time operations. Expected in the hashtable sense (depends on the hash function
- * doing a good job of distributing the elements to the buckets to a distribution not far from
- * uniform), and amortized since some operations can trigger a hash table resize.
+ * constant time operations. Expected in the hashtable sense (depends on the hash function doing a
+ * good job of distributing the elements to the buckets to a distribution not far from uniform), and
+ * amortized since some operations can trigger a hash table resize.
  *
- * <p>This implementation consumes significantly less memory than {@code java.util.LinkedHashSet}
- * or even {@code java.util.HashSet}, and places considerably less load on the garbage collector.
- * Like {@code java.util.LinkedHashSet}, it offers insertion-order iteration, with identical
- * behavior.
+ * <p>This implementation consumes significantly less memory than {@code java.util.LinkedHashSet} or
+ * even {@code java.util.HashSet}, and places considerably less load on the garbage collector. Like
+ * {@code java.util.LinkedHashSet}, it offers insertion-order iteration, with identical behavior.
+ *
+ * <p>This class should not be assumed to be universally superior to {@code
+ * java.util.LinkedHashSet}. Generally speaking, this class reduces object allocation and memory
+ * consumption at the price of moderately increased constant factors of CPU. Only use this class
+ * when there is a specific reason to prioritize memory over CPU.
  *
  * @author Louis Wasserman
  */
@@ -104,13 +108,13 @@ class CompactLinkedHashSet<E> extends CompactHashSet<E> {
    * Pointer to the predecessor of an entry in insertion order. ENDPOINT indicates a node is the
    * first node in insertion order; all values at indices ≥ {@link #size()} are UNSET.
    */
-  private transient int[] predecessor;
+  @MonotonicNonNullDecl private transient int[] predecessor;
 
   /**
    * Pointer to the successor of an entry in insertion order. ENDPOINT indicates a node is the last
    * node in insertion order; all values at indices ≥ {@link #size()} are UNSET.
    */
-  private transient int[] successor;
+  @MonotonicNonNullDecl private transient int[] successor;
 
   private transient int firstEntry;
   private transient int lastEntry;

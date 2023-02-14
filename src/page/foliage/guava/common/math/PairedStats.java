@@ -14,22 +14,21 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Double.NaN;
-import static java.lang.Double.doubleToLongBits;
-import static java.lang.Double.isNaN;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
-
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import static java.lang.Double.NaN;
+import static java.lang.Double.doubleToLongBits;
+import static java.lang.Double.isNaN;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.MoreObjects;
 import page.foliage.guava.common.base.Objects;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable value object capturing some basic statistics about a collection of paired double

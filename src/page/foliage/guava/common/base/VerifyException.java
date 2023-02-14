@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.base;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Exception thrown upon the failure of a <a

@@ -16,21 +16,19 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.Weak;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.math.IntMath;
-
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.math.IntMath;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.AbstractQueue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,6 +41,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A double-ended priority queue, which provides constant-time access to both its least element and
@@ -505,7 +505,7 @@ public final class MinMaxPriorityQueue<E> extends AbstractQueue<E> {
   @WeakOuter
   private class Heap {
     final Ordering<E> ordering;
-    @Weak Heap otherHeap;
+    @MonotonicNonNullDecl @Weak Heap otherHeap;
 
     Heap(Ordering<E> ordering) {
       this.ordering = ordering;
@@ -752,9 +752,9 @@ public final class MinMaxPriorityQueue<E> extends AbstractQueue<E> {
     private int expectedModCount = modCount;
     // The same element is not allowed in both forgetMeNot and skipMe, but duplicates are allowed in
     // either of them, up to the same multiplicity as the queue.
-    private Queue<E> forgetMeNot;
-    private List<E> skipMe;
-    private E lastFromForgetMeNot;
+    @MonotonicNonNullDecl private Queue<E> forgetMeNot;
+    @MonotonicNonNullDecl private List<E> skipMe;
+    @NullableDecl private E lastFromForgetMeNot;
     private boolean canRemove;
 
     @Override

@@ -14,10 +14,10 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Double.NaN;
-import static java.lang.Double.isNaN;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.primitives.Doubles.isFinite;
+import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;

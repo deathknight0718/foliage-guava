@@ -11,13 +11,12 @@
 
 package page.foliage.guava.common.cache;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * One or more variables that together maintain an initially zero {@code long} sum. When updates

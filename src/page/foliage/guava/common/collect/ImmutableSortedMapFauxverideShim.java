@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * "Overrides" the {@link ImmutableMap} static methods that lack {@link ImmutableSortedMap}

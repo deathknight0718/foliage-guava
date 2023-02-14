@@ -14,14 +14,13 @@
 
 package page.foliage.guava.common.reflect;
 
+import page.foliage.guava.common.collect.Sets;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Set;
-
-import page.foliage.guava.common.collect.Sets;
 
 /**
  * Based on what a {@link Type} is, dispatch it to the corresponding {@code visit*} method. By

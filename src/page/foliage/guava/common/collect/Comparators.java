@@ -19,14 +19,13 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Provides static methods for working with {@link Comparator} instances. For many other helpful
@@ -172,7 +171,7 @@ public final class Comparators {
    * @since 22.0
    */
   @Beta
-  public static <T> Comparator<Optional<T>> emptiesFirst(Comparator<T> valueComparator) {
+  public static <T> Comparator<Optional<T>> emptiesFirst(Comparator<? super T> valueComparator) {
     checkNotNull(valueComparator);
     return Comparator.comparing(o -> o.orElse(null), Comparator.nullsFirst(valueComparator));
   }
@@ -185,7 +184,7 @@ public final class Comparators {
    * @since 22.0
    */
   @Beta
-  public static <T> Comparator<Optional<T>> emptiesLast(Comparator<T> valueComparator) {
+  public static <T> Comparator<Optional<T>> emptiesLast(Comparator<? super T> valueComparator) {
     checkNotNull(valueComparator);
     return Comparator.comparing(o -> o.orElse(null), Comparator.nullsLast(valueComparator));
   }

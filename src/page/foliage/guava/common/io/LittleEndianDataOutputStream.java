@@ -14,16 +14,15 @@
 
 package page.foliage.guava.common.io;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.primitives.Longs;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.primitives.Longs;
 
 /**
  * An implementation of {@link DataOutput} that uses little-endian byte ordering for writing {@code

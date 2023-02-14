@@ -14,13 +14,11 @@
 
 package page.foliage.guava.common.cache;
 
-import com.google.errorprone.annotations.CompatibleWith;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.util.concurrent.ExecutionError;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-
+import com.google.errorprone.annotations.CompatibleWith;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;

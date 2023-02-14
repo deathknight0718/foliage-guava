@@ -14,25 +14,24 @@
 
 package page.foliage.guava.common.math;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
-import static java.math.RoundingMode.HALF_EVEN;
-import static java.math.RoundingMode.HALF_UP;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.math.MathPreconditions.checkNoOverflow;
 import static page.foliage.guava.common.math.MathPreconditions.checkNonNegative;
 import static page.foliage.guava.common.math.MathPreconditions.checkPositive;
 import static page.foliage.guava.common.math.MathPreconditions.checkRoundingUnnecessary;
-
-import java.math.BigInteger;
-import java.math.RoundingMode;
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.math.RoundingMode.HALF_UP;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.primitives.UnsignedLongs;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * A class for arithmetic on values of type {@code long}. Where possible, methods are defined and
@@ -545,7 +544,7 @@ public final class LongMath {
   @GwtIncompatible // TODO
   public static long checkedAdd(long a, long b) {
     long result = a + b;
-    checkNoOverflow((a ^ b) < 0 | (a ^ result) >= 0);
+    checkNoOverflow((a ^ b) < 0 | (a ^ result) >= 0, "checkedAdd", a, b);
     return result;
   }
 
@@ -557,7 +556,7 @@ public final class LongMath {
   @GwtIncompatible // TODO
   public static long checkedSubtract(long a, long b) {
     long result = a - b;
-    checkNoOverflow((a ^ b) >= 0 | (a ^ result) >= 0);
+    checkNoOverflow((a ^ b) >= 0 | (a ^ result) >= 0, "checkedSubtract", a, b);
     return result;
   }
 
@@ -566,7 +565,6 @@ public final class LongMath {
    *
    * @throws ArithmeticException if {@code a * b} overflows in signed {@code long} arithmetic
    */
-  @GwtIncompatible // TODO
   public static long checkedMultiply(long a, long b) {
     // Hacker's Delight, Section 2-12
     int leadingZeros =
@@ -587,10 +585,10 @@ public final class LongMath {
     if (leadingZeros > Long.SIZE + 1) {
       return a * b;
     }
-    checkNoOverflow(leadingZeros >= Long.SIZE);
-    checkNoOverflow(a >= 0 | b != Long.MIN_VALUE);
+    checkNoOverflow(leadingZeros >= Long.SIZE, "checkedMultiply", a, b);
+    checkNoOverflow(a >= 0 | b != Long.MIN_VALUE, "checkedMultiply", a, b);
     long result = a * b;
-    checkNoOverflow(a == 0 || result / a == b);
+    checkNoOverflow(a == 0 || result / a == b, "checkedMultiply", a, b);
     return result;
   }
 
@@ -612,10 +610,10 @@ public final class LongMath {
         case (-1):
           return ((k & 1) == 0) ? 1 : -1;
         case 2:
-          checkNoOverflow(k < Long.SIZE - 1);
+          checkNoOverflow(k < Long.SIZE - 1, "checkedPow", b, k);
           return 1L << k;
         case (-2):
-          checkNoOverflow(k < Long.SIZE);
+          checkNoOverflow(k < Long.SIZE, "checkedPow", b, k);
           return ((k & 1) == 0) ? (1L << k) : (-1L << k);
         default:
           throw new AssertionError();
@@ -634,7 +632,8 @@ public final class LongMath {
           }
           k >>= 1;
           if (k > 0) {
-            checkNoOverflow(-FLOOR_SQRT_MAX_LONG <= b && b <= FLOOR_SQRT_MAX_LONG);
+            checkNoOverflow(
+                -FLOOR_SQRT_MAX_LONG <= b && b <= FLOOR_SQRT_MAX_LONG, "checkedPow", b, k);
             b *= b;
           }
       }

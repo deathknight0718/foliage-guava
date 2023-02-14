@@ -16,11 +16,10 @@ package page.foliage.guava.common.reflect;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
+import page.foliage.guava.common.annotations.Beta;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
 
 /**
  * Captures a free type variable that can be used in {@link TypeToken#where}. For example:

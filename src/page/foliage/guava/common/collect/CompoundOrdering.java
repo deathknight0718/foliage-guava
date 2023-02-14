@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** An ordering that tries several comparators in order. */
 @GwtCompatible(serializable = true)

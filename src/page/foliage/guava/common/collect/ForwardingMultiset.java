@@ -16,12 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Objects;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -251,6 +249,11 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
     Multiset<E> multiset() {
       return ForwardingMultiset.this;
     }
+
+    @Override
+    public Iterator<E> iterator() {
+      return Multisets.elementIterator(multiset().entrySet().iterator());
+    }
   }
 
   /**
@@ -272,7 +275,7 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
    * @since 7.0
    */
   protected int standardSize() {
-    return Multisets.sizeImpl(this);
+    return Multisets.linearTimeSizeImpl(this);
   }
 
   /**

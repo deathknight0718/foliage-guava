@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.eventbus;
 
-import java.util.concurrent.Executor;
-
 import page.foliage.guava.common.annotations.Beta;
+import java.util.concurrent.Executor;
 
 /**
  * An {@link EventBus} that takes the Executor of your choice and uses it to dispatch events,

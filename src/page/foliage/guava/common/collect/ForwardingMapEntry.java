@@ -16,13 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Objects;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A map entry which forwards all its method calls to another map entry. Subclasses should override

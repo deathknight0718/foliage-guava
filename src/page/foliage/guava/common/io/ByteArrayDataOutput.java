@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.io;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An extension of {@code DataOutput} for writing to in-memory byte arrays; its methods offer

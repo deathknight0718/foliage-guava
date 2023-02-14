@@ -18,10 +18,9 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Arrays;
 import java.util.Comparator;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Static utility methods pertaining to {@code byte} primitives that interpret values as signed. The

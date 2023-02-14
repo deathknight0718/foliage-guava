@@ -16,13 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.NoSuchElementException;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides a skeletal implementation of the {@code Iterator} interface, to make this
@@ -82,7 +81,7 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
     FAILED,
   }
 
-  private T next;
+  @NullableDecl private T next;
 
   /**
    * Returns the next element. <b>Note:</b> the implementation must call {@link #endOfData()} when

@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.lang.reflect.Array;
 import java.util.Map;
 import java.util.Set;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Methods factored out so that they can be emulated differently in GWT.

@@ -16,12 +16,10 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
-import page.foliage.guava.common.collect.UnmodifiableIterator;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.collect.UnmodifiableIterator;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Map;

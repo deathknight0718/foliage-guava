@@ -16,15 +16,14 @@ package page.foliage.guava.common.util.concurrent;
 
 import static page.foliage.guava.common.util.concurrent.MoreExecutors.directExecutor;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Preconditions;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
 
 /**
  * Implementation of {@code Futures#withTimeout}.

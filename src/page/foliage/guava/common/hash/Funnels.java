@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.hash;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.base.Preconditions;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.Preconditions;
 
 /**
  * Funnels for common types. All implementations are serializable.

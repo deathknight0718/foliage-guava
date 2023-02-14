@@ -16,12 +16,11 @@ package page.foliage.guava.common.io;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * An {@link InputStream} that counts the number of bytes read.

@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.cache;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * The reason why a cached entry was removed.

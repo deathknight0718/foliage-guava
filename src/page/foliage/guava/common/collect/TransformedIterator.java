@@ -18,9 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Iterator;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.Iterator;
 
 /**
  * An iterator that transforms a backing iterator; for internal use. This avoids the object overhead

@@ -16,11 +16,6 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Function;
@@ -28,6 +23,10 @@ import page.foliage.guava.common.base.Supplier;
 import page.foliage.guava.common.util.concurrent.Futures;
 import page.foliage.guava.common.util.concurrent.ListenableFuture;
 import page.foliage.guava.common.util.concurrent.ListenableFutureTask;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a {@link LoadingCache}.
@@ -140,6 +139,19 @@ public abstract class CacheLoader<K, V> {
     return new FunctionToCacheLoader<>(function);
   }
 
+  /**
+   * Returns a cache loader based on an <i>existing</i> supplier instance. Note that there's no need
+   * to create a <i>new</i> supplier just to pass it in here; just subclass {@code CacheLoader} and
+   * implement {@link #load load} instead.
+   *
+   * @param supplier the supplier to be used for loading values; must never return {@code null}
+   * @return a cache loader that loads values by calling {@link Supplier#get}, irrespective of the
+   *     key
+   */
+  public static <V> CacheLoader<Object, V> from(Supplier<V> supplier) {
+    return new SupplierToCacheLoader<V>(supplier);
+  }
+
   private static final class FunctionToCacheLoader<K, V> extends CacheLoader<K, V>
       implements Serializable {
     private final Function<K, V> computingFunction;
@@ -154,19 +166,6 @@ public abstract class CacheLoader<K, V> {
     }
 
     private static final long serialVersionUID = 0;
-  }
-
-  /**
-   * Returns a cache loader based on an <i>existing</i> supplier instance. Note that there's no need
-   * to create a <i>new</i> supplier just to pass it in here; just subclass {@code CacheLoader} and
-   * implement {@link #load load} instead.
-   *
-   * @param supplier the supplier to be used for loading values; must never return {@code null}
-   * @return a cache loader that loads values by calling {@link Supplier#get}, irrespective of the
-   *     key
-   */
-  public static <V> CacheLoader<Object, V> from(Supplier<V> supplier) {
-    return new SupplierToCacheLoader<V>(supplier);
   }
 
   /**

@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Unchecked version of {@link java.util.concurrent.TimeoutException}.

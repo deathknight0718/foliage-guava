@@ -14,13 +14,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.DoNotMock;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Function;
-
+import com.google.errorprone.annotations.DoNotMock;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;

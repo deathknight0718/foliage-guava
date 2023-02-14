@@ -15,13 +15,11 @@
  */
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -29,6 +27,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * CompactLinkedHashMap is an implementation of a Map with insertion or LRU iteration order,
@@ -37,11 +36,16 @@ import java.util.function.Consumer;
  *
  * <p>{@code containsKey(k)}, {@code put(k, v)} and {@code remove(k)} are all (expected and
  * amortized) constant time operations. Expected in the hashtable sense (depends on the hash
- * function doing a good job of distributing the elements to the buckets to a distribution not
- * far from uniform), and amortized since some operations can trigger a hash table resize.
+ * function doing a good job of distributing the elements to the buckets to a distribution not far
+ * from uniform), and amortized since some operations can trigger a hash table resize.
  *
- * <p>As compared with {@link java.util.LinkedHashMap}, this structure places significantly
- * reduced load on the garbage collector by only using a constant number of internal objects.
+ * <p>As compared with {@link java.util.LinkedHashMap}, this structure places significantly reduced
+ * load on the garbage collector by only using a constant number of internal objects.
+ *
+ * <p>This class should not be assumed to be universally superior to {@code
+ * java.util.LinkedHashMap}. Generally speaking, this class reduces object allocation and memory
+ * consumption at the price of moderately increased constant factors of CPU. Only use this class
+ * when there is a specific reason to prioritize memory over CPU.
  *
  * @author Louis Wasserman
  */
@@ -80,7 +84,7 @@ class CompactLinkedHashMap<K, V> extends CompactHashMap<K, V> {
    * A node with "prev" pointer equal to {@code ENDPOINT} is the first node in the linked list,
    * and a node with "next" pointer equal to {@code ENDPOINT} is the last node.
    */
-  @VisibleForTesting transient long[] links;
+  @MonotonicNonNullDecl @VisibleForTesting transient long[] links;
 
   /**
    * Pointer to the first node in the linked list, or {@code ENDPOINT} if there are no entries.

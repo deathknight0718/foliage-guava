@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.base;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Represents a {@linkplain System#getProperties() standard system property}.
@@ -113,7 +112,7 @@ public enum StandardSystemProperty {
 
   private final String key;
 
-  private StandardSystemProperty(String key) {
+  StandardSystemProperty(String key) {
     this.key = key;
   }
 

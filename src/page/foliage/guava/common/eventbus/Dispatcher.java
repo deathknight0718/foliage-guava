@@ -16,11 +16,10 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.collect.Queues;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import page.foliage.guava.common.collect.Queues;
 
 /**
  * Handler for dispatching events to subscribers, providing different event ordering guarantees that

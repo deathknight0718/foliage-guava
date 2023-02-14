@@ -14,12 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.concurrent.GuardedBy;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +49,7 @@ public final class ExecutionList {
    * RunnableExecutorPair#next} field.
    */
   @GuardedBy("this")
-  private RunnableExecutorPair runnables;
+  @NullableDecl private RunnableExecutorPair runnables;
 
   @GuardedBy("this")
   private boolean executed;

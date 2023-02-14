@@ -14,10 +14,8 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.Immutable;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
-
+import com.google.errorprone.annotations.Immutable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;

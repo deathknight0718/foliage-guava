@@ -16,13 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Supplier;
-
-import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;

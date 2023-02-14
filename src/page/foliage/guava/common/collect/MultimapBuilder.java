@@ -19,6 +19,9 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Supplier;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,10 +35,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Supplier;
 
 /**
  * A builder for a multimap implementation that allows customization of the backing map and value

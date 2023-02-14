@@ -21,17 +21,16 @@ import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.graph.Graphs.checkNonNegative;
 import static page.foliage.guava.common.graph.Graphs.checkPositive;
 
-import java.util.AbstractSet;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.collect.Iterables;
 import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.Sets;
 import page.foliage.guava.common.collect.UnmodifiableIterator;
 import page.foliage.guava.common.math.IntMath;
+import java.util.AbstractSet;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A base implementation of {@link NetworkConnections} for directed networks.

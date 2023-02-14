@@ -18,9 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.Map;
 
 /**
  * An implementation of {@link ImmutableTable} that holds a single cell.

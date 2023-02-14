@@ -16,9 +16,8 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides default values for all Java types, as defined by the JLS.

@@ -23,9 +23,8 @@ import static page.foliage.guava.common.graph.GraphConstants.PARALLEL_EDGES_NOT_
 import static page.foliage.guava.common.graph.GraphConstants.REUSING_EDGE;
 import static page.foliage.guava.common.graph.GraphConstants.SELF_LOOPS_NOT_ALLOWED;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * Configurable implementation of {@link MutableNetwork} that supports both directed and undirected

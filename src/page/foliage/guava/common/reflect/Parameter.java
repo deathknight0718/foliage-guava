@@ -16,13 +16,12 @@ package page.foliage.guava.common.reflect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.collect.FluentIterable;
 import page.foliage.guava.common.collect.ImmutableList;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Represents a method or constructor parameter.

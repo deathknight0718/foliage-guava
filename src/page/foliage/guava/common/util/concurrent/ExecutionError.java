@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * {@link Error} variant of {@link java.util.concurrent.ExecutionException}. As with {@code

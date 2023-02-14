@@ -16,16 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** @see page.foliage.guava.common.collect.Maps#immutableEntry(Object, Object) */
 @GwtCompatible(serializable = true)
 class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
-  final K key;
-  final V value;
+  @NullableDecl final K key;
+  @NullableDecl final V value;
 
   ImmutableEntry(@NullableDecl K key, @NullableDecl V value) {
     this.key = key;

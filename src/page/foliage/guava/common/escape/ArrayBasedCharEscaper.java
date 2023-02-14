@@ -16,10 +16,9 @@ package page.foliage.guava.common.escape;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.Map;
 
 /**
  * A {@link CharEscaper} that uses an array to quickly look up replacement characters for a given

@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.hash;
 
-import java.nio.ByteOrder;
-
 import page.foliage.guava.common.primitives.Longs;
+import java.nio.ByteOrder;
 import sun.misc.Unsafe;
 
 /**

@@ -19,12 +19,12 @@ import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.BoundType.CLOSED;
 import static page.foliage.guava.common.collect.BoundType.OPEN;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Objects;
+import java.io.Serializable;
+import java.util.Comparator;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A generalized interval on any ordering, for internal use. Supports {@code null}. Unlike {@link
@@ -245,7 +245,7 @@ final class GeneralRange<T> implements Serializable {
         getUpperBoundType());
   }
 
-  private transient GeneralRange<T> reverse;
+  @MonotonicNonNullDecl private transient GeneralRange<T> reverse;
 
   /** Returns the same range relative to the reversed comparator. */
   GeneralRange<T> reverse() {

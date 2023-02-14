@@ -18,9 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.collect.CollectPreconditions.checkEntryNotNull;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Implementation of {@code Entry} for {@link ImmutableMap} that adds extra methods to traverse hash

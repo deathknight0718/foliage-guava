@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.concurrent.GuardedBy;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Preconditions;
 import page.foliage.guava.common.collect.Queues;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

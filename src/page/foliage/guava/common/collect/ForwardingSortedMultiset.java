@@ -14,12 +14,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A sorted multiset which forwards all its method calls to another sorted multiset. Subclasses

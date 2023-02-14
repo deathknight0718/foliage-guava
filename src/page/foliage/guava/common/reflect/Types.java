@@ -18,6 +18,14 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.Iterables.transform;
 
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Joiner;
+import page.foliage.guava.common.base.Objects;
+import page.foliage.guava.common.base.Predicates;
+import page.foliage.guava.common.collect.ImmutableList;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.Iterables;
 import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
@@ -37,15 +45,6 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Joiner;
-import page.foliage.guava.common.base.Objects;
-import page.foliage.guava.common.base.Predicates;
-import page.foliage.guava.common.collect.ImmutableList;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.Iterables;
 
 /**
  * Utilities for working with {@link Type}.
@@ -167,11 +166,7 @@ final class Types {
   /**
    * Returns human readable string representation of {@code type}.
    *
-   * <ul>
-   *   <li>For array type {@code Foo[]}, {@code "com.mypackage.Foo[]"} are returned.
-   *   <li>For any class, {@code theClass.getName()} are returned.
-   *   <li>For all other types, {@code type.toString()} are returned.
-   * </ul>
+   * <p>The format is subject to change.
    */
   static String toString(Type type) {
     return (type instanceof Class) ? ((Class<?>) type).getName() : type.toString();
@@ -645,20 +640,20 @@ final class Types {
 
     abstract Type usedInGenericType(Type type);
 
-    String typeName(Type type) {
-      return Types.toString(type);
-    }
-
-    boolean jdkTypeDuplicatesOwnerName() {
-      return true;
-    }
-
     final ImmutableList<Type> usedInGenericType(Type[] types) {
       ImmutableList.Builder<Type> builder = ImmutableList.builder();
       for (Type type : types) {
         builder.add(usedInGenericType(type));
       }
       return builder.build();
+    }
+
+    String typeName(Type type) {
+      return Types.toString(type);
+    }
+
+    boolean jdkTypeDuplicatesOwnerName() {
+      return true;
     }
   }
 

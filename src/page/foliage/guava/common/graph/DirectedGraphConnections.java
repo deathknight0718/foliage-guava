@@ -23,6 +23,9 @@ import static page.foliage.guava.common.graph.GraphConstants.INNER_LOAD_FACTOR;
 import static page.foliage.guava.common.graph.Graphs.checkNonNegative;
 import static page.foliage.guava.common.graph.Graphs.checkPositive;
 
+import page.foliage.guava.common.collect.AbstractIterator;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.UnmodifiableIterator;
 import java.util.AbstractSet;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,10 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.collect.AbstractIterator;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.UnmodifiableIterator;
 
 /**
  * An implementation of {@link GraphConnections} for directed graphs.

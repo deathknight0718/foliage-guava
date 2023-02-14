@@ -14,15 +14,13 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Predicate;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Predicate;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -148,15 +146,15 @@ class FilteredKeyMultimap<K, V> extends AbstractMultimap<K, V> implements Filter
     }
 
     @Override
-    public boolean addAll(Collection<? extends V> collection) {
-      addAll(0, collection);
-      return true;
-    }
-
-    @Override
     public void add(int index, V element) {
       checkPositionIndex(index, 0);
       throw new IllegalArgumentException("Key does not satisfy predicate: " + key);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends V> collection) {
+      addAll(0, collection);
+      return true;
     }
 
     @CanIgnoreReturnValue

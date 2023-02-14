@@ -19,6 +19,12 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
+import page.foliage.guava.common.base.Objects;
+import page.foliage.guava.common.base.Supplier;
+import page.foliage.guava.common.collect.Table.Cell;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,13 +37,6 @@ import java.util.Spliterator;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
-import page.foliage.guava.common.base.Objects;
-import page.foliage.guava.common.base.Supplier;
-import page.foliage.guava.common.collect.Table.Cell;
 
 /**
  * Provides static methods that involve a {@code Table}.
@@ -152,9 +151,9 @@ public final class Tables {
   }
 
   static final class ImmutableCell<R, C, V> extends AbstractCell<R, C, V> implements Serializable {
-    private final R rowKey;
-    private final C columnKey;
-    private final V value;
+    @NullableDecl private final R rowKey;
+    @NullableDecl private final C columnKey;
+    @NullableDecl private final V value;
 
     ImmutableCell(@NullableDecl R rowKey, @NullableDecl C columnKey, @NullableDecl V value) {
       this.rowKey = rowKey;

@@ -14,7 +14,6 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
@@ -29,10 +28,7 @@ import static page.foliage.guava.common.util.concurrent.Service.State.RUNNING;
 import static page.foliage.guava.common.util.concurrent.Service.State.STARTING;
 import static page.foliage.guava.common.util.concurrent.Service.State.STOPPING;
 import static page.foliage.guava.common.util.concurrent.Service.State.TERMINATED;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
-import com.google.j2objc.annotations.WeakOuter;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -54,7 +50,9 @@ import page.foliage.guava.common.collect.Multiset;
 import page.foliage.guava.common.collect.Ordering;
 import page.foliage.guava.common.collect.SetMultimap;
 import page.foliage.guava.common.util.concurrent.Service.State;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+import com.google.j2objc.annotations.WeakOuter;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.EnumSet;

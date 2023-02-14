@@ -14,15 +14,14 @@
 
 package page.foliage.guava.common.cache;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.Maps;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.Maps;
 
 /**
  * This class provides a skeletal implementation of the {@code Cache} interface to minimize the

@@ -20,11 +20,10 @@ import static page.foliage.guava.common.primitives.UnsignedInts.INT_MASK;
 import static page.foliage.guava.common.primitives.UnsignedInts.compare;
 import static page.foliage.guava.common.primitives.UnsignedInts.toLong;
 
-import java.math.BigInteger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.math.BigInteger;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A wrapper class for unsigned {@code int} values, supporting arithmetic operations.

@@ -18,13 +18,12 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.AbstractSet;
-import java.util.Map;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.collect.ImmutableSet;
 import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.UnmodifiableIterator;
+import java.util.AbstractSet;
+import java.util.Map;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A class to represent the set of edges connecting an (implicit) origin node to a target node.

@@ -16,12 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Interface that extends {@code Table} and whose rows are sorted.

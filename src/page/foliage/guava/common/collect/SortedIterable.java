@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An {@code Iterable} whose elements are sorted relative to a {@code Comparator}, typically

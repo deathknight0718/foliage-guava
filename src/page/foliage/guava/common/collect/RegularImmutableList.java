@@ -16,11 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.Spliterator;
-import java.util.Spliterators;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 /**
  * Implementation of {@link ImmutableList} backed by a simple array.

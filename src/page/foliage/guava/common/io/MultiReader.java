@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.io;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Preconditions;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
 
 /**
  * A {@link Reader} that concatenates multiple readers.
@@ -31,7 +30,7 @@ import page.foliage.guava.common.base.Preconditions;
 @GwtIncompatible
 class MultiReader extends Reader {
   private final Iterator<? extends CharSource> it;
-  private Reader current;
+  @NullableDecl private Reader current;
 
   MultiReader(Iterator<? extends CharSource> readers) throws IOException {
     this.it = readers;

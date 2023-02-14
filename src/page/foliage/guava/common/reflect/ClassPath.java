@@ -14,12 +14,28 @@
 
 package page.foliage.guava.common.reflect;
 
-import static java.util.logging.Level.WARNING;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.StandardSystemProperty.JAVA_CLASS_PATH;
 import static page.foliage.guava.common.base.StandardSystemProperty.PATH_SEPARATOR;
+import static java.util.logging.Level.WARNING;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.base.CharMatcher;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.base.Splitter;
+import page.foliage.guava.common.collect.FluentIterable;
+import page.foliage.guava.common.collect.ImmutableList;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.ImmutableSet;
+import page.foliage.guava.common.collect.Maps;
+import page.foliage.guava.common.collect.MultimapBuilder;
+import page.foliage.guava.common.collect.SetMultimap;
+import page.foliage.guava.common.collect.Sets;
+import page.foliage.guava.common.io.ByteSource;
+import page.foliage.guava.common.io.CharSource;
+import page.foliage.guava.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -39,23 +55,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.base.CharMatcher;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.base.Splitter;
-import page.foliage.guava.common.collect.FluentIterable;
-import page.foliage.guava.common.collect.ImmutableList;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.ImmutableSet;
-import page.foliage.guava.common.collect.Maps;
-import page.foliage.guava.common.collect.MultimapBuilder;
-import page.foliage.guava.common.collect.SetMultimap;
-import page.foliage.guava.common.collect.Sets;
-import page.foliage.guava.common.io.ByteSource;
-import page.foliage.guava.common.io.CharSource;
-import page.foliage.guava.common.io.Resources;
 
 /**
  * Scans the source of a {@link ClassLoader} and finds all loadable classes and resources.
@@ -356,18 +355,18 @@ public final class ClassPath {
       }
     }
 
-    /** Called when a directory is scanned for resource files. */
-    protected abstract void scanDirectory(ClassLoader loader, File directory) throws IOException;
-
-    /** Called when a jar file is scanned for resource entries. */
-    protected abstract void scanJarFile(ClassLoader loader, JarFile file) throws IOException;
-
     @VisibleForTesting
     final void scan(File file, ClassLoader classloader) throws IOException {
       if (scannedUris.add(file.getCanonicalFile())) {
         scanFrom(file, classloader);
       }
     }
+
+    /** Called when a directory is scanned for resource files. */
+    protected abstract void scanDirectory(ClassLoader loader, File directory) throws IOException;
+
+    /** Called when a jar file is scanned for resource entries. */
+    protected abstract void scanJarFile(ClassLoader loader, JarFile file) throws IOException;
 
     private void scanFrom(File file, ClassLoader classloader) throws IOException {
       try {

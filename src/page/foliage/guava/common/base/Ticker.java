@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.base;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * A time source; returns a time value representing the number of nanoseconds elapsed since some

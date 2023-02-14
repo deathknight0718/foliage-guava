@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Arrays;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Helper functions that can operate on any {@code Object}.

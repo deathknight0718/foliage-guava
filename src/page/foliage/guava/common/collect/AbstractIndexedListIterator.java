@@ -18,10 +18,9 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * This class provides a skeletal implementation of the {@link ListIterator} interface across a

@@ -14,8 +14,8 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
@@ -26,10 +26,8 @@ import page.foliage.guava.common.base.Throwables;
 import page.foliage.guava.common.collect.Lists;
 import page.foliage.guava.common.collect.Queues;
 import page.foliage.guava.common.util.concurrent.ForwardingListenableFuture.SimpleForwardingListenableFuture;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,45 +85,6 @@ public final class MoreExecutors {
   }
 
   /**
-   * Converts the given ScheduledThreadPoolExecutor into a ScheduledExecutorService that exits when
-   * the application is complete. It does so by using daemon threads and adding a shutdown hook to
-   * wait for their completion.
-   *
-   * <p>This is mainly for fixed thread pools. See {@link Executors#newScheduledThreadPool(int)}.
-   *
-   * @param executor the executor to modify to make sure it exits when the application is finished
-   * @param terminationTimeout how long to wait for the executor to finish before terminating the
-   *     JVM
-   * @param timeUnit unit of time for the time parameter
-   * @return an unmodifiable version of the input which will not hang the JVM
-   */
-  @Beta
-  @GwtIncompatible // TODO
-  public static ScheduledExecutorService getExitingScheduledExecutorService(
-      ScheduledThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
-    return new Application()
-        .getExitingScheduledExecutorService(executor, terminationTimeout, timeUnit);
-  }
-
-  /**
-   * Add a shutdown hook to wait for thread completion in the given {@link ExecutorService service}.
-   * This is useful if the given service uses daemon threads, and we want to keep the JVM from
-   * exiting immediately on shutdown, instead giving these daemon threads a chance to terminate
-   * normally.
-   *
-   * @param service ExecutorService which uses daemon threads
-   * @param terminationTimeout how long to wait for the executor to finish before terminating the
-   *     JVM
-   * @param timeUnit unit of time for the time parameter
-   */
-  @Beta
-  @GwtIncompatible // TODO
-  public static void addDelayedShutdownHook(
-      ExecutorService service, long terminationTimeout, TimeUnit timeUnit) {
-    new Application().addDelayedShutdownHook(service, terminationTimeout, timeUnit);
-  }
-
-  /**
    * Converts the given ThreadPoolExecutor into an ExecutorService that exits when the application
    * is complete. It does so by using daemon threads and adding a shutdown hook to wait for their
    * completion.
@@ -149,6 +108,27 @@ public final class MoreExecutors {
    * the application is complete. It does so by using daemon threads and adding a shutdown hook to
    * wait for their completion.
    *
+   * <p>This is mainly for fixed thread pools. See {@link Executors#newScheduledThreadPool(int)}.
+   *
+   * @param executor the executor to modify to make sure it exits when the application is finished
+   * @param terminationTimeout how long to wait for the executor to finish before terminating the
+   *     JVM
+   * @param timeUnit unit of time for the time parameter
+   * @return an unmodifiable version of the input which will not hang the JVM
+   */
+  @Beta
+  @GwtIncompatible // TODO
+  public static ScheduledExecutorService getExitingScheduledExecutorService(
+      ScheduledThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
+    return new Application()
+        .getExitingScheduledExecutorService(executor, terminationTimeout, timeUnit);
+  }
+
+  /**
+   * Converts the given ScheduledThreadPoolExecutor into a ScheduledExecutorService that exits when
+   * the application is complete. It does so by using daemon threads and adding a shutdown hook to
+   * wait for their completion.
+   *
    * <p>This method waits 120 seconds before continuing with JVM termination, even if the executor
    * has not finished its work.
    *
@@ -164,6 +144,24 @@ public final class MoreExecutors {
     return new Application().getExitingScheduledExecutorService(executor);
   }
 
+  /**
+   * Add a shutdown hook to wait for thread completion in the given {@link ExecutorService service}.
+   * This is useful if the given service uses daemon threads, and we want to keep the JVM from
+   * exiting immediately on shutdown, instead giving these daemon threads a chance to terminate
+   * normally.
+   *
+   * @param service ExecutorService which uses daemon threads
+   * @param terminationTimeout how long to wait for the executor to finish before terminating the
+   *     JVM
+   * @param timeUnit unit of time for the time parameter
+   */
+  @Beta
+  @GwtIncompatible // TODO
+  public static void addDelayedShutdownHook(
+      ExecutorService service, long terminationTimeout, TimeUnit timeUnit) {
+    new Application().addDelayedShutdownHook(service, terminationTimeout, timeUnit);
+  }
+
   /** Represents the current application to register shutdown hooks. */
   @GwtIncompatible // TODO
   @VisibleForTesting
@@ -177,12 +175,21 @@ public final class MoreExecutors {
       return service;
     }
 
+    final ExecutorService getExitingExecutorService(ThreadPoolExecutor executor) {
+      return getExitingExecutorService(executor, 120, TimeUnit.SECONDS);
+    }
+
     final ScheduledExecutorService getExitingScheduledExecutorService(
         ScheduledThreadPoolExecutor executor, long terminationTimeout, TimeUnit timeUnit) {
       useDaemonThreadFactory(executor);
       ScheduledExecutorService service = Executors.unconfigurableScheduledExecutorService(executor);
       addDelayedShutdownHook(executor, terminationTimeout, timeUnit);
       return service;
+    }
+
+    final ScheduledExecutorService getExitingScheduledExecutorService(
+        ScheduledThreadPoolExecutor executor) {
+      return getExitingScheduledExecutorService(executor, 120, TimeUnit.SECONDS);
     }
 
     final void addDelayedShutdownHook(
@@ -208,15 +215,6 @@ public final class MoreExecutors {
                   }
                 }
               }));
-    }
-
-    final ExecutorService getExitingExecutorService(ThreadPoolExecutor executor) {
-      return getExitingExecutorService(executor, 120, TimeUnit.SECONDS);
-    }
-
-    final ScheduledExecutorService getExitingScheduledExecutorService(
-        ScheduledThreadPoolExecutor executor) {
-      return getExitingScheduledExecutorService(executor, 120, TimeUnit.SECONDS);
     }
 
     @VisibleForTesting
@@ -421,54 +419,6 @@ public final class MoreExecutors {
    * <p>If a task is submitted while a thread is executing tasks from the task queue, the thread
    * will not be released until that submitted task is also complete.
    *
-   * <p>Tasks are always started with the Thread in an uninterrupted state.
-   *
-   * <p>If the thread is {@linkplain Thread#interrupt interrupted} while a task is running or before
-   * the thread is taken by the Executor:
-   *
-   * <ol>
-   *   <li>execution will not stop until the task queue is empty.
-   *   <li>the interrupt will be restored to the thread after it completes so that its {@code
-   *       delegate} Executor may process the interrupt.
-   * </ol>
-   *
-   * <p>{@code RuntimeException}s thrown by tasks are simply logged and the executor keeps trucking.
-   * If an {@code Error} is thrown, the error will propagate and execution will stop until the next
-   * time a task is submitted.
-   *
-   * <p>When an {@code Error} is thrown by an executed task, previously submitted tasks may never
-   * run. An attempt will be made to restart execution on the next call to {@code execute}. If the
-   * {@code delegate} has begun to reject execution, the previously submitted tasks may never run,
-   * despite not throwing a RejectedExecutionException synchronously with the call to {@code
-   * execute}. If this behaviour is problematic, use an Executor with a single thread (e.g. {@link
-   * Executors#newSingleThreadExecutor}).
-   *
-   * @deprecated Use {@link #newSequentialExecutor}. This method is scheduled for removal in January
-   *     2018.
-   * @since 23.1
-   */
-  @Beta
-  @Deprecated
-  @GwtIncompatible
-  public static Executor sequentialExecutor(Executor delegate) {
-    return new SequentialExecutor(delegate);
-  }
-
-  /**
-   * Returns an {@link Executor} that runs each task executed sequentially, such that no two tasks
-   * are running concurrently. Submitted tasks have a happens-before order as defined in the Java
-   * Language Specification.
-   *
-   * <p>The executor uses {@code delegate} in order to {@link Executor#execute execute} each task in
-   * turn, and does not create any threads of its own.
-   *
-   * <p>After execution begins on a thread from the {@code delegate} {@link Executor}, tasks are
-   * polled and executed from a task queue until there are no more tasks. The thread will not be
-   * released until there are no more tasks to run.
-   *
-   * <p>If a task is submitted while a thread is executing tasks from the task queue, the thread
-   * will not be released until that submitted task is also complete.
-   *
    * <p>If a task is {@linkplain Thread#interrupt interrupted} while a task is running:
    *
    * <ol>
@@ -493,7 +443,7 @@ public final class MoreExecutors {
    * execute}. If this behaviour is problematic, use an Executor with a single thread (e.g. {@link
    * Executors#newSingleThreadExecutor}).
    *
-   * @since 23.3 (since 23.1 as {@link #sequentialExecutor(Executor)})
+   * @since 23.3 (since 23.1 as {@code sequentialExecutor})
    */
   @Beta
   @GwtIncompatible
@@ -813,7 +763,7 @@ public final class MoreExecutors {
     }
     try {
       return (ThreadFactory)
-          Class.forName("page.foliage.guava.appengine.api.ThreadManager")
+          Class.forName("com.google.appengine.api.ThreadManager")
               .getMethod("currentRequestThreadFactory")
               .invoke(null);
     } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
@@ -825,12 +775,12 @@ public final class MoreExecutors {
 
   @GwtIncompatible // TODO
   private static boolean isAppEngine() {
-    if (System.getProperty("page.foliage.guava.appengine.runtime.environment") == null) {
+    if (System.getProperty("com.google.appengine.runtime.environment") == null) {
       return false;
     }
     try {
       // If the current environment is null, we're not inside AppEngine.
-      return Class.forName("page.foliage.guava.apphosting.api.ApiProxy")
+      return Class.forName("com.google.apphosting.api.ApiProxy")
               .getMethod("getCurrentEnvironment")
               .invoke(null)
           != null;

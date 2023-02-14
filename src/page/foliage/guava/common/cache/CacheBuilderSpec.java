@@ -16,11 +16,6 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.MoreObjects;
@@ -29,6 +24,11 @@ import page.foliage.guava.common.base.Splitter;
 import page.foliage.guava.common.cache.LocalCache.Strength;
 import page.foliage.guava.common.collect.ImmutableList;
 import page.foliage.guava.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A specification of a {@link CacheBuilder} configuration.
@@ -107,19 +107,19 @@ public final class CacheBuilderSpec {
           .put("refreshInterval", new RefreshDurationParser())
           .build();
 
-  @VisibleForTesting Integer initialCapacity;
-  @VisibleForTesting Long maximumSize;
-  @VisibleForTesting Long maximumWeight;
-  @VisibleForTesting Integer concurrencyLevel;
-  @VisibleForTesting Strength keyStrength;
-  @VisibleForTesting Strength valueStrength;
-  @VisibleForTesting Boolean recordStats;
+  @MonotonicNonNullDecl @VisibleForTesting Integer initialCapacity;
+  @MonotonicNonNullDecl @VisibleForTesting Long maximumSize;
+  @MonotonicNonNullDecl @VisibleForTesting Long maximumWeight;
+  @MonotonicNonNullDecl @VisibleForTesting Integer concurrencyLevel;
+  @MonotonicNonNullDecl @VisibleForTesting Strength keyStrength;
+  @MonotonicNonNullDecl @VisibleForTesting Strength valueStrength;
+  @MonotonicNonNullDecl @VisibleForTesting Boolean recordStats;
   @VisibleForTesting long writeExpirationDuration;
-  @VisibleForTesting TimeUnit writeExpirationTimeUnit;
+  @MonotonicNonNullDecl @VisibleForTesting TimeUnit writeExpirationTimeUnit;
   @VisibleForTesting long accessExpirationDuration;
-  @VisibleForTesting TimeUnit accessExpirationTimeUnit;
+  @MonotonicNonNullDecl @VisibleForTesting TimeUnit accessExpirationTimeUnit;
   @VisibleForTesting long refreshDuration;
-  @VisibleForTesting TimeUnit refreshTimeUnit;
+  @MonotonicNonNullDecl @VisibleForTesting TimeUnit refreshTimeUnit;
   /** Specification; used for toParseableString(). */
   private final String specification;
 

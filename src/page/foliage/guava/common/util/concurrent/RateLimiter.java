@@ -14,13 +14,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static java.lang.Math.max;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -28,9 +26,10 @@ import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.Stopwatch;
 import page.foliage.guava.common.util.concurrent.SmoothRateLimiter.SmoothBursty;
 import page.foliage.guava.common.util.concurrent.SmoothRateLimiter.SmoothWarmingUp;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * A rate limiter. Conceptually, a rate limiter distributes permits at a configurable rate. Each
@@ -184,7 +183,7 @@ public abstract class RateLimiter {
   private final SleepingStopwatch stopwatch;
 
   // Can't be initialized in the constructor because mocks don't call the constructor.
-  private volatile Object mutexDoNotUseDirectly;
+  @MonotonicNonNullDecl private volatile Object mutexDoNotUseDirectly;
 
   private Object mutex() {
     Object mutex = mutexDoNotUseDirectly;
@@ -407,7 +406,7 @@ public abstract class RateLimiter {
 
     protected abstract void sleepMicrosUninterruptibly(long micros);
 
-    public static final SleepingStopwatch createFromSystemTimer() {
+    public static SleepingStopwatch createFromSystemTimer() {
       return new SleepingStopwatch() {
         final Stopwatch stopwatch = Stopwatch.createStarted();
 

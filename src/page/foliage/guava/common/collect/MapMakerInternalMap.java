@@ -14,20 +14,18 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
-import com.google.j2objc.annotations.Weak;
-import com.google.j2objc.annotations.WeakOuter;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.Equivalence;
 import page.foliage.guava.common.collect.MapMaker.Dummy;
 import page.foliage.guava.common.primitives.Ints;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+import com.google.j2objc.annotations.Weak;
+import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -49,6 +47,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -341,7 +340,7 @@ class MapMakerInternalMap<
       implements InternalEntry<K, V, E> {
     final K key;
     final int hash;
-    final E next;
+    @NullableDecl final E next;
 
     AbstractStrongKeyEntry(K key, int hash, @NullableDecl E next) {
       this.key = key;
@@ -648,7 +647,7 @@ class MapMakerInternalMap<
   abstract static class AbstractWeakKeyEntry<K, V, E extends InternalEntry<K, V, E>>
       extends WeakReference<K> implements InternalEntry<K, V, E> {
     final int hash;
-    final E next;
+    @NullableDecl final E next;
 
     AbstractWeakKeyEntry(ReferenceQueue<K> queue, K key, int hash, @NullableDecl E next) {
       super(key, queue);
@@ -1199,7 +1198,7 @@ class MapMakerInternalMap<
     int threshold;
 
     /** The per-segment table. */
-    volatile AtomicReferenceArray<E> table;
+    @MonotonicNonNullDecl volatile AtomicReferenceArray<E> table;
 
     /** The maximum size of this map. MapMaker.UNSET_INT if there is no maximum. */
     final int maxSegmentSize;
@@ -2483,7 +2482,7 @@ class MapMakerInternalMap<
     }
   }
 
-  transient Set<K> keySet;
+  @MonotonicNonNullDecl transient Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
@@ -2491,7 +2490,7 @@ class MapMakerInternalMap<
     return (ks != null) ? ks : (keySet = new KeySet());
   }
 
-  transient Collection<V> values;
+  @MonotonicNonNullDecl transient Collection<V> values;
 
   @Override
   public Collection<V> values() {
@@ -2499,7 +2498,7 @@ class MapMakerInternalMap<
     return (vs != null) ? vs : (values = new Values());
   }
 
-  transient Set<Entry<K, V>> entrySet;
+  @MonotonicNonNullDecl transient Set<Entry<K, V>> entrySet;
 
   @Override
   public Set<Entry<K, V>> entrySet() {
@@ -2513,11 +2512,11 @@ class MapMakerInternalMap<
 
     int nextSegmentIndex;
     int nextTableIndex;
-    Segment<K, V, E, S> currentSegment;
-    AtomicReferenceArray<E> currentTable;
-    E nextEntry;
-    WriteThroughEntry nextExternal;
-    WriteThroughEntry lastReturned;
+    @MonotonicNonNullDecl Segment<K, V, E, S> currentSegment;
+    @MonotonicNonNullDecl AtomicReferenceArray<E> currentTable;
+    @NullableDecl E nextEntry;
+    @NullableDecl WriteThroughEntry nextExternal;
+    @NullableDecl WriteThroughEntry lastReturned;
 
     HashIterator() {
       nextSegmentIndex = segments.length - 1;

@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.base;
 
-import java.util.BitSet;
-
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.CharMatcher.NamedFastMatcher;
+import java.util.BitSet;
 
 /**
  * An immutable version of CharMatcher for smallish sets of characters that uses a hash table with

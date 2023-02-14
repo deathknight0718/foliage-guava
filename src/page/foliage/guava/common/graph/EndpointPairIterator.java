@@ -18,12 +18,11 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import page.foliage.guava.common.collect.AbstractIterator;
 import page.foliage.guava.common.collect.ImmutableSet;
 import page.foliage.guava.common.collect.Sets;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A class to facilitate the set returned by {@link Graph#edges()}.

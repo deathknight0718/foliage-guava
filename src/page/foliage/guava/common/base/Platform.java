@@ -14,6 +14,7 @@
 
 package page.foliage.guava.common.base;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Locale;
@@ -23,8 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Methods factored out so that they can be emulated differently in GWT.

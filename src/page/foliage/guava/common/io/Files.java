@@ -14,7 +14,9 @@
 
 package page.foliage.guava.common.io;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.io.FileWriteMode.APPEND;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
@@ -29,11 +31,7 @@ import page.foliage.guava.common.graph.SuccessorsFunction;
 import page.foliage.guava.common.graph.Traverser;
 import page.foliage.guava.common.hash.HashCode;
 import page.foliage.guava.common.hash.HashFunction;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.io.FileWriteMode.APPEND;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -292,6 +290,22 @@ public final class Files {
   }
 
   /**
+   * Writes a character sequence (such as a string) to a file using the given character set.
+   *
+   * @param from the character sequence to write
+   * @param to the destination file
+   * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
+   *     helpful predefined constants
+   * @throws IOException if an I/O error occurs
+   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}. This method is scheduled to be
+   *     removed in January 2019.
+   */
+  @Deprecated
+  public static void write(CharSequence from, File to, Charset charset) throws IOException {
+    asCharSink(to, charset).write(from);
+  }
+
+  /**
    * Copies all bytes from a file to an output stream.
    *
    * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
@@ -330,19 +344,19 @@ public final class Files {
   }
 
   /**
-   * Writes a character sequence (such as a string) to a file using the given character set.
+   * Copies all characters from a file to an appendable object, using the given character set.
    *
-   * @param from the character sequence to write
-   * @param to the destination file
-   * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
+   * @param from the source file
+   * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
    *     helpful predefined constants
+   * @param to the appendable object
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}. This method is scheduled to be
-   *     removed in January 2019.
+   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
+   *     be removed in January 2019.
    */
   @Deprecated
-  public static void write(CharSequence from, File to, Charset charset) throws IOException {
-    asCharSink(to, charset).write(from);
+  public static void copy(File from, Charset charset, Appendable to) throws IOException {
+    asCharSource(from, charset).copyTo(to);
   }
 
   /**
@@ -359,22 +373,6 @@ public final class Files {
   @Deprecated
   public static void append(CharSequence from, File to, Charset charset) throws IOException {
     asCharSink(to, charset, FileWriteMode.APPEND).write(from);
-  }
-
-  /**
-   * Copies all characters from a file to an appendable object, using the given character set.
-   *
-   * @param from the source file
-   * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-   *     helpful predefined constants
-   * @param to the appendable object
-   * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
-   *     be removed in January 2019.
-   */
-  @Deprecated
-  public static void copy(File from, Charset charset, Appendable to) throws IOException {
-    asCharSource(from, charset).copyTo(to);
   }
 
   /**

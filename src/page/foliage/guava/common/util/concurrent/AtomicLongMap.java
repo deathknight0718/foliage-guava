@@ -16,13 +16,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -31,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * A map containing {@code long} values that can be atomically updated. While writes to a
@@ -226,6 +225,14 @@ public final class AtomicLongMap<K> implements Serializable {
   }
 
   /**
+   * If {@code (key, value)} is currently in the map, this method removes it and returns true;
+   * otherwise, this method returns false.
+   */
+  boolean remove(K key, long value) {
+    return map.remove(key, value);
+  }
+
+  /**
    * Atomically remove {@code key} from the map iff its associated value is 0.
    *
    * @since 20.0
@@ -255,7 +262,7 @@ public final class AtomicLongMap<K> implements Serializable {
     return map.values().stream().mapToLong(Long::longValue).sum();
   }
 
-  private transient Map<K, Long> asMap;
+  @MonotonicNonNullDecl private transient Map<K, Long> asMap;
 
   /** Returns a live, read-only view of the map backing this {@code AtomicLongMap}. */
   public Map<K, Long> asMap() {
@@ -334,13 +341,5 @@ public final class AtomicLongMap<K> implements Serializable {
     } else {
       return map.replace(key, expectedOldValue, newValue);
     }
-  }
-
-  /**
-   * If {@code (key, value)} is currently in the map, this method removes it and returns true;
-   * otherwise, this method returns false.
-   */
-  boolean remove(K key, long value) {
-    return map.remove(key, value);
   }
 }

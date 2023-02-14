@@ -16,10 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.errorprone.annotations.concurrent.LazyInit;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
-
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.EnumSet;

@@ -14,11 +14,11 @@
 
 package page.foliage.guava.common.hash;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.primitives.Ints;
+import com.google.errorprone.annotations.Immutable;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 /**
  * A hash function is a collision-averse pure function that maps an arbitrary block of data to a
@@ -118,6 +118,7 @@ import page.foliage.guava.common.primitives.Ints;
  * @since 11.0
  */
 @Beta
+@Immutable
 public interface HashFunction {
   /**
    * Begins a new hash code computation by returning an initialized, stateful {@code Hasher}

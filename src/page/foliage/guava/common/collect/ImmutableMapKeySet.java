@@ -16,13 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.Weak;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.j2objc.annotations.Weak;
 import java.io.Serializable;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -35,7 +33,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Kevin Bourrillion
  */
 @GwtCompatible(emulated = true)
-final class ImmutableMapKeySet<K, V> extends ImmutableSet.Indexed<K> {
+final class ImmutableMapKeySet<K, V> extends IndexedImmutableSet<K> {
   @Weak private final ImmutableMap<K, V> map;
 
   ImmutableMapKeySet(ImmutableMap<K, V> map) {

@@ -14,22 +14,20 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import static java.util.concurrent.atomic.AtomicReferenceFieldUpdater.newUpdater;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Strings.isNullOrEmpty;
 import static page.foliage.guava.common.base.Throwables.throwIfUnchecked;
 import static page.foliage.guava.common.util.concurrent.Futures.getDone;
 import static page.foliage.guava.common.util.concurrent.MoreExecutors.directExecutor;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.DoNotMock;
-import com.google.errorprone.annotations.ForOverride;
-import com.google.j2objc.annotations.ReflectionSupport;
+import static java.util.concurrent.atomic.AtomicReferenceFieldUpdater.newUpdater;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Ascii;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotMock;
+import com.google.errorprone.annotations.ForOverride;
+import com.google.j2objc.annotations.ReflectionSupport;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -345,13 +343,13 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    *       argument.
    * </ul>
    */
-  private volatile Object value;
+  @NullableDecl private volatile Object value;
 
   /** All listeners. */
-  private volatile Listener listeners;
+  @NullableDecl private volatile Listener listeners;
 
   /** All waiting threads. */
-  private volatile Waiter waiters;
+  @NullableDecl private volatile Waiter waiters;
 
   /** Constructor for use by subclasses. */
   protected AbstractFuture() {}
@@ -986,7 +984,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   protected String pendingToString() {
     Object localValue = value;
     if (localValue instanceof SetFuture) {
-      return "setFuture=[" + ((SetFuture) localValue).future + "]";
+      return "setFuture=[" + userObjectToString(((SetFuture) localValue).future) + "]";
     } else if (this instanceof ScheduledFuture) {
       return "remaining delay=["
           + ((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS)
@@ -998,7 +996,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   private void addDoneString(StringBuilder builder) {
     try {
       V value = getDone(this);
-      builder.append("SUCCESS, result=[").append(value).append("]");
+      builder.append("SUCCESS, result=[").append(userObjectToString(value)).append("]");
     } catch (ExecutionException e) {
       builder.append("FAILURE, cause=[").append(e.getCause()).append("]");
     } catch (CancellationException e) {
@@ -1006,6 +1004,18 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     } catch (RuntimeException e) {
       builder.append("UNKNOWN, cause=[").append(e.getClass()).append(" thrown from get()]");
     }
+  }
+
+  /** Helper for printing user supplied objects into our toString method. */
+  private String userObjectToString(Object o) {
+    // This is some basic recursion detection for when people create cycles via set/setFuture
+    // This is however only partial protection though since it only detects self loops.  We could
+    // detect arbitrary cycles using a thread local or possibly by catching StackOverflowExceptions
+    // but this should be a good enough solution (it is also what jdk collections do in these cases)
+    if (o == this) {
+      return "this future";
+    }
+    return String.valueOf(o);
   }
 
   /**

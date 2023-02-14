@@ -14,14 +14,12 @@
 
 package page.foliage.guava.common.base;
 
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.ForOverride;
 import com.google.errorprone.annotations.concurrent.LazyInit;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;

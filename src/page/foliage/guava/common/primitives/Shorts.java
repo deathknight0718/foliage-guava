@@ -19,6 +19,10 @@ import static page.foliage.guava.common.base.Preconditions.checkElementIndex;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Converter;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -28,11 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.RandomAccess;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Converter;
 
 /**
  * Static utility methods pertaining to {@code short} primitives, that are not already found in

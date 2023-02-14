@@ -17,6 +17,13 @@ package page.foliage.guava.common.net;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.Splitter;
+import page.foliage.guava.common.hash.Hashing;
+import page.foliage.guava.common.io.ByteStreams;
+import page.foliage.guava.common.primitives.Ints;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -25,14 +32,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Locale;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Splitter;
-import page.foliage.guava.common.hash.Hashing;
-import page.foliage.guava.common.io.ByteStreams;
-import page.foliage.guava.common.primitives.Ints;
 
 /**
  * Static utility methods pertaining to {@link InetAddress} instances.

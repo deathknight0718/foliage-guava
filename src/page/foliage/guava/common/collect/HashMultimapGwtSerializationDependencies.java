@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collection;
 import java.util.Map;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A dummy superclass to support GWT serialization of the element types of a {@link HashMultimap}.

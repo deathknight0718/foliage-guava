@@ -14,6 +14,17 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.base.Supplier;
+import page.foliage.guava.common.collect.ImmutableList;
+import page.foliage.guava.common.collect.Iterables;
+import page.foliage.guava.common.collect.MapMaker;
+import page.foliage.guava.common.math.IntMath;
+import page.foliage.guava.common.primitives.Ints;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -29,18 +40,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.base.Supplier;
-import page.foliage.guava.common.collect.ImmutableList;
-import page.foliage.guava.common.collect.Iterables;
-import page.foliage.guava.common.collect.MapMaker;
-import page.foliage.guava.common.math.IntMath;
-import page.foliage.guava.common.primitives.Ints;
 
 /**
  * A striped {@code Lock/Semaphore/ReadWriteLock}. This offers the underlying lock striping similar

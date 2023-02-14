@@ -16,10 +16,9 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.SortedSet;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Utilities for dealing with sorted collections of all types.

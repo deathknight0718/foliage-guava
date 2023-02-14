@@ -14,9 +14,8 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /** Methods factored out so that they can be emulated differently in GWT. */
 @GwtCompatible(emulated = true)

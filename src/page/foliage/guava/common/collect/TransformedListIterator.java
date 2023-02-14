@@ -16,10 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import java.util.ListIterator;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
+import java.util.ListIterator;
 
 /**
  * An iterator that transforms a backing list iterator; for internal use. This avoids the object

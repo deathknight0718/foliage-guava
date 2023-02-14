@@ -14,7 +14,8 @@
 
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.VisibleForTesting;
@@ -24,10 +25,7 @@ import page.foliage.guava.common.hash.BloomFilterStrategies.LockFreeBitArray;
 import page.foliage.guava.common.math.DoubleMath;
 import page.foliage.guava.common.primitives.SignedBytes;
 import page.foliage.guava.common.primitives.UnsignedBytes;
-
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

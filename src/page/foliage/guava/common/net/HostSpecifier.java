@@ -14,13 +14,12 @@
 
 package page.foliage.guava.common.net;
 
-import java.net.InetAddress;
-import java.text.ParseException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Preconditions;
+import java.net.InetAddress;
+import java.text.ParseException;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A syntactically valid host specifier, suitable for use in a URI. This may be either a numeric IP

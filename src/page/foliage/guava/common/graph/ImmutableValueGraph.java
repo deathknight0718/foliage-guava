@@ -18,12 +18,11 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import com.google.errorprone.annotations.Immutable;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.collect.Maps;
+import com.google.errorprone.annotations.Immutable;
 
 /**
  * A {@link ValueGraph} whose elements and structural relationships will never change. Instances of

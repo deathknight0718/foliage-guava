@@ -18,6 +18,7 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
+import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -30,7 +31,10 @@ import java.util.Arrays;
  * @author Kevin Bourrillion
  * @author Dimitris Andreou
  */
+@Immutable
 final class MessageDigestHashFunction extends AbstractHashFunction implements Serializable {
+
+  @SuppressWarnings("Immutable") // cloned before each use
   private final MessageDigest prototype;
   private final int bytes;
   private final boolean supportsClone;

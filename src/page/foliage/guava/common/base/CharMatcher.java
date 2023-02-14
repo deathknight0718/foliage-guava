@@ -18,12 +18,11 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
 
-import java.util.Arrays;
-import java.util.BitSet;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
+import java.util.Arrays;
+import java.util.BitSet;
 
 /**
  * Determines a true or false value for any Java {@code char} value, just as {@link Predicate} does

@@ -16,18 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
-import com.google.j2objc.annotations.WeakOuter;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.collect.Maps.ViewCachingAbstractMap;
-
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Predicates.in;
 import static page.foliage.guava.common.base.Predicates.not;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.collect.Maps.ViewCachingAbstractMap;
+import com.google.j2objc.annotations.WeakOuter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;

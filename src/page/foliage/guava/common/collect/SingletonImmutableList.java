@@ -18,11 +18,10 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.Spliterator;
-
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Preconditions;
+import java.util.Collections;
+import java.util.Spliterator;
 
 /**
  * Implementation of {@link ImmutableList} with exactly one element.

@@ -18,6 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,12 +27,9 @@ import java.util.Optional;
 import java.util.stream.Collector;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-
 /**
  * Collectors not present in {@code java.util.stream.Collectors} that are not otherwise associated
- * with a {@code page.foliage.guava.common} type.
+ * with a {@code com.google.common} type.
  *
  * @author Louis Wasserman
  * @since 21.0

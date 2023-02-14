@@ -14,18 +14,16 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.J2ObjCIncompatible;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.collect.Ordering;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

@@ -14,10 +14,9 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import java.util.concurrent.ScheduledFuture;
-
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Helper interface to implement both {@link ListenableFuture} and {@link ScheduledFuture}.

@@ -18,13 +18,12 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.graph.GraphConstants.EXPECTED_DEGREE;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import page.foliage.guava.common.collect.BiMap;
 import page.foliage.guava.common.collect.HashBiMap;
 import page.foliage.guava.common.collect.ImmutableBiMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An implementation of {@link NetworkConnections} for directed networks.

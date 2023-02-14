@@ -16,13 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
+import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Set;
-
-import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A {@link Multiset} which maintains the ordering of its elements, according to either their
