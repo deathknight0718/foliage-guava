@@ -24,6 +24,7 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author Hayward Chan
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 class ForwardingImmutableCollection {
   private ForwardingImmutableCollection() {}
 }

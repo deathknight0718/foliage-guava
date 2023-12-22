@@ -16,10 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Predicate;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Predicate;
 
 /**
  * Implementation of {@link Multimaps#filterEntries(SetMultimap, Predicate)}.
@@ -27,8 +32,9 @@ import java.util.Set;
  * @author Louis Wasserman
  */
 @GwtCompatible
-final class FilteredEntrySetMultimap<K, V> extends FilteredEntryMultimap<K, V>
-    implements FilteredSetMultimap<K, V> {
+@ElementTypesAreNonnullByDefault
+final class FilteredEntrySetMultimap<K extends @Nullable Object, V extends @Nullable Object>
+    extends FilteredEntryMultimap<K, V> implements FilteredSetMultimap<K, V> {
 
   FilteredEntrySetMultimap(SetMultimap<K, V> unfiltered, Predicate<? super Entry<K, V>> predicate) {
     super(unfiltered, predicate);
@@ -40,17 +46,17 @@ final class FilteredEntrySetMultimap<K, V> extends FilteredEntryMultimap<K, V>
   }
 
   @Override
-  public Set<V> get(K key) {
+  public Set<V> get(@ParametricNullness K key) {
     return (Set<V>) super.get(key);
   }
 
   @Override
-  public Set<V> removeAll(Object key) {
+  public Set<V> removeAll(@CheckForNull Object key) {
     return (Set<V>) super.removeAll(key);
   }
 
   @Override
-  public Set<V> replaceValues(K key, Iterable<? extends V> values) {
+  public Set<V> replaceValues(@ParametricNullness K key, Iterable<? extends V> values) {
     return (Set<V>) super.replaceValues(key, values);
   }
 

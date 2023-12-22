@@ -16,11 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Predicate;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Predicate;
 
 /**
  * Implementation of {@link Multimaps#filterKeys(SetMultimap, Predicate)}.
@@ -28,8 +32,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Louis Wasserman
  */
 @GwtCompatible
-final class FilteredKeySetMultimap<K, V> extends FilteredKeyMultimap<K, V>
-    implements FilteredSetMultimap<K, V> {
+@ElementTypesAreNonnullByDefault
+final class FilteredKeySetMultimap<K extends @Nullable Object, V extends @Nullable Object>
+    extends FilteredKeyMultimap<K, V> implements FilteredSetMultimap<K, V> {
 
   FilteredKeySetMultimap(SetMultimap<K, V> unfiltered, Predicate<? super K> keyPredicate) {
     super(unfiltered, keyPredicate);
@@ -41,17 +46,17 @@ final class FilteredKeySetMultimap<K, V> extends FilteredKeyMultimap<K, V>
   }
 
   @Override
-  public Set<V> get(K key) {
+  public Set<V> get(@ParametricNullness K key) {
     return (Set<V>) super.get(key);
   }
 
   @Override
-  public Set<V> removeAll(Object key) {
+  public Set<V> removeAll(@CheckForNull Object key) {
     return (Set<V>) super.removeAll(key);
   }
 
   @Override
-  public Set<V> replaceValues(K key, Iterable<? extends V> values) {
+  public Set<V> replaceValues(@ParametricNullness K key, Iterable<? extends V> values) {
     return (Set<V>) super.replaceValues(key, values);
   }
 
@@ -72,7 +77,7 @@ final class FilteredKeySetMultimap<K, V> extends FilteredKeyMultimap<K, V>
     }
 
     @Override
-    public boolean equals(@NullableDecl Object o) {
+    public boolean equals(@CheckForNull Object o) {
       return Sets.equalsImpl(this, o);
     }
   }

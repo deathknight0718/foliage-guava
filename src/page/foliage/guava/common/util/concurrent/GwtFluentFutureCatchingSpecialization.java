@@ -14,7 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Hidden superclass of {@link FluentFuture} that provides us a place to declare special GWT
@@ -22,7 +25,10 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * FluentFuture.catching} family of methods. Those versions have slightly different signatures.
  */
 @GwtCompatible(emulated = true)
-abstract class GwtFluentFutureCatchingSpecialization<V> implements ListenableFuture<V> {
+@J2ktIncompatible // Super-sourced
+@ElementTypesAreNonnullByDefault
+abstract class GwtFluentFutureCatchingSpecialization<V extends @Nullable Object>
+    extends AbstractFuture<V> {
   /*
    * This server copy of the class is empty. The corresponding GWT copy contains alternative
    * versions of catching() and catchingAsync() with slightly different signatures from the ones

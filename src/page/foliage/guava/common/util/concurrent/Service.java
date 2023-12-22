@@ -14,12 +14,18 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import static page.foliage.guava.common.util.concurrent.Internal.toNanosSaturated;
+
+import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotMock;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * An object with an operational state, plus asynchronous {@link #startAsync()} and {@link
@@ -51,8 +57,10 @@ import java.util.concurrent.TimeoutException;
  * @author Luke Sandberg
  * @since 9.0 (in 1.0 as {@code page.foliage.guava.common.base.Service})
  */
-@Beta
+@DoNotMock("Create an AbstractIdleService")
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public interface Service {
   /**
    * If the service state is {@link State#NEW}, this initiates service startup and returns
@@ -99,6 +107,21 @@ public interface Service {
    * than the given time.
    *
    * @param timeout the maximum time to wait
+   * @throws TimeoutException if the service has not reached the given state within the deadline
+   * @throws IllegalStateException if the service reaches a state from which it is not possible to
+   *     enter the {@link State#RUNNING RUNNING} state. e.g. if the {@code state} is {@code
+   *     State#TERMINATED} when this method is called then this will throw an IllegalStateException.
+   * @since 28.0
+   */
+  default void awaitRunning(Duration timeout) throws TimeoutException {
+    awaitRunning(toNanosSaturated(timeout), TimeUnit.NANOSECONDS);
+  }
+
+  /**
+   * Waits for the {@link Service} to reach the {@linkplain State#RUNNING running state} for no more
+   * than the given time.
+   *
+   * @param timeout the maximum time to wait
    * @param unit the time unit of the timeout argument
    * @throws TimeoutException if the service has not reached the given state within the deadline
    * @throws IllegalStateException if the service reaches a state from which it is not possible to
@@ -106,6 +129,7 @@ public interface Service {
    *     State#TERMINATED} when this method is called then this will throw an IllegalStateException.
    * @since 15.0
    */
+  @SuppressWarnings("GoodTime") // should accept a java.time.Duration
   void awaitRunning(long timeout, TimeUnit unit) throws TimeoutException;
 
   /**
@@ -121,11 +145,25 @@ public interface Service {
    * terminated} or {@link Service.State#FAILED failed}) for no more than the given time.
    *
    * @param timeout the maximum time to wait
+   * @throws TimeoutException if the service has not reached the given state within the deadline
+   * @throws IllegalStateException if the service {@linkplain State#FAILED fails}.
+   * @since 28.0
+   */
+  default void awaitTerminated(Duration timeout) throws TimeoutException {
+    awaitTerminated(toNanosSaturated(timeout), TimeUnit.NANOSECONDS);
+  }
+
+  /**
+   * Waits for the {@link Service} to reach a terminal state (either {@link Service.State#TERMINATED
+   * terminated} or {@link Service.State#FAILED failed}) for no more than the given time.
+   *
+   * @param timeout the maximum time to wait
    * @param unit the time unit of the timeout argument
    * @throws TimeoutException if the service has not reached the given state within the deadline
    * @throws IllegalStateException if the service {@linkplain State#FAILED fails}.
    * @since 15.0
    */
+  @SuppressWarnings("GoodTime") // should accept a java.time.Duration
   void awaitTerminated(long timeout, TimeUnit unit) throws TimeoutException;
 
   /**
@@ -171,64 +209,30 @@ public interface Service {
    *
    * @since 9.0 (in 1.0 as {@code page.foliage.guava.common.base.Service.State})
    */
-  @Beta // should come out of Beta when Service does
   enum State {
     /** A service in this state is inactive. It does minimal work and consumes minimal resources. */
-    NEW {
-      @Override
-      boolean isTerminal() {
-        return false;
-      }
-    },
+    NEW,
 
     /** A service in this state is transitioning to {@link #RUNNING}. */
-    STARTING {
-      @Override
-      boolean isTerminal() {
-        return false;
-      }
-    },
+    STARTING,
 
     /** A service in this state is operational. */
-    RUNNING {
-      @Override
-      boolean isTerminal() {
-        return false;
-      }
-    },
+    RUNNING,
 
     /** A service in this state is transitioning to {@link #TERMINATED}. */
-    STOPPING {
-      @Override
-      boolean isTerminal() {
-        return false;
-      }
-    },
+    STOPPING,
 
     /**
      * A service in this state has completed execution normally. It does minimal work and consumes
      * minimal resources.
      */
-    TERMINATED {
-      @Override
-      boolean isTerminal() {
-        return true;
-      }
-    },
+    TERMINATED,
 
     /**
      * A service in this state has encountered a problem and may not be operational. It cannot be
      * started nor stopped.
      */
-    FAILED {
-      @Override
-      boolean isTerminal() {
-        return true;
-      }
-    };
-
-    /** Returns true if this state is terminal. */
-    abstract boolean isTerminal();
+    FAILED,
   }
 
   /**
@@ -239,7 +243,6 @@ public interface Service {
    * @author Luke Sandberg
    * @since 15.0 (present as an interface in 13.0)
    */
-  @Beta // should come out of Beta when Service does
   abstract class Listener {
     /**
      * Called when the service transitions from {@linkplain State#NEW NEW} to {@linkplain
@@ -269,9 +272,9 @@ public interface Service {
      * diagram. Therefore, if this method is called, no other methods will be called on the {@link
      * Listener}.
      *
-     * @param from The previous state that is being transitioned from. The only valid values for
-     *     this are {@linkplain State#NEW NEW}, {@linkplain State#RUNNING RUNNING} or {@linkplain
-     *     State#STOPPING STOPPING}.
+     * @param from The previous state that is being transitioned from. Failure can occur in any
+     *     state with the exception of {@linkplain State#FAILED FAILED} and {@linkplain
+     *     State#TERMINATED TERMINATED}.
      */
     public void terminated(State from) {}
 

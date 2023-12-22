@@ -16,8 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.SortedMap;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An object representing the differences between two sorted maps.
@@ -26,7 +29,9 @@ import java.util.SortedMap;
  * @since 8.0
  */
 @GwtCompatible
-public interface SortedMapDifference<K, V> extends MapDifference<K, V> {
+@ElementTypesAreNonnullByDefault
+public interface SortedMapDifference<K extends @Nullable Object, V extends @Nullable Object>
+    extends MapDifference<K, V> {
 
   @Override
   SortedMap<K, V> entriesOnlyOnLeft();

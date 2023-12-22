@@ -16,11 +16,17 @@ package page.foliage.guava.common.util.concurrent;
 
 import static java.lang.Double.doubleToRawLongBits;
 import static java.lang.Double.longBitsToDouble;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.j2objc.annotations.ReflectionSupport;
-import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A {@code double} value that may be updated atomically. See the {@link
@@ -29,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
  * cannot be used as a replacement for a {@link Double}. However, this class does extend {@code
  * Number} to allow uniform access by tools and utilities that deal with numerically-based classes.
  *
- * <p><a name="bitEquals"></a>This class compares primitive {@code double} values in methods such as
+ * <p><a id="bitEquals"></a>This class compares primitive {@code double} values in methods such as
  * {@link #compareAndSet} by comparing their bitwise representation using {@link
  * Double#doubleToRawLongBits}, which differs from both the primitive double {@code ==} operator and
  * from {@link Double#equals}, as if implemented by:
@@ -44,17 +50,17 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
  *
  * <p>It is possible to write a more scalable updater, at the cost of giving up strict atomicity.
  * See for example <a
- * href="http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166edocs/jsr166e/DoubleAdder.html">
- * DoubleAdder</a> and <a
- * href="http://gee.cs.oswego.edu/dl/jsr166/dist/jsr166edocs/jsr166e/DoubleMaxUpdater.html">
- * DoubleMaxUpdater</a>.
+ * href="http://gee.cs.oswego.edu/dl/jsr166/dist/docs/java.base/java/util/concurrent/atomic/DoubleAdder.html">
+ * DoubleAdder</a>.
  *
  * @author Doug Lea
  * @author Martin Buchholz
  * @since 11.0
  */
 @GwtIncompatible
+@J2ktIncompatible
 @ReflectionSupport(value = ReflectionSupport.Level.FULL)
+@ElementTypesAreNonnullByDefault
 public class AtomicDouble extends Number implements java.io.Serializable {
   private static final long serialVersionUID = 0L;
 
@@ -156,15 +162,7 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    */
   @CanIgnoreReturnValue
   public final double getAndAdd(double delta) {
-    while (true) {
-      long current = value;
-      double currentVal = longBitsToDouble(current);
-      double nextVal = currentVal + delta;
-      long next = doubleToRawLongBits(nextVal);
-      if (updater.compareAndSet(this, current, next)) {
-        return currentVal;
-      }
-    }
+    return getAndAccumulate(delta, Double::sum);
   }
 
   /**
@@ -175,10 +173,72 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    */
   @CanIgnoreReturnValue
   public final double addAndGet(double delta) {
+    return accumulateAndGet(delta, Double::sum);
+  }
+
+  /**
+   * Atomically updates the current value with the results of applying the given function to the
+   * current and given values.
+   *
+   * @param x the update value
+   * @param accumulatorFunction the accumulator function
+   * @return the previous value
+   * @since 31.1
+   */
+  @CanIgnoreReturnValue
+  public final double getAndAccumulate(double x, DoubleBinaryOperator accumulatorFunction) {
+    checkNotNull(accumulatorFunction);
+    return getAndUpdate(oldValue -> accumulatorFunction.applyAsDouble(oldValue, x));
+  }
+
+  /**
+   * Atomically updates the current value with the results of applying the given function to the
+   * current and given values.
+   *
+   * @param x the update value
+   * @param accumulatorFunction the accumulator function
+   * @return the updated value
+   * @since 31.1
+   */
+  @CanIgnoreReturnValue
+  public final double accumulateAndGet(double x, DoubleBinaryOperator accumulatorFunction) {
+    checkNotNull(accumulatorFunction);
+    return updateAndGet(oldValue -> accumulatorFunction.applyAsDouble(oldValue, x));
+  }
+
+  /**
+   * Atomically updates the current value with the results of applying the given function.
+   *
+   * @param updateFunction the update function
+   * @return the previous value
+   * @since 31.1
+   */
+  @CanIgnoreReturnValue
+  public final double getAndUpdate(DoubleUnaryOperator updateFunction) {
     while (true) {
       long current = value;
       double currentVal = longBitsToDouble(current);
-      double nextVal = currentVal + delta;
+      double nextVal = updateFunction.applyAsDouble(currentVal);
+      long next = doubleToRawLongBits(nextVal);
+      if (updater.compareAndSet(this, current, next)) {
+        return currentVal;
+      }
+    }
+  }
+
+  /**
+   * Atomically updates the current value with the results of applying the given function.
+   *
+   * @param updateFunction the update function
+   * @return the updated value
+   * @since 31.1
+   */
+  @CanIgnoreReturnValue
+  public final double updateAndGet(DoubleUnaryOperator updateFunction) {
+    while (true) {
+      long current = value;
+      double currentVal = longBitsToDouble(current);
+      double nextVal = updateFunction.applyAsDouble(currentVal);
       long next = doubleToRawLongBits(nextVal);
       if (updater.compareAndSet(this, current, next)) {
         return nextVal;
@@ -191,6 +251,7 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    *
    * @return the String representation of the current value
    */
+  @Override
   public String toString() {
     return Double.toString(get());
   }
@@ -199,6 +260,7 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    * Returns the value of this {@code AtomicDouble} as an {@code int} after a narrowing primitive
    * conversion.
    */
+  @Override
   public int intValue() {
     return (int) get();
   }
@@ -207,6 +269,7 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    * Returns the value of this {@code AtomicDouble} as a {@code long} after a narrowing primitive
    * conversion.
    */
+  @Override
   public long longValue() {
     return (long) get();
   }
@@ -215,11 +278,13 @@ public class AtomicDouble extends Number implements java.io.Serializable {
    * Returns the value of this {@code AtomicDouble} as a {@code float} after a narrowing primitive
    * conversion.
    */
+  @Override
   public float floatValue() {
     return (float) get();
   }
 
   /** Returns the value of this {@code AtomicDouble} as a {@code double}. */
+  @Override
   public double doubleValue() {
     return get();
   }

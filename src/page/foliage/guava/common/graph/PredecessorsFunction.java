@@ -16,6 +16,8 @@
 
 package page.foliage.guava.common.graph;
 
+import com.google.errorprone.annotations.DoNotMock;
+
 import page.foliage.guava.common.annotations.Beta;
 
 /**
@@ -78,6 +80,8 @@ import page.foliage.guava.common.annotations.Beta;
  * @since 23.0
  */
 @Beta
+@DoNotMock("Implement with a lambda, or use GraphBuilder to build a Graph with the desired edges")
+@ElementTypesAreNonnullByDefault
 public interface PredecessorsFunction<N> {
 
   /**

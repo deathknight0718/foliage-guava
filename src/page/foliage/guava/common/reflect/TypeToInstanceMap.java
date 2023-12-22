@@ -14,10 +14,15 @@
 
 package page.foliage.guava.common.reflect;
 
-import page.foliage.guava.common.annotations.Beta;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Map;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotMock;
 
 /**
  * A map, each entry of which maps a {@link TypeToken} to an instance of that type. In addition to
@@ -38,8 +43,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Ben Yu
  * @since 13.0
  */
-@Beta
-public interface TypeToInstanceMap<B> extends Map<TypeToken<? extends B>, B> {
+@DoNotMock("Use ImmutableTypeToInstanceMap or MutableTypeToInstanceMap")
+@ElementTypesAreNonnullByDefault
+public interface TypeToInstanceMap<B extends @Nullable Object>
+    extends Map<TypeToken<? extends @NonNull B>, B> {
 
   /**
    * Returns the value the specified class is mapped to, or {@code null} if no entry for this class
@@ -49,16 +56,16 @@ public interface TypeToInstanceMap<B> extends Map<TypeToken<? extends B>, B> {
    * <p>{@code getInstance(Foo.class)} is equivalent to {@code
    * getInstance(TypeToken.of(Foo.class))}.
    */
-  @NullableDecl
-  <T extends B> T getInstance(Class<T> type);
+  @CheckForNull
+  <T extends @NonNull B> T getInstance(Class<T> type);
 
   /**
    * Returns the value the specified type is mapped to, or {@code null} if no entry for this type is
    * present. This will only return a value that was bound to this specific type, not a value that
    * may have been bound to a subtype.
    */
-  @NullableDecl
-  <T extends B> T getInstance(TypeToken<T> type);
+  @CheckForNull
+  <T extends @NonNull B> T getInstance(TypeToken<T> type);
 
   /**
    * Maps the specified class to the specified value. Does <i>not</i> associate this value with any
@@ -70,9 +77,9 @@ public interface TypeToInstanceMap<B> extends Map<TypeToken<? extends B>, B> {
    * @return the value previously associated with this class (possibly {@code null}), or {@code
    *     null} if there was no previous entry.
    */
-  @NullableDecl
   @CanIgnoreReturnValue
-  <T extends B> T putInstance(Class<T> type, @NullableDecl T value);
+  @CheckForNull
+  <T extends B> T putInstance(Class<@NonNull T> type, @ParametricNullness T value);
 
   /**
    * Maps the specified type to the specified value. Does <i>not</i> associate this value with any
@@ -81,7 +88,7 @@ public interface TypeToInstanceMap<B> extends Map<TypeToken<? extends B>, B> {
    * @return the value previously associated with this type (possibly {@code null}), or {@code null}
    *     if there was no previous entry.
    */
-  @NullableDecl
   @CanIgnoreReturnValue
-  <T extends B> T putInstance(TypeToken<T> type, @NullableDecl T value);
+  @CheckForNull
+  <T extends B> T putInstance(TypeToken<@NonNull T> type, @ParametricNullness T value);
 }

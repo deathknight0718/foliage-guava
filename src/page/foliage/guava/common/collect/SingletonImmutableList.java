@@ -18,10 +18,11 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Spliterator;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Preconditions;
 
 /**
  * Implementation of {@link ImmutableList} with exactly one element.
@@ -30,6 +31,7 @@ import java.util.Spliterator;
  */
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial") // uses writeReplace(), not default serialization
+@ElementTypesAreNonnullByDefault
 final class SingletonImmutableList<E> extends ImmutableList<E> {
 
   final transient E element;

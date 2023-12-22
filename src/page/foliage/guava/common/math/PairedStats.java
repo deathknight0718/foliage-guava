@@ -14,21 +14,23 @@
 
 package page.foliage.guava.common.math;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.base.Preconditions.checkState;
 import static java.lang.Double.NaN;
 import static java.lang.Double.doubleToLongBits;
 import static java.lang.Double.isNaN;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.base.Objects;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.base.Objects;
 
 /**
  * An immutable value object capturing some basic statistics about a collection of paired double
@@ -37,8 +39,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Pete Gillin
  * @since 20.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class PairedStats implements Serializable {
 
   private final Stats xStats;
@@ -213,7 +216,7 @@ public final class PairedStats implements Serializable {
    * guarantees {@code strictfp}-like semantics.)
    */
   @Override
-  public boolean equals(@NullableDecl Object obj) {
+  public boolean equals(@CheckForNull Object obj) {
     if (obj == null) {
       return false;
     }
@@ -221,10 +224,9 @@ public final class PairedStats implements Serializable {
       return false;
     }
     PairedStats other = (PairedStats) obj;
-    return (xStats.equals(other.xStats))
-        && (yStats.equals(other.yStats))
-        && (doubleToLongBits(sumOfProductsOfDeltas)
-            == doubleToLongBits(other.sumOfProductsOfDeltas));
+    return xStats.equals(other.xStats)
+        && yStats.equals(other.yStats)
+        && doubleToLongBits(sumOfProductsOfDeltas) == doubleToLongBits(other.sumOfProductsOfDeltas);
   }
 
   /**

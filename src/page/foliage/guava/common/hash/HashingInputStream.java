@@ -16,11 +16,13 @@ package page.foliage.guava.common.hash;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.Beta;
 
 /**
  * An {@link InputStream} that maintains a hash of the data read from it.
@@ -29,6 +31,7 @@ import java.io.InputStream;
  * @since 16.0
  */
 @Beta
+@ElementTypesAreNonnullByDefault
 public final class HashingInputStream extends FilterInputStream {
   private final Hasher hasher;
 

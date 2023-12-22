@@ -16,6 +16,10 @@ package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.Executor;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Function;
@@ -23,10 +27,6 @@ import page.foliage.guava.common.base.Supplier;
 import page.foliage.guava.common.util.concurrent.Futures;
 import page.foliage.guava.common.util.concurrent.ListenableFuture;
 import page.foliage.guava.common.util.concurrent.ListenableFutureTask;
-import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a {@link LoadingCache}.
@@ -56,6 +56,7 @@ import java.util.concurrent.Executor;
  * @since 10.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public abstract class CacheLoader<K, V> {
   /** Constructor for use by subclasses. */
   protected CacheLoader() {}
@@ -132,6 +133,8 @@ public abstract class CacheLoader<K, V> {
    * Returns a cache loader that uses {@code function} to load keys, without supporting either
    * reloading or bulk loading. This allows creating a cache loader using a lambda expression.
    *
+   * <p>The returned object is serializable if {@code function} is serializable.
+   *
    * @param function the function to be used for loading values; must never return {@code null}
    * @return a cache loader that loads values by passing each key to {@code function}
    */
@@ -144,12 +147,14 @@ public abstract class CacheLoader<K, V> {
    * to create a <i>new</i> supplier just to pass it in here; just subclass {@code CacheLoader} and
    * implement {@link #load load} instead.
    *
+   * <p>The returned object is serializable if {@code supplier} is serializable.
+   *
    * @param supplier the supplier to be used for loading values; must never return {@code null}
    * @return a cache loader that loads values by calling {@link Supplier#get}, irrespective of the
    *     key
    */
   public static <V> CacheLoader<Object, V> from(Supplier<V> supplier) {
-    return new SupplierToCacheLoader<V>(supplier);
+    return new SupplierToCacheLoader<>(supplier);
   }
 
   private static final class FunctionToCacheLoader<K, V> extends CacheLoader<K, V>
@@ -189,15 +194,9 @@ public abstract class CacheLoader<K, V> {
       }
 
       @Override
-      public ListenableFuture<V> reload(final K key, final V oldValue) throws Exception {
+      public ListenableFuture<V> reload(final K key, final V oldValue) {
         ListenableFutureTask<V> task =
-            ListenableFutureTask.create(
-                new Callable<V>() {
-                  @Override
-                  public V call() throws Exception {
-                    return loader.reload(key, oldValue).get();
-                  }
-                });
+            ListenableFutureTask.create(() -> loader.reload(key, oldValue).get());
         executor.execute(task);
         return task;
       }

@@ -14,15 +14,12 @@
 
 package page.foliage.guava.common.collect;
 
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkRemove;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.primitives.Ints;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,20 +28,29 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.ObjIntConsumer;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.primitives.Ints;
 
 /**
  * Multiset implementation specialized for enum elements, supporting all single-element operations
  * in O(1).
  *
  * <p>See the Guava User Guide article on <a href=
- * "https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset"> {@code
- * Multiset}</a>.
+ * "https://github.com/google/guava/wiki/NewCollectionTypesExplained#multiset">{@code Multiset}</a>.
  *
  * @author Jared Levy
  * @since 2.0
  */
 @GwtCompatible(emulated = true)
+@J2ktIncompatible
+@ElementTypesAreNonnullByDefault
 public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
     implements Serializable {
   /** Creates an empty {@code EnumMultiset}. */
@@ -94,7 +100,7 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
     this.counts = new int[enumConstants.length];
   }
 
-  private boolean isActuallyE(@NullableDecl Object o) {
+  private boolean isActuallyE(@CheckForNull Object o) {
     if (o instanceof Enum) {
       Enum<?> e = (Enum<?>) o;
       int index = e.ordinal();
@@ -107,8 +113,7 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
    * Returns {@code element} cast to {@code E}, if it actually is a nonnull E. Otherwise, throws
    * either a NullPointerException or a ClassCastException as appropriate.
    */
-  @SuppressWarnings("unchecked")
-  void checkIsE(@NullableDecl Object element) {
+  private void checkIsE(Object element) {
     checkNotNull(element);
     if (!isActuallyE(element)) {
       throw new ClassCastException("Expected an " + type + " but got " + element);
@@ -126,7 +131,8 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
   }
 
   @Override
-  public int count(@NullableDecl Object element) {
+  public int count(@CheckForNull Object element) {
+    // isActuallyE checks for null, but we check explicitly to help nullness checkers.
     if (element == null || !isActuallyE(element)) {
       return 0;
     }
@@ -158,7 +164,8 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
   // Modification Operations
   @CanIgnoreReturnValue
   @Override
-  public int remove(@NullableDecl Object element, int occurrences) {
+  public int remove(@CheckForNull Object element, int occurrences) {
+    // isActuallyE checks for null, but we check explicitly to help nullness checkers.
     if (element == null || !isActuallyE(element)) {
       return 0;
     }
@@ -306,7 +313,7 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMultiset<E>
   private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
     stream.defaultReadObject();
     @SuppressWarnings("unchecked") // reading data stored by writeObject
-    Class<E> localType = (Class<E>) stream.readObject();
+    Class<E> localType = (Class<E>) requireNonNull(stream.readObject());
     type = localType;
     enumConstants = type.getEnumConstants();
     counts = new int[enumConstants.length];

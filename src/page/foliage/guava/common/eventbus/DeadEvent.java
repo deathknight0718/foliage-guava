@@ -16,7 +16,6 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.MoreObjects;
 
 /**
@@ -28,7 +27,7 @@ import page.foliage.guava.common.base.MoreObjects;
  * @author Cliff Biffle
  * @since 10.0
  */
-@Beta
+@ElementTypesAreNonnullByDefault
 public class DeadEvent {
 
   private final Object source;

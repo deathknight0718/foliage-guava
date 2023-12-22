@@ -16,7 +16,8 @@ package page.foliage.guava.common.escape;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
@@ -49,8 +50,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author David Beaumont
  * @since 15.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class UnicodeEscaper extends Escaper {
   /** The amount of padding (chars) to use when growing the escape buffer. */
   private static final int DEST_PAD = 32;
@@ -77,6 +78,7 @@ public abstract class UnicodeEscaper extends Escaper {
    * @param cp the Unicode code point to escape if necessary
    * @return the replacement characters, or {@code null} if no escaping was needed
    */
+  @CheckForNull
   protected abstract char[] escape(int cp);
 
   /**
@@ -90,7 +92,7 @@ public abstract class UnicodeEscaper extends Escaper {
    * <p><b>Note:</b> When implementing an escaper it is a good idea to override this method for
    * efficiency by inlining the implementation of {@link #nextEscapeIndex(CharSequence, int, int)}
    * directly. Doing this for {@link page.foliage.guava.common.net.PercentEscaper} more than doubled the
-   * performance for unescaped strings (as measured by {@link CharEscapersBenchmark}).
+   * performance for unescaped strings (as measured by {@code CharEscapersBenchmark}).
    *
    * @param string the literal string to be escaped
    * @return the escaped form of {@code string}

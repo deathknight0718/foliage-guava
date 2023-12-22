@@ -14,11 +14,22 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
+import static java.lang.Math.min;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.FutureTask;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A {@link FutureTask} that also implements the {@link ListenableFuture} interface. Unlike {@code
@@ -33,8 +44,11 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Sven Mawson
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
-public class ListenableFutureTask<V> extends FutureTask<V> implements ListenableFuture<V> {
+@ElementTypesAreNonnullByDefault
+public class ListenableFutureTask<V extends @Nullable Object> extends FutureTask<V>
+    implements ListenableFuture<V> {
   // TODO(cpovirk): explore ways of making ListenableFutureTask final. There are some valid reasons
   // such as BoundedQueueExecutorService to allow extends but it would be nice to make it final to
   // avoid unintended usage.
@@ -49,8 +63,8 @@ public class ListenableFutureTask<V> extends FutureTask<V> implements Listenable
    * @param callable the callable task
    * @since 10.0
    */
-  public static <V> ListenableFutureTask<V> create(Callable<V> callable) {
-    return new ListenableFutureTask<V>(callable);
+  public static <V extends @Nullable Object> ListenableFutureTask<V> create(Callable<V> callable) {
+    return new ListenableFutureTask<>(callable);
   }
 
   /**
@@ -63,21 +77,37 @@ public class ListenableFutureTask<V> extends FutureTask<V> implements Listenable
    *     ListenableFutureTask.create(runnable, null)}
    * @since 10.0
    */
-  public static <V> ListenableFutureTask<V> create(Runnable runnable, @NullableDecl V result) {
-    return new ListenableFutureTask<V>(runnable, result);
+  public static <V extends @Nullable Object> ListenableFutureTask<V> create(
+      Runnable runnable, @ParametricNullness V result) {
+    return new ListenableFutureTask<>(runnable, result);
   }
 
   ListenableFutureTask(Callable<V> callable) {
     super(callable);
   }
 
-  ListenableFutureTask(Runnable runnable, @NullableDecl V result) {
+  ListenableFutureTask(Runnable runnable, @ParametricNullness V result) {
     super(runnable, result);
   }
 
   @Override
   public void addListener(Runnable listener, Executor exec) {
     executionList.add(listener, exec);
+  }
+
+  @CanIgnoreReturnValue
+  @Override
+  @ParametricNullness
+  public V get(long timeout, TimeUnit unit)
+      throws TimeoutException, InterruptedException, ExecutionException {
+
+    long timeoutNanos = unit.toNanos(timeout);
+    if (timeoutNanos <= OverflowAvoidingLockSupport.MAX_NANOSECONDS_THRESHOLD) {
+      return super.get(timeout, unit);
+    }
+    // Waiting 68 years should be enough for any program.
+    return super.get(
+        min(timeoutNanos, OverflowAvoidingLockSupport.MAX_NANOSECONDS_THRESHOLD), NANOSECONDS);
   }
 
   /** Internal implementation detail used to invoke the listeners. */

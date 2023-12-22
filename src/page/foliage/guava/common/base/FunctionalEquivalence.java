@@ -16,10 +16,13 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Equivalence applied on functional result.
@@ -27,16 +30,17 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Bob Lee
  * @since 10.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 final class FunctionalEquivalence<F, T> extends Equivalence<F> implements Serializable {
 
   private static final long serialVersionUID = 0;
 
-  private final Function<F, ? extends T> function;
+  private final Function<? super F, ? extends @Nullable T> function;
   private final Equivalence<T> resultEquivalence;
 
-  FunctionalEquivalence(Function<F, ? extends T> function, Equivalence<T> resultEquivalence) {
+  FunctionalEquivalence(
+      Function<? super F, ? extends @Nullable T> function, Equivalence<T> resultEquivalence) {
     this.function = checkNotNull(function);
     this.resultEquivalence = checkNotNull(resultEquivalence);
   }
@@ -52,7 +56,7 @@ final class FunctionalEquivalence<F, T> extends Equivalence<F> implements Serial
   }
 
   @Override
-  public boolean equals(@NullableDecl Object obj) {
+  public boolean equals(@CheckForNull Object obj) {
     if (obj == this) {
       return true;
     }

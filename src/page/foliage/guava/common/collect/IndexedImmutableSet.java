@@ -18,13 +18,17 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+
 @GwtCompatible(emulated = true)
-abstract class IndexedImmutableSet<E> extends ImmutableSet<E> {
+@ElementTypesAreNonnullByDefault
+abstract class IndexedImmutableSet<E> extends ImmutableSet.CachingAsList<E> {
   abstract E get(int index);
 
   @Override
@@ -48,7 +52,7 @@ abstract class IndexedImmutableSet<E> extends ImmutableSet<E> {
 
   @Override
   @GwtIncompatible
-  int copyIntoArray(Object[] dst, int offset) {
+  int copyIntoArray(@Nullable Object[] dst, int offset) {
     return asList().copyIntoArray(dst, offset);
   }
 

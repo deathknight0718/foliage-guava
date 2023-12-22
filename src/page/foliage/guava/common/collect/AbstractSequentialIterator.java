@@ -16,9 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.NoSuchElementException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * This class provides a skeletal implementation of the {@code Iterator} interface for sequences
@@ -40,14 +42,15 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 12.0 (in Guava as {@code AbstractLinkedIterator} since 8.0)
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class AbstractSequentialIterator<T> extends UnmodifiableIterator<T> {
-  @NullableDecl private T nextOrNull;
+  @CheckForNull private T nextOrNull;
 
   /**
    * Creates a new iterator with the given first element, or, if {@code firstOrNull} is null,
    * creates a new empty iterator.
    */
-  protected AbstractSequentialIterator(@NullableDecl T firstOrNull) {
+  protected AbstractSequentialIterator(@CheckForNull T firstOrNull) {
     this.nextOrNull = firstOrNull;
   }
 
@@ -56,6 +59,7 @@ public abstract class AbstractSequentialIterator<T> extends UnmodifiableIterator
    * remain. This method is invoked during each call to {@link #next()} in order to compute the
    * result of a <i>future</i> call to {@code next()}.
    */
+  @CheckForNull
   protected abstract T computeNext(T previous);
 
   @Override
@@ -65,13 +69,11 @@ public abstract class AbstractSequentialIterator<T> extends UnmodifiableIterator
 
   @Override
   public final T next() {
-    if (!hasNext()) {
+    if (nextOrNull == null) {
       throw new NoSuchElementException();
     }
-    try {
-      return nextOrNull;
-    } finally {
-      nextOrNull = computeNext(nextOrNull);
-    }
+    T oldNext = nextOrNull;
+    nextOrNull = computeNext(oldNext);
+    return oldNext;
   }
 }

@@ -16,8 +16,11 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.SortedSet;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * Superinterface of {@link SortedMultiset} to introduce a bridge method for {@code elementSet()},
@@ -27,7 +30,8 @@ import java.util.SortedSet;
  * @author Louis Wasserman
  */
 @GwtIncompatible
-interface SortedMultisetBridge<E> extends Multiset<E> {
+@ElementTypesAreNonnullByDefault
+interface SortedMultisetBridge<E extends @Nullable Object> extends Multiset<E> {
   @Override
   SortedSet<E> elementSet();
 }

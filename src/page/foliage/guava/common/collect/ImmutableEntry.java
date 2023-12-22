@@ -16,35 +16,44 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
-/** @see page.foliage.guava.common.collect.Maps#immutableEntry(Object, Object) */
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+
+/**
+ * An immutable {@code Map.Entry}, used both by {@link
+ * page.foliage.guava.common.collect.Maps#immutableEntry(Object, Object)} and by other parts of {@code
+ * common.collect} as a superclass.
+ */
 @GwtCompatible(serializable = true)
-class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
-  @NullableDecl final K key;
-  @NullableDecl final V value;
+@ElementTypesAreNonnullByDefault
+class ImmutableEntry<K extends @Nullable Object, V extends @Nullable Object>
+    extends AbstractMapEntry<K, V> implements Serializable {
+  @ParametricNullness final K key;
+  @ParametricNullness final V value;
 
-  ImmutableEntry(@NullableDecl K key, @NullableDecl V value) {
+  ImmutableEntry(@ParametricNullness K key, @ParametricNullness V value) {
     this.key = key;
     this.value = value;
   }
 
-  @NullableDecl
   @Override
+  @ParametricNullness
   public final K getKey() {
     return key;
   }
 
-  @NullableDecl
   @Override
+  @ParametricNullness
   public final V getValue() {
     return value;
   }
 
   @Override
-  public final V setValue(V value) {
+  @ParametricNullness
+  public final V setValue(@ParametricNullness V value) {
     throw new UnsupportedOperationException();
   }
 

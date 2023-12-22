@@ -16,11 +16,12 @@ package page.foliage.guava.common.io;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * An {@link InputStream} that counts the number of bytes read.
@@ -28,8 +29,9 @@ import java.io.InputStream;
  * @author Chris Nokleberg
  * @since 1.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class CountingInputStream extends FilterInputStream {
 
   private long count;

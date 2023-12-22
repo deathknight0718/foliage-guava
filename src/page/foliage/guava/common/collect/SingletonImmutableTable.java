@@ -18,8 +18,9 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Map;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An implementation of {@link ImmutableTable} that holds a single cell.
@@ -27,6 +28,7 @@ import java.util.Map;
  * @author Gregory Kick
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 class SingletonImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
   final R singleRowKey;
   final C singleColumnKey;

@@ -16,6 +16,8 @@
 
 package page.foliage.guava.common.collect;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
@@ -24,7 +26,9 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author Louis Wasserman
  */
 @GwtCompatible
-interface FilteredSetMultimap<K, V> extends FilteredMultimap<K, V>, SetMultimap<K, V> {
+@ElementTypesAreNonnullByDefault
+interface FilteredSetMultimap<K extends @Nullable Object, V extends @Nullable Object>
+    extends FilteredMultimap<K, V>, SetMultimap<K, V> {
   @Override
   SetMultimap<K, V> unfiltered();
 }

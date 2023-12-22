@@ -14,9 +14,12 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Package-protected abstract class that implements the line reading algorithm used by {@link
@@ -29,7 +32,9 @@ import java.io.IOException;
  * @author Chris Nokleberg
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 abstract class LineBuffer {
   /** Holds partial line contents. */
   private StringBuilder line = new StringBuilder();

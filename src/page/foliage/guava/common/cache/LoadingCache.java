@@ -14,13 +14,16 @@
 
 package page.foliage.guava.common.cache;
 
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.util.concurrent.ExecutionError;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A semi-persistent mapping from keys to values. Values are automatically loaded by the cache, and
@@ -33,10 +36,13 @@ import java.util.concurrent.ExecutionException;
  * <p>When evaluated as a {@link Function}, a cache yields the same result as invoking {@link
  * #getUnchecked}.
  *
+ * @param <K> the type of the cache's keys, which are not permitted to be null
+ * @param <V> the type of the cache's values, which are not permitted to be null
  * @author Charles Fry
  * @since 11.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public interface LoadingCache<K, V> extends Cache<K, V>, Function<K, V> {
 
   /**
@@ -64,6 +70,7 @@ public interface LoadingCache<K, V> extends Cache<K, V>, Function<K, V> {
    *     value
    * @throws ExecutionError if an error was thrown while loading the value
    */
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this?
   V get(K key) throws ExecutionException;
 
   /**
@@ -90,6 +97,7 @@ public interface LoadingCache<K, V> extends Cache<K, V>, Function<K, V> {
    *     explained in the last paragraph above, this should be an unchecked exception only.)
    * @throws ExecutionError if an error was thrown while loading the value
    */
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this?
   V getUnchecked(K key);
 
   /**
@@ -116,6 +124,7 @@ public interface LoadingCache<K, V> extends Cache<K, V>, Function<K, V> {
    * @throws ExecutionError if an error was thrown while loading the values
    * @since 11.0
    */
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this
   ImmutableMap<K, V> getAll(Iterable<? extends K> keys) throws ExecutionException;
 
   /**
@@ -130,11 +139,11 @@ public interface LoadingCache<K, V> extends Cache<K, V>, Function<K, V> {
   V apply(K key);
 
   /**
-   * Loads a new value for key {@code key}, possibly asynchronously. While the new value is loading
-   * the previous value (if any) will continue to be returned by {@code get(key)} unless it is
-   * evicted. If the new value is loaded successfully it will replace the previous value in the
-   * cache; if an exception is thrown while refreshing the previous value will remain, <i>and the
-   * exception will be logged (using {@link java.util.logging.Logger}) and swallowed</i>.
+   * Loads a new value for {@code key}, possibly asynchronously. While the new value is loading the
+   * previous value (if any) will continue to be returned by {@code get(key)} unless it is evicted.
+   * If the new value is loaded successfully it will replace the previous value in the cache; if an
+   * exception is thrown while refreshing the previous value will remain, <i>and the exception will
+   * be logged (using {@link java.util.logging.Logger}) and swallowed</i>.
    *
    * <p>Caches loaded by a {@link CacheLoader} will call {@link CacheLoader#reload} if the cache
    * currently contains a value for {@code key}, and {@link CacheLoader#load} otherwise. Loading is

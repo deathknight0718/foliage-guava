@@ -16,10 +16,6 @@ package page.foliage.guava.common.util.concurrent;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.collect.Queues;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +23,13 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.collect.Queues;
 
 /**
  * A list of listeners for implementing a concurrency friendly observable object.
@@ -52,7 +55,9 @@ import java.util.logging.Logger;
  * the listeners can be delayed slightly so that locks can be dropped. Also, because {@link
  * #dispatch} is expected to be called concurrently, it is idempotent.
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 final class ListenerCallQueue<L> {
   // TODO(cpovirk): consider using the logger associated with listener.getClass().
   private static final Logger logger = Logger.getLogger(ListenerCallQueue.class.getName());
@@ -123,7 +128,7 @@ final class ListenerCallQueue<L> {
 
   /**
    * A special purpose queue/executor that dispatches listener events serially on a configured
-   * executor. Each event event can be added and dispatched as separate phases.
+   * executor. Each event can be added and dispatched as separate phases.
    *
    * <p>This class is very similar to {@link SequentialExecutor} with the exception that events can
    * be added without necessarily executing immediately.
@@ -146,7 +151,7 @@ final class ListenerCallQueue<L> {
       this.executor = checkNotNull(executor);
     }
 
-    /** Enqueues a event to be run. */
+    /** Enqueues an event to be run. */
     synchronized void add(ListenerCallQueue.Event<L> event, Object label) {
       waitQueue.add(event);
       labelQueue.add(label);

@@ -14,13 +14,15 @@
 
 package page.foliage.guava.common.hash;
 
-import page.foliage.guava.common.base.Preconditions;
-import com.google.errorprone.annotations.Immutable;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+
+import com.google.errorprone.annotations.Immutable;
+
+import page.foliage.guava.common.base.Preconditions;
 
 /**
  * Skeleton implementation of {@link HashFunction}, appropriate for non-streaming algorithms. All
@@ -30,6 +32,7 @@ import java.util.Arrays;
  * @author Dimitris Andreou
  */
 @Immutable
+@ElementTypesAreNonnullByDefault
 abstract class AbstractNonStreamingHashFunction extends AbstractHashFunction {
   @Override
   public Hasher newHasher() {

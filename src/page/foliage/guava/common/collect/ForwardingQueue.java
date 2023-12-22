@@ -16,10 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A queue which forwards all its method calls to another queue. Subclasses should override one or
@@ -44,7 +50,9 @@ import java.util.Queue;
  * @since 2.0
  */
 @GwtCompatible
-public abstract class ForwardingQueue<E> extends ForwardingCollection<E> implements Queue<E> {
+@ElementTypesAreNonnullByDefault
+public abstract class ForwardingQueue<E extends @Nullable Object> extends ForwardingCollection<E>
+    implements Queue<E> {
 
   /** Constructor for use by subclasses. */
   protected ForwardingQueue() {}
@@ -54,28 +62,32 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 
   @CanIgnoreReturnValue // TODO(cpovirk): Consider removing this?
   @Override
-  public boolean offer(E o) {
+  public boolean offer(@ParametricNullness E o) {
     return delegate().offer(o);
   }
 
   @CanIgnoreReturnValue // TODO(cpovirk): Consider removing this?
   @Override
+  @CheckForNull
   public E poll() {
     return delegate().poll();
   }
 
   @CanIgnoreReturnValue
   @Override
+  @ParametricNullness
   public E remove() {
     return delegate().remove();
   }
 
   @Override
+  @CheckForNull
   public E peek() {
     return delegate().peek();
   }
 
   @Override
+  @ParametricNullness
   public E element() {
     return delegate().element();
   }
@@ -86,7 +98,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
    *
    * @since 7.0
    */
-  protected boolean standardOffer(E e) {
+  protected boolean standardOffer(@ParametricNullness E e) {
     try {
       return add(e);
     } catch (IllegalStateException caught) {
@@ -100,6 +112,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
    *
    * @since 7.0
    */
+  @CheckForNull
   protected E standardPeek() {
     try {
       return element();
@@ -114,6 +127,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
    *
    * @since 7.0
    */
+  @CheckForNull
   protected E standardPoll() {
     try {
       return remove();

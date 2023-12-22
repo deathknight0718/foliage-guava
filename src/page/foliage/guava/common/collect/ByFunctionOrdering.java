@@ -18,18 +18,24 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import java.io.Serializable;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.base.Objects;
-import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An ordering that orders elements by applying an order to the result of a function on those
  * elements.
  */
 @GwtCompatible(serializable = true)
-final class ByFunctionOrdering<F, T> extends Ordering<F> implements Serializable {
+@ElementTypesAreNonnullByDefault
+final class ByFunctionOrdering<F extends @Nullable Object, T extends @Nullable Object>
+    extends Ordering<F> implements Serializable {
   final Function<F, ? extends T> function;
   final Ordering<T> ordering;
 
@@ -39,12 +45,12 @@ final class ByFunctionOrdering<F, T> extends Ordering<F> implements Serializable
   }
 
   @Override
-  public int compare(F left, F right) {
+  public int compare(@ParametricNullness F left, @ParametricNullness F right) {
     return ordering.compare(function.apply(left), function.apply(right));
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     if (object == this) {
       return true;
     }

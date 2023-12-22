@@ -18,14 +18,20 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.Comparator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** An ordering for a pre-existing comparator. */
 @GwtCompatible(serializable = true)
-final class ComparatorOrdering<T> extends Ordering<T> implements Serializable {
+@ElementTypesAreNonnullByDefault
+final class ComparatorOrdering<T extends @Nullable Object> extends Ordering<T>
+    implements Serializable {
   final Comparator<T> comparator;
 
   ComparatorOrdering(Comparator<T> comparator) {
@@ -33,12 +39,12 @@ final class ComparatorOrdering<T> extends Ordering<T> implements Serializable {
   }
 
   @Override
-  public int compare(T a, T b) {
+  public int compare(@ParametricNullness T a, @ParametricNullness T b) {
     return comparator.compare(a, b);
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     if (object == this) {
       return true;
     }

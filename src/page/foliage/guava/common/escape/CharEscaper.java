@@ -16,7 +16,8 @@ package page.foliage.guava.common.escape;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
@@ -39,8 +40,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author Sven Mawson
  * @since 15.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class CharEscaper extends Escaper {
   /** Constructor for use by subclasses. */
   protected CharEscaper() {}
@@ -80,6 +81,7 @@ public abstract class CharEscaper extends Escaper {
    * @param c the character to escape if necessary
    * @return the replacement characters, or {@code null} if no escaping was needed
    */
+  @CheckForNull
   protected abstract char[] escape(char c);
 
   /**

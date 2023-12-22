@@ -14,8 +14,9 @@
 
 package page.foliage.guava.common.collect;
 
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * A descending wrapper around an {@code ImmutableSortedMultiset}
@@ -24,6 +25,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  */
 @SuppressWarnings("serial") // uses writeReplace, not default serialization
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 final class DescendingImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E> {
   private final transient ImmutableSortedMultiset<E> forward;
 
@@ -32,16 +34,18 @@ final class DescendingImmutableSortedMultiset<E> extends ImmutableSortedMultiset
   }
 
   @Override
-  public int count(@NullableDecl Object element) {
+  public int count(@CheckForNull Object element) {
     return forward.count(element);
   }
 
   @Override
+  @CheckForNull
   public Entry<E> firstEntry() {
     return forward.lastEntry();
   }
 
   @Override
+  @CheckForNull
   public Entry<E> lastEntry() {
     return forward.firstEntry();
   }

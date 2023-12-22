@@ -16,15 +16,16 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collection;
 import java.util.Map;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A dummy superclass to support GWT serialization of the element types of an {@link
  * ArrayListMultimap}. The GWT supersource for this class contains a field for each type.
  *
- * <p>For details about this hack, see {@link GwtSerializationDependencies}, which takes the same
+ * <p>For details about this hack, see {@code GwtSerializationDependencies}, which takes the same
  * approach but with a subclass rather than a superclass.
  *
  * <p>TODO(cpovirk): Consider applying this subclass approach to our other types.

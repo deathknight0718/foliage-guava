@@ -18,12 +18,13 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.graph.GraphConstants.EXPECTED_DEGREE;
 
-import page.foliage.guava.common.collect.BiMap;
-import page.foliage.guava.common.collect.HashBiMap;
-import page.foliage.guava.common.collect.ImmutableBiMap;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import page.foliage.guava.common.collect.BiMap;
+import page.foliage.guava.common.collect.HashBiMap;
+import page.foliage.guava.common.collect.ImmutableBiMap;
 
 /**
  * An implementation of {@link NetworkConnections} for directed networks.
@@ -32,10 +33,10 @@ import java.util.Set;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 final class DirectedNetworkConnections<N, E> extends AbstractDirectedNetworkConnections<N, E> {
 
-  protected DirectedNetworkConnections(
-      Map<E, N> inEdgeMap, Map<E, N> outEdgeMap, int selfLoopCount) {
+  DirectedNetworkConnections(Map<E, N> inEdgeMap, Map<E, N> outEdgeMap, int selfLoopCount) {
     super(inEdgeMap, outEdgeMap, selfLoopCount);
   }
 
@@ -62,6 +63,6 @@ final class DirectedNetworkConnections<N, E> extends AbstractDirectedNetworkConn
 
   @Override
   public Set<E> edgesConnecting(N node) {
-    return new EdgesConnecting<E>(((BiMap<E, N>) outEdgeMap).inverse(), node);
+    return new EdgesConnecting<>(((BiMap<E, N>) outEdgeMap).inverse(), node);
   }
 }

@@ -16,12 +16,15 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.nio.file.FileSystemException;
 import java.nio.file.SecureDirectoryStream;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.j2objc.annotations.J2ObjCIncompatible;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Exception indicating that a recursive delete can't be performed because the file system does not
@@ -35,12 +38,13 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 21.0
  * @author Colin Decker
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
 @J2ObjCIncompatible // java.nio.file
+@ElementTypesAreNonnullByDefault
 public final class InsecureRecursiveDeleteException extends FileSystemException {
 
-  public InsecureRecursiveDeleteException(@NullableDecl String file) {
+  public InsecureRecursiveDeleteException(@CheckForNull String file) {
     super(file, null, "unable to guarantee security of recursive delete");
   }
 }

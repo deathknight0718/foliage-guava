@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.base;
 
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Legacy version of {@link java.util.function.Predicate java.util.function.Predicate}. Determines a
@@ -42,7 +44,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  */
 @FunctionalInterface
 @GwtCompatible
-public interface Predicate<T> extends java.util.function.Predicate<T> {
+@ElementTypesAreNonnullByDefault
+public interface Predicate<T extends @Nullable Object> extends java.util.function.Predicate<T> {
   /**
    * Returns the result of applying this predicate to {@code input} (Java 8 users, see notes in the
    * class documentation above). This method is <i>generally expected</i>, but not absolutely
@@ -58,8 +61,7 @@ public interface Predicate<T> extends java.util.function.Predicate<T> {
    * @throws NullPointerException if {@code input} is null and this predicate does not accept null
    *     arguments
    */
-  @CanIgnoreReturnValue
-  boolean apply(@NullableDecl T input);
+  boolean apply(@ParametricNullness T input);
 
   /**
    * Indicates whether another object is equal to this predicate.
@@ -72,10 +74,10 @@ public interface Predicate<T> extends java.util.function.Predicate<T> {
    * predicates are known <i>not</i> to be interchangeable.
    */
   @Override
-  boolean equals(@NullableDecl Object object);
+  boolean equals(@CheckForNull Object object);
 
   @Override
-  default boolean test(@NullableDecl T input) {
+  default boolean test(@ParametricNullness T input) {
     return apply(input);
   }
 }

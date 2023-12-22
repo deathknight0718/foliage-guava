@@ -14,18 +14,21 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.primitives.Ints;
-import page.foliage.guava.common.primitives.Longs;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotCall;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.primitives.Ints;
+import page.foliage.guava.common.primitives.Longs;
 
 /**
  * An implementation of {@link DataInput} that uses little-endian byte ordering for reading {@code
@@ -38,8 +41,9 @@ import java.io.InputStream;
  * @author Keith Bottner
  * @since 8.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class LittleEndianDataInputStream extends FilterInputStream implements DataInput {
 
   /**
@@ -54,6 +58,7 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
   /** This method will throw an {@link UnsupportedOperationException}. */
   @CanIgnoreReturnValue // to skip a line
   @Override
+  @DoNotCall("Always throws UnsupportedOperationException")
   public String readLine() {
     throw new UnsupportedOperationException("readLine is not supported");
   }

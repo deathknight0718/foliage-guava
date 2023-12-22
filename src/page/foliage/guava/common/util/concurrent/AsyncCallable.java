@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.Future;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Computes a value, possibly asynchronously. For an example usage and more information, see {@link
@@ -27,10 +29,10 @@ import java.util.concurrent.Future;
  *
  * @since 20.0
  */
-@Beta
 @FunctionalInterface
 @GwtCompatible
-public interface AsyncCallable<V> {
+@ElementTypesAreNonnullByDefault
+public interface AsyncCallable<V extends @Nullable Object> {
   /**
    * Computes a result {@code Future}. The output {@code Future} need not be {@linkplain
    * Future#isDone done}, making {@code AsyncCallable} suitable for asynchronous derivations.

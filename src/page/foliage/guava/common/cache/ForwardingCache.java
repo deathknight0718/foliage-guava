@@ -14,15 +14,17 @@
 
 package page.foliage.guava.common.cache;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.collect.ForwardingObject;
-import page.foliage.guava.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.collect.ForwardingObject;
+import page.foliage.guava.common.collect.ImmutableMap;
 
 /**
  * A cache which forwards all its method calls to another cache. Subclasses should override one or
@@ -33,6 +35,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 10.0
  */
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public abstract class ForwardingCache<K, V> extends ForwardingObject implements Cache<K, V> {
 
   /** Constructor for use by subclasses. */
@@ -43,7 +46,7 @@ public abstract class ForwardingCache<K, V> extends ForwardingObject implements 
 
   /** @since 11.0 */
   @Override
-  @NullableDecl
+  @CheckForNull
   public V getIfPresent(Object key) {
     return delegate().getIfPresent(key);
   }
@@ -56,7 +59,11 @@ public abstract class ForwardingCache<K, V> extends ForwardingObject implements 
 
   /** @since 11.0 */
   @Override
-  public ImmutableMap<K, V> getAllPresent(Iterable<?> keys) {
+  /*
+   * <? extends Object> is mostly the same as <?> to plain Java. But to nullness checkers, they
+   * differ: <? extends Object> means "non-null types," while <?> means "all types."
+   */
+  public ImmutableMap<K, V> getAllPresent(Iterable<? extends Object> keys) {
     return delegate().getAllPresent(keys);
   }
 
@@ -79,7 +86,8 @@ public abstract class ForwardingCache<K, V> extends ForwardingObject implements 
 
   /** @since 11.0 */
   @Override
-  public void invalidateAll(Iterable<?> keys) {
+  // For discussion of <? extends Object>, see getAllPresent.
+  public void invalidateAll(Iterable<? extends Object> keys) {
     delegate().invalidateAll(keys);
   }
 

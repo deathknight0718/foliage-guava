@@ -16,10 +16,17 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Map;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotMock;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A map, each entry of which maps a Java <a href="http://tinyurl.com/2cmwkz">raw type</a> to an
@@ -29,26 +36,36 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>Like any other {@code Map<Class, Object>}, this map may contain entries for primitive types,
  * and a primitive type and its corresponding wrapper type may map to different values.
  *
- * <p>See the Guava User Guide article on <a href=
- * "https://github.com/google/guava/wiki/NewCollectionTypesExplained#classtoinstancemap"> {@code
- * ClassToInstanceMap}</a>.
+ * <h3>Implementations</h3>
+ *
+ * <ul>
+ *   <li>{@link ImmutableClassToInstanceMap}
+ *   <li>{@link MutableClassToInstanceMap}
+ * </ul>
  *
  * <p>To map a generic type to an instance of that type, use {@link
  * page.foliage.guava.common.reflect.TypeToInstanceMap} instead.
  *
- * @param <B> the common supertype that all entries must share; often this is simply {@link Object}
- * @author Kevin Bourrillion
+ * <p>See the Guava User Guide article on <a href=
+ * "https://github.com/google/guava/wiki/NewCollectionTypesExplained#classtoinstancemap">{@code
+ * ClassToInstanceMap}</a>.
+ *
+ * @param <B> the common supertype that all values will share. When in doubt, just use {@link
+ *     Object}, or use {@code @Nullable Object} to allow null values.
  * @since 2.0
  */
+@DoNotMock("Use ImmutableClassToInstanceMap or MutableClassToInstanceMap")
 @GwtCompatible
-public interface ClassToInstanceMap<B> extends Map<Class<? extends B>, B> {
+@ElementTypesAreNonnullByDefault
+public interface ClassToInstanceMap<B extends @Nullable Object>
+    extends Map<Class<? extends @NonNull B>, B> {
   /**
    * Returns the value the specified class is mapped to, or {@code null} if no entry for this class
    * is present. This will only return a value that was bound to this specific class, not a value
    * that may have been bound to a subtype.
    */
-  @CanIgnoreReturnValue // TODO(kak): Consider removing this?
-  <T extends B> T getInstance(Class<T> type);
+  @CheckForNull
+  <T extends @NonNull B> T getInstance(Class<T> type);
 
   /**
    * Maps the specified class to the specified value. Does <i>not</i> associate this value with any
@@ -58,5 +75,6 @@ public interface ClassToInstanceMap<B> extends Map<Class<? extends B>, B> {
    *     null} if there was no previous entry.
    */
   @CanIgnoreReturnValue
-  <T extends B> T putInstance(Class<T> type, @NullableDecl T value);
+  @CheckForNull
+  <T extends B> T putInstance(Class<@NonNull T> type, @ParametricNullness T value);
 }

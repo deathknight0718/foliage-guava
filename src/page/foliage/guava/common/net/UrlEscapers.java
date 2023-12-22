@@ -24,12 +24,12 @@ import page.foliage.guava.common.escape.Escaper;
  * escaping with {@link page.foliage.guava.common.html.HtmlEscapers} or {@link
  * page.foliage.guava.common.xml.XmlEscapers}.
  *
- *
  * @author David Beaumont
  * @author Chris Povirk
  * @since 15.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class UrlEscapers {
   private UrlEscapers() {}
 

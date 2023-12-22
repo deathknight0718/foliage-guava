@@ -14,9 +14,12 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An {@code Iterable} whose elements are sorted relative to a {@code Comparator}, typically
@@ -25,7 +28,8 @@ import java.util.Iterator;
  * @author Louis Wasserman
  */
 @GwtCompatible
-interface SortedIterable<T> extends Iterable<T> {
+@ElementTypesAreNonnullByDefault
+interface SortedIterable<T extends @Nullable Object> extends Iterable<T> {
   /**
    * Returns the {@code Comparator} by which the elements of this iterable are ordered, or {@code
    * Ordering.natural()} if the elements are ordered by their natural ordering.

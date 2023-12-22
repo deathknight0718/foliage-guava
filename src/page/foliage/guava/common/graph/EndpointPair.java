@@ -16,15 +16,17 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.graph.GraphConstants.NOT_AVAILABLE_ON_UNDIRECTED;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.Immutable;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Objects;
 import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.UnmodifiableIterator;
-import com.google.errorprone.annotations.Immutable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable pair representing the two endpoints of an edge in a graph. The {@link EndpointPair}
@@ -39,6 +41,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  */
 @Beta
 @Immutable(containerOf = {"N"})
+@ElementTypesAreNonnullByDefault
 public abstract class EndpointPair<N> implements Iterable<N> {
   private final N nodeU;
   private final N nodeV;
@@ -50,13 +53,13 @@ public abstract class EndpointPair<N> implements Iterable<N> {
 
   /** Returns an {@link EndpointPair} representing the endpoints of a directed edge. */
   public static <N> EndpointPair<N> ordered(N source, N target) {
-    return new Ordered<N>(source, target);
+    return new Ordered<>(source, target);
   }
 
   /** Returns an {@link EndpointPair} representing the endpoints of an undirected edge. */
   public static <N> EndpointPair<N> unordered(N nodeU, N nodeV) {
     // Swap nodes on purpose to prevent callers from relying on the "ordering" of an unordered pair.
-    return new Unordered<N>(nodeV, nodeU);
+    return new Unordered<>(nodeV, nodeU);
   }
 
   /** Returns an {@link EndpointPair} representing the endpoints of an edge in {@code graph}. */
@@ -103,8 +106,9 @@ public abstract class EndpointPair<N> implements Iterable<N> {
    * Returns the node that is adjacent to {@code node} along the origin edge.
    *
    * @throws IllegalArgumentException if this {@link EndpointPair} does not contain {@code node}
+   * @since 20.0 (but the argument type was changed from {@code Object} to {@code N} in 31.0)
    */
-  public final N adjacentNode(Object node) {
+  public final N adjacentNode(N node) {
     if (node.equals(nodeU)) {
       return nodeV;
     } else if (node.equals(nodeV)) {
@@ -132,7 +136,7 @@ public abstract class EndpointPair<N> implements Iterable<N> {
    * ordered {@link EndpointPair} is never equal to an unordered {@link EndpointPair}.
    */
   @Override
-  public abstract boolean equals(@NullableDecl Object obj);
+  public abstract boolean equals(@CheckForNull Object obj);
 
   /**
    * The hashcode of an ordered {@link EndpointPair} is equal to {@code Objects.hashCode(source(),
@@ -163,7 +167,7 @@ public abstract class EndpointPair<N> implements Iterable<N> {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object obj) {
+    public boolean equals(@CheckForNull Object obj) {
       if (obj == this) {
         return true;
       }
@@ -211,7 +215,7 @@ public abstract class EndpointPair<N> implements Iterable<N> {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object obj) {
+    public boolean equals(@CheckForNull Object obj) {
       if (obj == this) {
         return true;
       }

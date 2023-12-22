@@ -16,12 +16,15 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import com.google.j2objc.annotations.Weak;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.j2objc.annotations.Weak;
+
+import page.foliage.guava.common.annotations.VisibleForTesting;
 
 /**
  * A subscriber method on a specific object, plus the executor that should be used for dispatching
@@ -32,6 +35,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  *
  * @author Colin Decker
  */
+@ElementTypesAreNonnullByDefault
 class Subscriber {
 
   /** Creates a {@code Subscriber} for {@code method} on {@code listener}. */
@@ -63,16 +67,13 @@ class Subscriber {
   }
 
   /** Dispatches {@code event} to this subscriber using the proper executor. */
-  final void dispatchEvent(final Object event) {
+  final void dispatchEvent(Object event) {
     executor.execute(
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              invokeSubscriberMethod(event);
-            } catch (InvocationTargetException e) {
-              bus.handleSubscriberException(e.getCause(), context(event));
-            }
+        () -> {
+          try {
+            invokeSubscriberMethod(event);
+          } catch (InvocationTargetException e) {
+            bus.handleSubscriberException(e.getCause(), context(event));
           }
         });
   }
@@ -108,7 +109,7 @@ class Subscriber {
   }
 
   @Override
-  public final boolean equals(@NullableDecl Object obj) {
+  public final boolean equals(@CheckForNull Object obj) {
     if (obj instanceof Subscriber) {
       Subscriber that = (Subscriber) obj;
       // Use == so that different equal instances will still receive events.

@@ -16,13 +16,16 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collections;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** Implementation of an {@link Optional} containing a reference. */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 final class Present<T> extends Optional<T> {
   private final T reference;
 
@@ -70,14 +73,14 @@ final class Present<T> extends Optional<T> {
 
   @Override
   public <V> Optional<V> transform(Function<? super T, V> function) {
-    return new Present<V>(
+    return new Present<>(
         checkNotNull(
             function.apply(reference),
             "the Function passed to Optional.transform() must not return null."));
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     if (object instanceof Present) {
       Present<?> other = (Present<?>) object;
       return reference.equals(other.reference);

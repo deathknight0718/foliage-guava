@@ -14,11 +14,13 @@
 
 package page.foliage.guava.common.hash;
 
+
 /**
  * Abstract interface for objects that can concurrently add longs.
  *
  * @author Louis Wasserman
  */
+@ElementTypesAreNonnullByDefault
 interface LongAddable {
   void increment();
 

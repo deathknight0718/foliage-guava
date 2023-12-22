@@ -16,15 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import static page.foliage.guava.common.collect.ObjectArrays.checkElementsNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.collect.ObjectArrays.checkElementsNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -39,7 +34,18 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotCall;
+import com.google.errorprone.annotations.concurrent.LazyInit;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A {@link NavigableSet} whose contents will never change, with many other important properties
@@ -52,7 +58,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * collection will not correctly obey its specification.
  *
  * <p>See the Guava User Guide article on <a href=
- * "https://github.com/google/guava/wiki/ImmutableCollectionsExplained"> immutable collections</a>.
+ * "https://github.com/google/guava/wiki/ImmutableCollectionsExplained">immutable collections</a>.
  *
  * @author Jared Levy
  * @author Louis Wasserman
@@ -61,6 +67,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 // TODO(benyu): benchmark and optimize all creation paths, which are a mess now
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial") // we're overriding default serialization
+@ElementTypesAreNonnullByDefault
 public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxverideShim<E>
     implements NavigableSet<E>, SortedIterable<E> {
   static final int SPLITERATOR_CHARACTERISTICS =
@@ -75,7 +82,6 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
    *
    * @since 21.0
    */
-  @Beta
   public static <E> Collector<E, ?, ImmutableSortedSet<E>> toImmutableSortedSet(
       Comparator<? super E> comparator) {
     return CollectCollectors.toImmutableSortedSet(comparator);
@@ -89,7 +95,11 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
     }
   }
 
-  /** Returns the empty immutable sorted set. */
+  /**
+   * Returns the empty immutable sorted set.
+   *
+   * <p><b>Performance note:</b> the instance returned is a singleton.
+   */
   public static <E> ImmutableSortedSet<E> of() {
     return (ImmutableSortedSet<E>) RegularImmutableSortedSet.NATURAL_EMPTY_SET;
   }
@@ -354,8 +364,8 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
    * elements are in the first {@code k} positions of {@code contents}, and {@code contents[i] ==
    * null} for {@code k <= i < n}.
    *
-   * <p>If {@code k == contents.length}, then {@code contents} may no longer be safe for
-   * modification.
+   * <p>This method takes ownership of {@code contents}; do not modify {@code contents} after this
+   * returns.
    *
    * @throws NullPointerException if any of the first {@code n} elements of {@code contents} is null
    */
@@ -572,16 +582,16 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
     }
   }
 
-  int unsafeCompare(Object a, Object b) {
+  int unsafeCompare(Object a, @CheckForNull Object b) {
     return unsafeCompare(comparator, a, b);
   }
 
-  static int unsafeCompare(Comparator<?> comparator, Object a, Object b) {
+  static int unsafeCompare(Comparator<?> comparator, Object a, @CheckForNull Object b) {
     // Pretend the comparator can compare anything. If it turns out it can't
-    // compare a and b, we should get a CCE on the subsequent line. Only methods
-    // that are spec'd to throw CCE should call this.
-    @SuppressWarnings("unchecked")
-    Comparator<Object> unsafeComparator = (Comparator<Object>) comparator;
+    // compare a and b, we should get a CCE or NPE on the subsequent line. Only methods
+    // that are spec'd to throw CCE and NPE should call this.
+    @SuppressWarnings({"unchecked", "nullness"})
+    Comparator<@Nullable Object> unsafeComparator = (Comparator<@Nullable Object>) comparator;
     return unsafeComparator.compare(a, b);
   }
 
@@ -620,7 +630,6 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   }
 
   /** @since 12.0 */
-  @GwtIncompatible // NavigableSet
   @Override
   public ImmutableSortedSet<E> headSet(E toElement, boolean inclusive) {
     return headSetImpl(checkNotNull(toElement), inclusive);
@@ -670,7 +679,6 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   }
 
   /** @since 12.0 */
-  @GwtIncompatible // NavigableSet
   @Override
   public ImmutableSortedSet<E> tailSet(E fromElement, boolean inclusive) {
     return tailSetImpl(checkNotNull(fromElement), inclusive);
@@ -690,29 +698,31 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   /** @since 12.0 */
   @GwtIncompatible // NavigableSet
   @Override
+  @CheckForNull
   public E lower(E e) {
-    return Iterators.getNext(headSet(e, false).descendingIterator(), null);
+    return Iterators.<@Nullable E>getNext(headSet(e, false).descendingIterator(), null);
   }
 
   /** @since 12.0 */
-  @GwtIncompatible // NavigableSet
   @Override
+  @CheckForNull
   public E floor(E e) {
-    return Iterators.getNext(headSet(e, true).descendingIterator(), null);
+    return Iterators.<@Nullable E>getNext(headSet(e, true).descendingIterator(), null);
   }
 
   /** @since 12.0 */
-  @GwtIncompatible // NavigableSet
   @Override
+  @CheckForNull
   public E ceiling(E e) {
-    return Iterables.getFirst(tailSet(e, true), null);
+    return Iterables.<@Nullable E>getFirst(tailSet(e, true), null);
   }
 
   /** @since 12.0 */
   @GwtIncompatible // NavigableSet
   @Override
+  @CheckForNull
   public E higher(E e) {
-    return Iterables.getFirst(tailSet(e, false), null);
+    return Iterables.<@Nullable E>getFirst(tailSet(e, false), null);
   }
 
   @Override
@@ -736,6 +746,8 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   @Deprecated
   @GwtIncompatible // NavigableSet
   @Override
+  @DoNotCall("Always throws UnsupportedOperationException")
+  @CheckForNull
   public final E pollFirst() {
     throw new UnsupportedOperationException();
   }
@@ -751,12 +763,15 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   @Deprecated
   @GwtIncompatible // NavigableSet
   @Override
+  @DoNotCall("Always throws UnsupportedOperationException")
+  @CheckForNull
   public final E pollLast() {
     throw new UnsupportedOperationException();
   }
 
   @GwtIncompatible // NavigableSet
   @LazyInit
+  @CheckForNull
   transient ImmutableSortedSet<E> descendingSet;
 
   /** @since 12.0 */
@@ -807,7 +822,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
   public abstract UnmodifiableIterator<E> descendingIterator();
 
   /** Returns the position of an element within the set, or -1 if not present. */
-  abstract int indexOf(@NullableDecl Object target);
+  abstract int indexOf(@CheckForNull Object target);
 
   /*
    * This class is used to serialize all ImmutableSortedSet instances,
@@ -815,6 +830,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
    * only. This is necessary to ensure that the existence of a particular
    * implementation type is an implementation detail.
    */
+  @J2ktIncompatible // serialization
   private static class SerializedForm<E> implements Serializable {
     final Comparator<? super E> comparator;
     final Object[] elements;
@@ -832,11 +848,13 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
     private static final long serialVersionUID = 0;
   }
 
-  private void readObject(ObjectInputStream stream) throws InvalidObjectException {
+  @J2ktIncompatible // serialization
+  private void readObject(ObjectInputStream unused) throws InvalidObjectException {
     throw new InvalidObjectException("Use SerializedForm");
   }
 
   @Override
+  @J2ktIncompatible // serialization
   Object writeReplace() {
     return new SerializedForm<E>(comparator, toArray());
   }

@@ -14,18 +14,24 @@
 
 package page.foliage.guava.common.collect;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Map;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.Immutable;
+import com.google.j2objc.annotations.WeakOuter;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.collect.ImmutableMap.IteratorBasedImmutableMap;
-import com.google.errorprone.annotations.Immutable;
-import com.google.j2objc.annotations.WeakOuter;
-import java.util.Map;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /** A {@code RegularImmutableTable} optimized for dense data. */
 @GwtCompatible
 @Immutable(containerOf = {"R", "C", "V"})
+@ElementTypesAreNonnullByDefault
 final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> {
   private final ImmutableMap<R, Integer> rowKeyToIndex;
   private final ImmutableMap<C, Integer> columnKeyToIndex;
@@ -39,7 +45,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
   private final int[] columnCounts;
 
   @SuppressWarnings("Immutable") // We don't modify this after construction.
-  private final V[][] values;
+  private final @Nullable V[][] values;
 
   // For each cell in iteration order, the index of that cell's row key in the row key list.
   @SuppressWarnings("Immutable") // We don't modify this after construction.
@@ -54,7 +60,8 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
       ImmutableSet<R> rowSpace,
       ImmutableSet<C> columnSpace) {
     @SuppressWarnings("unchecked")
-    V[][] array = (V[][]) new Object[rowSpace.size()][columnSpace.size()];
+    @Nullable
+    V[][] array = (@Nullable V[][]) new Object[rowSpace.size()][columnSpace.size()];
     this.values = array;
     this.rowKeyToIndex = Maps.indexMap(rowSpace);
     this.columnKeyToIndex = Maps.indexMap(columnSpace);
@@ -66,10 +73,11 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
       Cell<R, C, V> cell = cellList.get(i);
       R rowKey = cell.getRowKey();
       C columnKey = cell.getColumnKey();
-      int rowIndex = rowKeyToIndex.get(rowKey);
-      int columnIndex = columnKeyToIndex.get(columnKey);
+      // The requireNonNull calls are safe because we construct the indexes with indexMap.
+      int rowIndex = requireNonNull(rowKeyToIndex.get(rowKey));
+      int columnIndex = requireNonNull(columnKeyToIndex.get(columnKey));
       V existingValue = values[rowIndex][columnIndex];
-      checkArgument(existingValue == null, "duplicate key: (%s, %s)", rowKey, columnKey);
+      checkNoDuplicate(rowKey, columnKey, existingValue, cell.getValue());
       values[rowIndex][columnIndex] = cell.getValue();
       rowCounts[rowIndex]++;
       columnCounts[columnIndex]++;
@@ -101,7 +109,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
       return keyToIndex().keySet().asList().get(index);
     }
 
-    @NullableDecl
+    @CheckForNull
     abstract V getValue(int keyIndex);
 
     @Override
@@ -115,7 +123,8 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     }
 
     @Override
-    public V get(@NullableDecl Object key) {
+    @CheckForNull
+    public V get(@CheckForNull Object key) {
       Integer keyIndex = keyToIndex().get(key);
       return (keyIndex == null) ? null : getValue(keyIndex);
     }
@@ -127,6 +136,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
         private final int maxIndex = keyToIndex().size();
 
         @Override
+        @CheckForNull
         protected Entry<K, V> computeNext() {
           for (index++; index < maxIndex; index++) {
             V value = getValue(index);
@@ -154,6 +164,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     }
 
     @Override
+    @CheckForNull
     V getValue(int keyIndex) {
       return values[rowIndex][keyIndex];
     }
@@ -178,6 +189,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     }
 
     @Override
+    @CheckForNull
     V getValue(int keyIndex) {
       return values[keyIndex][columnIndex];
     }
@@ -247,7 +259,8 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
   }
 
   @Override
-  public V get(@NullableDecl Object rowKey, @NullableDecl Object columnKey) {
+  @CheckForNull
+  public V get(@CheckForNull Object rowKey, @CheckForNull Object columnKey) {
     Integer rowIndex = rowKeyToIndex.get(rowKey);
     Integer columnIndex = columnKeyToIndex.get(columnKey);
     return ((rowIndex == null) || (columnIndex == null)) ? null : values[rowIndex][columnIndex];
@@ -264,13 +277,15 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     int columnIndex = cellColumnIndices[index];
     R rowKey = rowKeySet().asList().get(rowIndex);
     C columnKey = columnKeySet().asList().get(columnIndex);
-    V value = values[rowIndex][columnIndex];
+    // requireNonNull is safe because we use indexes that were populated by the constructor.
+    V value = requireNonNull(values[rowIndex][columnIndex]);
     return cellOf(rowKey, columnKey, value);
   }
 
   @Override
   V getValue(int index) {
-    return values[cellRowIndices[index]][cellColumnIndices[index]];
+    // requireNonNull is safe because we use indexes that were populated by the constructor.
+    return requireNonNull(values[cellRowIndices[index]][cellColumnIndices[index]]);
   }
 
   @Override

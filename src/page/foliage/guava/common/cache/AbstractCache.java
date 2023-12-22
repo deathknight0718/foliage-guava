@@ -14,14 +14,15 @@
 
 package page.foliage.guava.common.cache;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.Maps;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.Maps;
 
 /**
  * This class provides a skeletal implementation of the {@code Cache} interface to minimize the
@@ -38,6 +39,7 @@ import java.util.concurrent.ExecutionException;
  * @since 10.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
   /** Constructor for use by subclasses. */
@@ -58,8 +60,12 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
    *
    * @since 11.0
    */
+  /*
+   * <? extends Object> is mostly the same as <?> to plain Java. But to nullness checkers, they
+   * differ: <? extends Object> means "non-null types," while <?> means "all types."
+   */
   @Override
-  public ImmutableMap<K, V> getAllPresent(Iterable<?> keys) {
+  public ImmutableMap<K, V> getAllPresent(Iterable<? extends Object> keys) {
     Map<K, V> result = Maps.newLinkedHashMap();
     for (Object key : keys) {
       if (!result.containsKey(key)) {
@@ -103,7 +109,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
   /** @since 11.0 */
   @Override
-  public void invalidateAll(Iterable<?> keys) {
+  // For discussion of <? extends Object>, see getAllPresent.
+  public void invalidateAll(Iterable<? extends Object> keys) {
     for (Object key : keys) {
       invalidate(key);
     }
@@ -160,6 +167,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
      * @param loadTime the number of nanoseconds the cache spent computing or retrieving the new
      *     value
      */
+    @SuppressWarnings("GoodTime") // should accept a java.time.Duration
     void recordLoadSuccess(long loadTime);
 
     /**
@@ -170,6 +178,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
      * @param loadTime the number of nanoseconds the cache spent computing or retrieving the new
      *     value prior to an exception being thrown
      */
+    @SuppressWarnings("GoodTime") // should accept a java.time.Duration
     void recordLoadException(long loadTime);
 
     /**
@@ -214,12 +223,14 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
       missCount.add(count);
     }
 
+    @SuppressWarnings("GoodTime") // b/122668874
     @Override
     public void recordLoadSuccess(long loadTime) {
       loadSuccessCount.increment();
       totalLoadTime.add(loadTime);
     }
 
+    @SuppressWarnings("GoodTime") // b/122668874
     @Override
     public void recordLoadException(long loadTime) {
       loadExceptionCount.increment();
@@ -234,12 +245,17 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     @Override
     public CacheStats snapshot() {
       return new CacheStats(
-          hitCount.sum(),
-          missCount.sum(),
-          loadSuccessCount.sum(),
-          loadExceptionCount.sum(),
-          totalLoadTime.sum(),
-          evictionCount.sum());
+          negativeToMaxValue(hitCount.sum()),
+          negativeToMaxValue(missCount.sum()),
+          negativeToMaxValue(loadSuccessCount.sum()),
+          negativeToMaxValue(loadExceptionCount.sum()),
+          negativeToMaxValue(totalLoadTime.sum()),
+          negativeToMaxValue(evictionCount.sum()));
+    }
+
+    /** Returns {@code value}, if non-negative. Otherwise, returns {@link Long#MAX_VALUE}. */
+    private static long negativeToMaxValue(long value) {
+      return (value >= 0) ? value : Long.MAX_VALUE;
     }
 
     /** Increments all counters by the values in {@code other}. */

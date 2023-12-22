@@ -14,10 +14,11 @@
 
 package page.foliage.guava.common.cache;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * The reason why a cached entry was removed.
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * @since 10.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public enum RemovalCause {
   /**
    * The entry was manually removed by the user. This can result from the user invoking {@link

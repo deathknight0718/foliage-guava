@@ -16,10 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A list multimap which forwards all its method calls to another list multimap. Subclasses should
@@ -34,8 +39,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 3.0
  */
 @GwtCompatible
-public abstract class ForwardingListMultimap<K, V> extends ForwardingMultimap<K, V>
-    implements ListMultimap<K, V> {
+@ElementTypesAreNonnullByDefault
+public abstract class ForwardingListMultimap<K extends @Nullable Object, V extends @Nullable Object>
+    extends ForwardingMultimap<K, V> implements ListMultimap<K, V> {
 
   /** Constructor for use by subclasses. */
   protected ForwardingListMultimap() {}
@@ -44,19 +50,19 @@ public abstract class ForwardingListMultimap<K, V> extends ForwardingMultimap<K,
   protected abstract ListMultimap<K, V> delegate();
 
   @Override
-  public List<V> get(@NullableDecl K key) {
+  public List<V> get(@ParametricNullness K key) {
     return delegate().get(key);
   }
 
   @CanIgnoreReturnValue
   @Override
-  public List<V> removeAll(@NullableDecl Object key) {
+  public List<V> removeAll(@CheckForNull Object key) {
     return delegate().removeAll(key);
   }
 
   @CanIgnoreReturnValue
   @Override
-  public List<V> replaceValues(K key, Iterable<? extends V> values) {
+  public List<V> replaceValues(@ParametricNullness K key, Iterable<? extends V> values) {
     return delegate().replaceValues(key, values);
   }
 }

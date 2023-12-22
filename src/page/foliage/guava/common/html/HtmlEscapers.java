@@ -14,7 +14,6 @@
 
 package page.foliage.guava.common.html;
 
-import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.escape.Escaper;
 import page.foliage.guava.common.escape.Escapers;
@@ -35,8 +34,8 @@ import page.foliage.guava.common.escape.Escapers;
  * @author David Beaumont
  * @since 15.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class HtmlEscapers {
   /**
    * Returns an {@link Escaper} instance that escapes HTML metacharacters as specified by <a

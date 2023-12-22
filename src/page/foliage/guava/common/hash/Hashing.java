@@ -14,21 +14,28 @@
 
 package page.foliage.guava.common.hash;
 
+import static java.lang.invoke.MethodType.methodType;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Throwables.throwIfUnchecked;
 
-import page.foliage.guava.common.annotations.Beta;
-import com.google.errorprone.annotations.Immutable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+
+import javax.annotation.CheckForNull;
 import javax.crypto.spec.SecretKeySpec;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import com.google.errorprone.annotations.Immutable;
+import com.google.j2objc.annotations.J2ObjCIncompatible;
 
 /**
  * Static methods to obtain {@link HashFunction} instances, and other static hashing-related
@@ -42,7 +49,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Kurt Alfred Kluever
  * @since 11.0
  */
-@Beta
+@ElementTypesAreNonnullByDefault
 public final class Hashing {
   /**
    * Returns a general-purpose, <b>temporary-use</b>, non-cryptographic hash function. The algorithm
@@ -57,7 +64,8 @@ public final class Hashing {
    * <p>Repeated calls to this method on the same loaded {@code Hashing} class, using the same value
    * for {@code minimumBits}, will return identically-behaving {@link HashFunction} instances.
    *
-   * @param minimumBits a positive integer (can be arbitrarily large)
+   * @param minimumBits a positive integer. This can be arbitrarily large. The returned {@link
+   *     HashFunction} instance may use memory proportional to this integer.
    * @return a hash function, described above, that produces hash codes of length {@code
    *     minimumBits} or greater
    */
@@ -87,7 +95,44 @@ public final class Hashing {
    * Used to randomize {@link #goodFastHash} instances, so that programs which persist anything
    * dependent on the hash codes they produce will fail sooner.
    */
+  @SuppressWarnings("GoodTime") // reading system time without TimeSource
   static final int GOOD_FAST_HASH_SEED = (int) System.currentTimeMillis();
+
+  /**
+   * Returns a hash function implementing the <a
+   * href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">32-bit murmur3
+   * algorithm, x86 variant</a> (little-endian variant), using the given seed value, <b>with a known
+   * bug</b> as described in the deprecation text.
+   *
+   * <p>The C++ equivalent is the MurmurHash3_x86_32 function (Murmur3A), which however does not
+   * have the bug.
+   *
+   * @deprecated This implementation produces incorrect hash values from the {@link
+   *     HashFunction#hashString} method if the string contains non-BMP characters. Use {@link
+   *     #murmur3_32_fixed(int)} instead.
+   */
+  @Deprecated
+  public static HashFunction murmur3_32(int seed) {
+    return new Murmur3_32HashFunction(seed, /* supplementaryPlaneFix= */ false);
+  }
+
+  /**
+   * Returns a hash function implementing the <a
+   * href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">32-bit murmur3
+   * algorithm, x86 variant</a> (little-endian variant), using the given seed value, <b>with a known
+   * bug</b> as described in the deprecation text.
+   *
+   * <p>The C++ equivalent is the MurmurHash3_x86_32 function (Murmur3A), which however does not
+   * have the bug.
+   *
+   * @deprecated This implementation produces incorrect hash values from the {@link
+   *     HashFunction#hashString} method if the string contains non-BMP characters. Use {@link
+   *     #murmur3_32_fixed()} instead.
+   */
+  @Deprecated
+  public static HashFunction murmur3_32() {
+    return Murmur3_32HashFunction.MURMUR3_32;
+  }
 
   /**
    * Returns a hash function implementing the <a
@@ -95,9 +140,14 @@ public final class Hashing {
    * algorithm, x86 variant</a> (little-endian variant), using the given seed value.
    *
    * <p>The exact C++ equivalent is the MurmurHash3_x86_32 function (Murmur3A).
+   *
+   * <p>This method is called {@code murmur3_32_fixed} because it fixes a bug in the {@code
+   * HashFunction} returned by the original {@code murmur3_32} method.
+   *
+   * @since 31.0
    */
-  public static HashFunction murmur3_32(int seed) {
-    return new Murmur3_32HashFunction(seed);
+  public static HashFunction murmur3_32_fixed(int seed) {
+    return new Murmur3_32HashFunction(seed, /* supplementaryPlaneFix= */ true);
   }
 
   /**
@@ -106,9 +156,14 @@ public final class Hashing {
    * algorithm, x86 variant</a> (little-endian variant), using a seed value of zero.
    *
    * <p>The exact C++ equivalent is the MurmurHash3_x86_32 function (Murmur3A).
+   *
+   * <p>This method is called {@code murmur3_32_fixed} because it fixes a bug in the {@code
+   * HashFunction} returned by the original {@code murmur3_32} method.
+   *
+   * @since 31.0
    */
-  public static HashFunction murmur3_32() {
-    return Murmur3_32HashFunction.MURMUR3_32;
+  public static HashFunction murmur3_32_fixed() {
+    return Murmur3_32HashFunction.MURMUR3_32_FIXED;
   }
 
   /**
@@ -233,7 +288,6 @@ public final class Hashing {
    * Returns a hash function implementing the Message Authentication Code (MAC) algorithm, using the
    * MD5 (128 hash bits) hash function and the given secret key.
    *
-   *
    * @param key the secret key
    * @throws IllegalArgumentException if the given key is inappropriate for initializing this MAC
    * @since 20.0
@@ -247,7 +301,6 @@ public final class Hashing {
    * MD5 (128 hash bits) hash function and a {@link SecretKeySpec} created from the given byte array
    * and the MD5 algorithm.
    *
-   *
    * @param key the key material of the secret key
    * @since 20.0
    */
@@ -258,7 +311,6 @@ public final class Hashing {
   /**
    * Returns a hash function implementing the Message Authentication Code (MAC) algorithm, using the
    * SHA-1 (160 hash bits) hash function and the given secret key.
-   *
    *
    * @param key the secret key
    * @throws IllegalArgumentException if the given key is inappropriate for initializing this MAC
@@ -273,7 +325,6 @@ public final class Hashing {
    * SHA-1 (160 hash bits) hash function and a {@link SecretKeySpec} created from the given byte
    * array and the SHA-1 algorithm.
    *
-   *
    * @param key the key material of the secret key
    * @since 20.0
    */
@@ -284,7 +335,6 @@ public final class Hashing {
   /**
    * Returns a hash function implementing the Message Authentication Code (MAC) algorithm, using the
    * SHA-256 (256 hash bits) hash function and the given secret key.
-   *
    *
    * @param key the secret key
    * @throws IllegalArgumentException if the given key is inappropriate for initializing this MAC
@@ -299,7 +349,6 @@ public final class Hashing {
    * SHA-256 (256 hash bits) hash function and a {@link SecretKeySpec} created from the given byte
    * array and the SHA-256 algorithm.
    *
-   *
    * @param key the key material of the secret key
    * @since 20.0
    */
@@ -310,7 +359,6 @@ public final class Hashing {
   /**
    * Returns a hash function implementing the Message Authentication Code (MAC) algorithm, using the
    * SHA-512 (512 hash bits) hash function and the given secret key.
-   *
    *
    * @param key the secret key
    * @throws IllegalArgumentException if the given key is inappropriate for initializing this MAC
@@ -325,7 +373,6 @@ public final class Hashing {
    * SHA-512 (512 hash bits) hash function and a {@link SecretKeySpec} created from the given byte
    * array and the SHA-512 algorithm.
    *
-   *
    * @param key the key material of the secret key
    * @since 20.0
    */
@@ -334,9 +381,13 @@ public final class Hashing {
   }
 
   private static String hmacToString(String methodName, Key key) {
-    return String.format(
-        "Hashing.%s(Key[algorithm=%s, format=%s])",
-        methodName, key.getAlgorithm(), key.getFormat());
+    return "Hashing."
+        + methodName
+        + "(Key[algorithm="
+        + key.getAlgorithm()
+        + ", format="
+        + key.getFormat()
+        + "])";
   }
 
   /**
@@ -350,7 +401,45 @@ public final class Hashing {
    * @since 18.0
    */
   public static HashFunction crc32c() {
-    return Crc32cHashFunction.CRC_32_C;
+    return Crc32CSupplier.HASH_FUNCTION;
+  }
+
+  @Immutable
+  private enum Crc32CSupplier implements ImmutableSupplier<HashFunction> {
+    @J2ObjCIncompatible
+    JAVA_UTIL_ZIP {
+      @Override
+      public HashFunction get() {
+        return ChecksumType.CRC_32C.hashFunction;
+      }
+    },
+    ABSTRACT_HASH_FUNCTION {
+      @Override
+      public HashFunction get() {
+        return Crc32cHashFunction.CRC_32_C;
+      }
+    };
+
+    static final HashFunction HASH_FUNCTION = pickFunction().get();
+
+    private static Crc32CSupplier pickFunction() {
+      Crc32CSupplier[] functions = values();
+
+      if (functions.length == 1) {
+        // We're running under J2ObjC.
+        return functions[0];
+      }
+
+      // We can't refer to JAVA_UTIL_ZIP directly at compile time because of J2ObjC.
+      Crc32CSupplier javaUtilZip = functions[0];
+
+      try {
+        Class.forName("java.util.zip.CRC32C");
+        return javaUtilZip;
+      } catch (ClassNotFoundException runningUnderJava8) {
+        return ABSTRACT_HASH_FUNCTION;
+      }
+    }
   }
 
   /**
@@ -393,6 +482,13 @@ public final class Hashing {
         return new CRC32();
       }
     },
+    @J2ObjCIncompatible
+    CRC_32C("Hashing.crc32c()") {
+      @Override
+      public Checksum get() {
+        return Crc32cMethodHandles.newCrc32c();
+      }
+    },
     ADLER_32("Hashing.adler32()") {
       @Override
       public Checksum get() {
@@ -404,6 +500,52 @@ public final class Hashing {
 
     ChecksumType(String toString) {
       this.hashFunction = new ChecksumHashFunction(this, 32, toString);
+    }
+  }
+
+  @J2ObjCIncompatible
+  @SuppressWarnings("unused")
+  private static final class Crc32cMethodHandles {
+    private static final MethodHandle CONSTRUCTOR = crc32cConstructor();
+
+    @IgnoreJRERequirement // https://github.com/mojohaus/animal-sniffer/issues/67
+    static Checksum newCrc32c() {
+      try {
+        return (Checksum) CONSTRUCTOR.invokeExact();
+      } catch (Throwable e) {
+        throwIfUnchecked(e);
+        // That constructor has no `throws` clause.
+        throw newLinkageError(e);
+      }
+    }
+
+    private static MethodHandle crc32cConstructor() {
+      try {
+        Class<?> clazz = Class.forName("java.util.zip.CRC32C");
+        /*
+         * We can't cast to CRC32C at the call site because we support building with Java 8
+         * (https://github.com/google/guava/issues/6549). So we have to use asType() to change from
+         * CRC32C to Checksum. This may carry some performance cost
+         * (https://stackoverflow.com/a/22321671/28465), but I'd have to benchmark more carefully to
+         * even detect it.
+         */
+        return MethodHandles.lookup()
+            .findConstructor(clazz, methodType(void.class))
+            .asType(methodType(Checksum.class));
+      } catch (ClassNotFoundException e) {
+        // We check that the class is available before calling this method.
+        throw new AssertionError(e);
+      } catch (IllegalAccessException e) {
+        // That API is public.
+        throw newLinkageError(e);
+      } catch (NoSuchMethodException e) {
+        // That constructor exists.
+        throw newLinkageError(e);
+      }
+    }
+
+    private static LinkageError newLinkageError(Throwable cause) {
+      return new LinkageError(cause.toString(), cause);
     }
   }
 
@@ -427,6 +569,30 @@ public final class Hashing {
    */
   public static HashFunction farmHashFingerprint64() {
     return FarmHashFingerprint64.FARMHASH_FINGERPRINT_64;
+  }
+
+  /**
+   * Returns a hash function implementing the Fingerprint2011 hashing function (64 hash bits).
+   *
+   * <p>This is designed for generating persistent fingerprints of strings. It isn't
+   * cryptographically secure, but it produces a high-quality hash with few collisions. Fingerprints
+   * generated using this are byte-wise identical to those created using the C++ version, but note
+   * that this uses unsigned integers (see {@link page.foliage.guava.common.primitives.UnsignedInts}).
+   * Comparisons between the two should take this into account.
+   *
+   * <p>Fingerprint2011() is a form of Murmur2 on strings up to 32 bytes and a form of CityHash for
+   * longer strings. It could have been one or the other throughout. The main advantage of the
+   * combination is that CityHash has a bunch of special cases for short strings that don't need to
+   * be replicated here. The result will never be 0 or 1.
+   *
+   * <p>This function is best understood as a <a
+   * href="https://en.wikipedia.org/wiki/Fingerprint_(computing)">fingerprint</a> rather than a true
+   * <a href="https://en.wikipedia.org/wiki/Hash_function">hash function</a>.
+   *
+   * @since 31.1
+   */
+  public static HashFunction fingerprint2011() {
+    return Fingerprint2011.FINGERPRINT_2011;
   }
 
   /**
@@ -455,7 +621,6 @@ public final class Hashing {
    *       assign all the old {@code alpha} traffic to {@code bravo} and all the old {@code bravo}
    *       traffic to {@code charlie}, rather than letting {@code bravo} keep its traffic.
    * </ul>
-   *
    *
    * <p>See the <a href="http://en.wikipedia.org/wiki/Consistent_hashing">Wikipedia article on
    * consistent hashing</a> for more information.
@@ -490,7 +655,6 @@ public final class Hashing {
    *       assign all the old {@code alpha} traffic to {@code bravo} and all the old {@code bravo}
    *       traffic to {@code charlie}, rather than letting {@code bravo} keep its traffic.
    * </ul>
-   *
    *
    * <p>See the <a href="http://en.wikipedia.org/wiki/Consistent_hashing">Wikipedia article on
    * consistent hashing</a> for more information.
@@ -583,7 +747,7 @@ public final class Hashing {
     List<HashFunction> list = new ArrayList<>();
     list.add(first);
     list.add(second);
-    list.addAll(Arrays.asList(rest));
+    Collections.addAll(list, rest);
     return new ConcatenatedHashFunction(list.toArray(new HashFunction[0]));
   }
 
@@ -604,30 +768,26 @@ public final class Hashing {
     for (HashFunction hashFunction : hashFunctions) {
       list.add(hashFunction);
     }
-    checkArgument(list.size() > 0, "number of hash functions (%s) must be > 0", list.size());
+    checkArgument(!list.isEmpty(), "number of hash functions (%s) must be > 0", list.size());
     return new ConcatenatedHashFunction(list.toArray(new HashFunction[0]));
   }
 
   private static final class ConcatenatedHashFunction extends AbstractCompositeHashFunction {
-    private final int bits;
 
     private ConcatenatedHashFunction(HashFunction... functions) {
       super(functions);
-      int bitSum = 0;
       for (HashFunction function : functions) {
-        bitSum += function.bits();
         checkArgument(
             function.bits() % 8 == 0,
             "the number of bits (%s) in hashFunction (%s) must be divisible by 8",
             function.bits(),
             function);
       }
-      this.bits = bitSum;
     }
 
     @Override
     HashCode makeHash(Hasher[] hashers) {
-      byte[] bytes = new byte[bits / 8];
+      byte[] bytes = new byte[bits() / 8];
       int i = 0;
       for (Hasher hasher : hashers) {
         HashCode newHash = hasher.hash();
@@ -638,11 +798,15 @@ public final class Hashing {
 
     @Override
     public int bits() {
-      return bits;
+      int bitSum = 0;
+      for (HashFunction function : functions) {
+        bitSum += function.bits();
+      }
+      return bitSum;
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@CheckForNull Object object) {
       if (object instanceof ConcatenatedHashFunction) {
         ConcatenatedHashFunction other = (ConcatenatedHashFunction) object;
         return Arrays.equals(functions, other.functions);
@@ -652,7 +816,7 @@ public final class Hashing {
 
     @Override
     public int hashCode() {
-      return Arrays.hashCode(functions) * 31 + bits;
+      return Arrays.hashCode(functions);
     }
   }
 
@@ -669,7 +833,7 @@ public final class Hashing {
 
     public double nextDouble() {
       state = 2862933555777941757L * state + 1;
-      return ((double) ((int) (state >>> 33) + 1)) / (0x1.0p31);
+      return ((double) ((int) (state >>> 33) + 1)) / 0x1.0p31;
     }
   }
 

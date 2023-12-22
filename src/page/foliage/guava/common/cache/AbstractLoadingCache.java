@@ -14,13 +14,16 @@
 
 package page.foliage.guava.common.cache;
 
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.collect.ImmutableMap;
 import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This class provides a skeletal implementation of the {@code Cache} interface to minimize the
@@ -38,12 +41,14 @@ import java.util.concurrent.ExecutionException;
  * @since 11.0
  */
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public abstract class AbstractLoadingCache<K, V> extends AbstractCache<K, V>
     implements LoadingCache<K, V> {
 
   /** Constructor for use by subclasses. */
   protected AbstractLoadingCache() {}
 
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this?
   @Override
   public V getUnchecked(K key) {
     try {

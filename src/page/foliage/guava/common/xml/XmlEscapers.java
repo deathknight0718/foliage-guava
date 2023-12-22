@@ -14,7 +14,6 @@
 
 package page.foliage.guava.common.xml;
 
-import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.escape.Escaper;
 import page.foliage.guava.common.escape.Escapers;
@@ -30,7 +29,6 @@ import page.foliage.guava.common.escape.Escapers;
  * non-ASCII characters to their numeric entity replacements. These XML escapers provide the minimal
  * level of escaping to ensure that the output can be safely included in a Unicode XML document.
  *
- *
  * <p>For details on the behavior of the escapers in this class, see sections <a
  * href="http://www.w3.org/TR/2008/REC-xml-20081126/#charsets">2.2</a> and <a
  * href="http://www.w3.org/TR/2008/REC-xml-20081126/#syntax">2.4</a> of the XML specification.
@@ -39,8 +37,8 @@ import page.foliage.guava.common.escape.Escapers;
  * @author David Beaumont
  * @since 15.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public class XmlEscapers {
   private XmlEscapers() {}
 

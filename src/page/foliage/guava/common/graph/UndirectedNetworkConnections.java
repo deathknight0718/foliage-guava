@@ -18,12 +18,13 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.graph.GraphConstants.EXPECTED_DEGREE;
 
-import page.foliage.guava.common.collect.BiMap;
-import page.foliage.guava.common.collect.HashBiMap;
-import page.foliage.guava.common.collect.ImmutableBiMap;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import page.foliage.guava.common.collect.BiMap;
+import page.foliage.guava.common.collect.HashBiMap;
+import page.foliage.guava.common.collect.ImmutableBiMap;
 
 /**
  * An implementation of {@link NetworkConnections} for undirected networks.
@@ -32,9 +33,10 @@ import java.util.Set;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 final class UndirectedNetworkConnections<N, E> extends AbstractUndirectedNetworkConnections<N, E> {
 
-  protected UndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
+  UndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
     super(incidentEdgeMap);
   }
 
@@ -53,6 +55,6 @@ final class UndirectedNetworkConnections<N, E> extends AbstractUndirectedNetwork
 
   @Override
   public Set<E> edgesConnecting(N node) {
-    return new EdgesConnecting<E>(((BiMap<E, N>) incidentEdgeMap).inverse(), node);
+    return new EdgesConnecting<>(((BiMap<E, N>) incidentEdgeMap).inverse(), node);
   }
 }

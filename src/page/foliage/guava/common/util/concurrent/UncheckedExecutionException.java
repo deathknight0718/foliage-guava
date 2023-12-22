@@ -14,8 +14,9 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Unchecked variant of {@link java.util.concurrent.ExecutionException}. As with {@code
@@ -33,22 +34,29 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 10.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public class UncheckedExecutionException extends RuntimeException {
+  /*
+   * Ideally, this class would have exposed only constructors that require a non-null cause. We
+   * might try to move in that direction, but there are complications. See
+   * https://github.com/jspecify/jspecify-reference-checker/blob/61aafa4ae52594830cfc2d61c8b113009dbdb045/src/main/java/com/google/jspecify/nullness/NullSpecTransfer.java#L789
+   */
+
   /** Creates a new instance with {@code null} as its detail message. */
   protected UncheckedExecutionException() {}
 
   /** Creates a new instance with the given detail message. */
-  protected UncheckedExecutionException(@NullableDecl String message) {
+  protected UncheckedExecutionException(@CheckForNull String message) {
     super(message);
   }
 
   /** Creates a new instance with the given detail message and cause. */
-  public UncheckedExecutionException(@NullableDecl String message, @NullableDecl Throwable cause) {
+  public UncheckedExecutionException(@CheckForNull String message, @CheckForNull Throwable cause) {
     super(message, cause);
   }
 
   /** Creates a new instance with the given cause. */
-  public UncheckedExecutionException(@NullableDecl Throwable cause) {
+  public UncheckedExecutionException(@CheckForNull Throwable cause) {
     super(cause);
   }
 

@@ -17,9 +17,6 @@ package page.foliage.guava.common.io;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -29,10 +26,17 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+
 /**
  * Provides utility methods for working with character streams.
- *
- * <p>All method parameters must be non-null unless documented otherwise.
  *
  * <p>Some of the methods in this class take arguments with a generic type of {@code Readable &
  * Closeable}. A {@link java.io.Reader} implements both of those interfaces. Similarly for {@code
@@ -43,8 +47,9 @@ import java.util.List;
  * @author Colin Decker
  * @since 1.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class CharStreams {
 
   // 2K chars (4K bytes)
@@ -77,19 +82,19 @@ public final class CharStreams {
       } else {
         return copyReaderToWriter((Reader) from, asWriter(to));
       }
-    } else {
-      checkNotNull(from);
-      checkNotNull(to);
-      long total = 0;
-      CharBuffer buf = createBuffer();
-      while (from.read(buf) != -1) {
-        buf.flip();
-        to.append(buf);
-        total += buf.remaining();
-        buf.clear();
-      }
-      return total;
     }
+
+    checkNotNull(from);
+    checkNotNull(to);
+    long total = 0;
+    CharBuffer buf = createBuffer();
+    while (from.read(buf) != -1) {
+      Java8Compatibility.flip(buf);
+      to.append(buf);
+      total += buf.remaining();
+      Java8Compatibility.clear(buf);
+    }
+    return total;
   }
 
   // TODO(lukes): consider allowing callers to pass in a buffer to use, some callers would be able
@@ -213,7 +218,9 @@ public final class CharStreams {
    * @since 14.0
    */
   @CanIgnoreReturnValue // some processors won't return a useful result
-  public static <T> T readLines(Readable readable, LineProcessor<T> processor) throws IOException {
+  @ParametricNullness
+  public static <T extends @Nullable Object> T readLines(
+      Readable readable, LineProcessor<T> processor) throws IOException {
     checkNotNull(readable);
     checkNotNull(processor);
 
@@ -240,7 +247,7 @@ public final class CharStreams {
     CharBuffer buf = createBuffer();
     while ((read = readable.read(buf)) != -1) {
       total += read;
-      buf.clear();
+      Java8Compatibility.clear(buf);
     }
     return total;
   }
@@ -302,14 +309,13 @@ public final class CharStreams {
     }
 
     @Override
-    public Writer append(CharSequence csq) {
-      checkNotNull(csq);
+    public Writer append(@CheckForNull CharSequence csq) {
       return this;
     }
 
     @Override
-    public Writer append(CharSequence csq, int start, int end) {
-      checkPositionIndexes(start, end, csq.length());
+    public Writer append(@CheckForNull CharSequence csq, int start, int end) {
+      checkPositionIndexes(start, end, csq == null ? "null".length() : csq.length());
       return this;
     }
 

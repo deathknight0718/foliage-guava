@@ -18,12 +18,13 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Static utility methods pertaining to {@code long} primitives that interpret values as
@@ -48,8 +49,8 @@ import java.util.Comparator;
  * @author Colin Evans
  * @since 10.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class UnsignedLongs {
   private UnsignedLongs() {}
 

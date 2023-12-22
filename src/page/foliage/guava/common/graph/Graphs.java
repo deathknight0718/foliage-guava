@@ -16,24 +16,27 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.graph.GraphConstants.NODE_NOT_IN_GRAPH;
+import static java.util.Objects.requireNonNull;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.base.Objects;
+import page.foliage.guava.common.collect.ImmutableSet;
 import page.foliage.guava.common.collect.Iterables;
+import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.Maps;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Static utility methods for {@link Graph}, {@link ValueGraph}, and {@link Network} instances.
@@ -43,6 +46,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 20.0
  */
 @Beta
+@ElementTypesAreNonnullByDefault
 public final class Graphs {
 
   private Graphs() {}
@@ -102,7 +106,7 @@ public final class Graphs {
       Graph<N> graph,
       Map<Object, NodeVisitState> visitedNodes,
       N node,
-      @NullableDecl N previousNode) {
+      @CheckForNull N previousNode) {
     NodeVisitState state = visitedNodes.get(node);
     if (state == NodeVisitState.COMPLETE) {
       return false;
@@ -129,7 +133,7 @@ public final class Graphs {
    * from B to A).
    */
   private static boolean canTraverseWithoutReusingEdge(
-      Graph<?> graph, Object nextNode, @NullableDecl Object previousNode) {
+      Graph<?> graph, Object nextNode, @CheckForNull Object previousNode) {
     if (graph.isDirected() || !Objects.equal(previousNode, nextNode)) {
       return true;
     }
@@ -194,20 +198,7 @@ public final class Graphs {
    */
   public static <N> Set<N> reachableNodes(Graph<N> graph, N node) {
     checkArgument(graph.nodes().contains(node), NODE_NOT_IN_GRAPH, node);
-    Set<N> visitedNodes = new LinkedHashSet<N>();
-    Queue<N> queuedNodes = new ArrayDeque<N>();
-    visitedNodes.add(node);
-    queuedNodes.add(node);
-    // Perform a breadth-first traversal rooted at the input node.
-    while (!queuedNodes.isEmpty()) {
-      N currentNode = queuedNodes.remove();
-      for (N successor : graph.successors(currentNode)) {
-        if (visitedNodes.add(successor)) {
-          queuedNodes.add(successor);
-        }
-      }
-    }
-    return Collections.unmodifiableSet(visitedNodes);
+    return ImmutableSet.copyOf(Traverser.forGraph(graph).breadthFirst(node));
   }
 
   // Graph mutation methods
@@ -262,6 +253,13 @@ public final class Graphs {
     return new TransposedNetwork<>(network);
   }
 
+  static <N> EndpointPair<N> transpose(EndpointPair<N> endpoints) {
+    if (endpoints.isOrdered()) {
+      return EndpointPair.ordered(endpoints.target(), endpoints.source());
+    }
+    return endpoints;
+  }
+
   // NOTE: this should work as long as the delegate graph's implementation of edges() (like that of
   // AbstractGraph) derives its behavior from calling successors().
   private static class TransposedGraph<N> extends ForwardingGraph<N> {
@@ -272,7 +270,7 @@ public final class Graphs {
     }
 
     @Override
-    protected Graph<N> delegate() {
+    Graph<N> delegate() {
       return graph;
     }
 
@@ -284,6 +282,18 @@ public final class Graphs {
     @Override
     public Set<N> successors(N node) {
       return delegate().predecessors(node); // transpose
+    }
+
+    @Override
+    public Set<EndpointPair<N>> incidentEdges(N node) {
+      return new IncidentEdgeSet<N>(this, node) {
+        @Override
+        public Iterator<EndpointPair<N>> iterator() {
+          return Iterators.transform(
+              delegate().incidentEdges(node).iterator(),
+              edge -> EndpointPair.of(delegate(), edge.nodeV(), edge.nodeU()));
+        }
+      };
     }
 
     @Override
@@ -299,6 +309,11 @@ public final class Graphs {
     @Override
     public boolean hasEdgeConnecting(N nodeU, N nodeV) {
       return delegate().hasEdgeConnecting(nodeV, nodeU); // transpose
+    }
+
+    @Override
+    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+      return delegate().hasEdgeConnecting(transpose(endpoints));
     }
   }
 
@@ -312,7 +327,7 @@ public final class Graphs {
     }
 
     @Override
-    protected ValueGraph<N, V> delegate() {
+    ValueGraph<N, V> delegate() {
       return graph;
     }
 
@@ -342,14 +357,30 @@ public final class Graphs {
     }
 
     @Override
+    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+      return delegate().hasEdgeConnecting(transpose(endpoints));
+    }
+
+    @Override
     public Optional<V> edgeValue(N nodeU, N nodeV) {
       return delegate().edgeValue(nodeV, nodeU); // transpose
     }
 
     @Override
-    @NullableDecl
-    public V edgeValueOrDefault(N nodeU, N nodeV, @NullableDecl V defaultValue) {
+    public Optional<V> edgeValue(EndpointPair<N> endpoints) {
+      return delegate().edgeValue(transpose(endpoints));
+    }
+
+    @Override
+    @CheckForNull
+    public V edgeValueOrDefault(N nodeU, N nodeV, @CheckForNull V defaultValue) {
       return delegate().edgeValueOrDefault(nodeV, nodeU, defaultValue); // transpose
+    }
+
+    @Override
+    @CheckForNull
+    public V edgeValueOrDefault(EndpointPair<N> endpoints, @CheckForNull V defaultValue) {
+      return delegate().edgeValueOrDefault(transpose(endpoints), defaultValue);
     }
   }
 
@@ -361,7 +392,7 @@ public final class Graphs {
     }
 
     @Override
-    protected Network<N, E> delegate() {
+    Network<N, E> delegate() {
       return network;
     }
 
@@ -407,18 +438,40 @@ public final class Graphs {
     }
 
     @Override
+    public Set<E> edgesConnecting(EndpointPair<N> endpoints) {
+      return delegate().edgesConnecting(transpose(endpoints));
+    }
+
+    @Override
     public Optional<E> edgeConnecting(N nodeU, N nodeV) {
       return delegate().edgeConnecting(nodeV, nodeU); // transpose
     }
 
     @Override
+    public Optional<E> edgeConnecting(EndpointPair<N> endpoints) {
+      return delegate().edgeConnecting(transpose(endpoints));
+    }
+
+    @Override
+    @CheckForNull
     public E edgeConnectingOrNull(N nodeU, N nodeV) {
       return delegate().edgeConnectingOrNull(nodeV, nodeU); // transpose
     }
 
     @Override
+    @CheckForNull
+    public E edgeConnectingOrNull(EndpointPair<N> endpoints) {
+      return delegate().edgeConnectingOrNull(transpose(endpoints));
+    }
+
+    @Override
     public boolean hasEdgeConnecting(N nodeU, N nodeV) {
       return delegate().hasEdgeConnecting(nodeV, nodeU); // transpose
+    }
+
+    @Override
+    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+      return delegate().hasEdgeConnecting(transpose(endpoints));
     }
   }
 
@@ -469,8 +522,11 @@ public final class Graphs {
     for (N node : subgraph.nodes()) {
       for (N successorNode : graph.successors(node)) {
         if (subgraph.nodes().contains(successorNode)) {
+          // requireNonNull is safe because the endpoint pair comes from the graph.
           subgraph.putEdgeValue(
-              node, successorNode, graph.edgeValueOrDefault(node, successorNode, null));
+              node,
+              successorNode,
+              requireNonNull(graph.edgeValueOrDefault(node, successorNode, null)));
         }
       }
     }
@@ -525,8 +581,11 @@ public final class Graphs {
       copy.addNode(node);
     }
     for (EndpointPair<N> edge : graph.edges()) {
+      // requireNonNull is safe because the endpoint pair comes from the graph.
       copy.putEdgeValue(
-          edge.nodeU(), edge.nodeV(), graph.edgeValueOrDefault(edge.nodeU(), edge.nodeV(), null));
+          edge.nodeU(),
+          edge.nodeV(),
+          requireNonNull(graph.edgeValueOrDefault(edge.nodeU(), edge.nodeV(), null)));
     }
     return copy;
   }

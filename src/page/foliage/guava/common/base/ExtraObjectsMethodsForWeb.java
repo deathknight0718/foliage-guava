@@ -21,4 +21,5 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * version.
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 abstract class ExtraObjectsMethodsForWeb {}

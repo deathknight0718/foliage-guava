@@ -14,14 +14,18 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Preconditions;
-import page.foliage.guava.common.collect.ForwardingObject;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Preconditions;
+import page.foliage.guava.common.collect.ForwardingObject;
 
 /**
  * A {@link Future} which forwards all its method calls to another future. Subclasses should
@@ -33,9 +37,10 @@ import java.util.concurrent.TimeoutException;
  * @author Sven Mawson
  * @since 1.0
  */
-@CanIgnoreReturnValue // TODO(cpovirk): Consider being more strict.
 @GwtCompatible
-public abstract class ForwardingFuture<V> extends ForwardingObject implements Future<V> {
+@ElementTypesAreNonnullByDefault
+public abstract class ForwardingFuture<V extends @Nullable Object> extends ForwardingObject
+    implements Future<V> {
   /** Constructor for use by subclasses. */
   protected ForwardingFuture() {}
 
@@ -43,6 +48,7 @@ public abstract class ForwardingFuture<V> extends ForwardingObject implements Fu
   protected abstract Future<? extends V> delegate();
 
   @Override
+  @CanIgnoreReturnValue
   public boolean cancel(boolean mayInterruptIfRunning) {
     return delegate().cancel(mayInterruptIfRunning);
   }
@@ -58,11 +64,15 @@ public abstract class ForwardingFuture<V> extends ForwardingObject implements Fu
   }
 
   @Override
+  @CanIgnoreReturnValue
+  @ParametricNullness
   public V get() throws InterruptedException, ExecutionException {
     return delegate().get();
   }
 
   @Override
+  @CanIgnoreReturnValue
+  @ParametricNullness
   public V get(long timeout, TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
     return delegate().get(timeout, unit);
@@ -75,7 +85,8 @@ public abstract class ForwardingFuture<V> extends ForwardingObject implements Fu
    *
    * @since 9.0
    */
-  public abstract static class SimpleForwardingFuture<V> extends ForwardingFuture<V> {
+  public abstract static class SimpleForwardingFuture<V extends @Nullable Object>
+      extends ForwardingFuture<V> {
     private final Future<V> delegate;
 
     protected SimpleForwardingFuture(Future<V> delegate) {

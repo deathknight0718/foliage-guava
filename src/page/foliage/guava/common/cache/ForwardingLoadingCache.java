@@ -14,10 +14,13 @@
 
 package page.foliage.guava.common.cache;
 
+import java.util.concurrent.ExecutionException;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
 import page.foliage.guava.common.base.Preconditions;
 import page.foliage.guava.common.collect.ImmutableMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A cache which forwards all its method calls to another cache. Subclasses should override one or
@@ -31,6 +34,7 @@ import java.util.concurrent.ExecutionException;
  * @since 11.0
  */
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public abstract class ForwardingLoadingCache<K, V> extends ForwardingCache<K, V>
     implements LoadingCache<K, V> {
 
@@ -40,16 +44,19 @@ public abstract class ForwardingLoadingCache<K, V> extends ForwardingCache<K, V>
   @Override
   protected abstract LoadingCache<K, V> delegate();
 
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this
   @Override
   public V get(K key) throws ExecutionException {
     return delegate().get(key);
   }
 
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this
   @Override
   public V getUnchecked(K key) {
     return delegate().getUnchecked(key);
   }
 
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this
   @Override
   public ImmutableMap<K, V> getAll(Iterable<? extends K> keys) throws ExecutionException {
     return delegate().getAll(keys);

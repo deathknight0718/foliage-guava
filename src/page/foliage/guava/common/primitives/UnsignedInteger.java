@@ -14,16 +14,19 @@
 
 package page.foliage.guava.common.primitives;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.primitives.UnsignedInts.INT_MASK;
 import static page.foliage.guava.common.primitives.UnsignedInts.compare;
 import static page.foliage.guava.common.primitives.UnsignedInts.toLong;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
+import java.math.BigInteger;
+
+import javax.annotation.CheckForNull;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-import java.math.BigInteger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A wrapper class for unsigned {@code int} values, supporting arithmetic operations.
@@ -39,6 +42,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 11.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class UnsignedInteger extends Number implements Comparable<UnsignedInteger> {
   public static final UnsignedInteger ZERO = fromIntBits(0);
   public static final UnsignedInteger ONE = fromIntBits(1);
@@ -142,6 +146,7 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
    *
    * @since 14.0
    */
+  @J2ktIncompatible
   @GwtIncompatible // Does not truncate correctly
   public UnsignedInteger times(UnsignedInteger val) {
     // TODO(lowasser): make this GWT-compatible
@@ -226,7 +231,7 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
   }
 
   @Override
-  public boolean equals(@NullableDecl Object obj) {
+  public boolean equals(@CheckForNull Object obj) {
     if (obj instanceof UnsignedInteger) {
       UnsignedInteger other = (UnsignedInteger) obj;
       return value == other.value;

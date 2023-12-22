@@ -14,19 +14,20 @@
 
 /**
  * Interfaces, utilities, and simple implementations of escapers and encoders. The primary type is
- * {@link page.foliage.guava.common.escape.Escaper}.
+ * {@link Escaper}.
  *
  * <p>Additional escapers implementations are found in the applicable packages: {@link
  * page.foliage.guava.common.html.HtmlEscapers} in {@code page.foliage.guava.common.html}, {@link
  * page.foliage.guava.common.xml.XmlEscapers} in {@code page.foliage.guava.common.xml}, and {@link
  * page.foliage.guava.common.net.UrlEscapers} in {@code page.foliage.guava.common.net}.
  *
- * <p>This package is a part of the open-source <a href="http://github.com/google/guava">Guava</a>
+ * <p>This package is a part of the open-source <a href="https://github.com/google/guava">Guava</a>
  * library.
  */
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package page.foliage.guava.common.escape;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.errorprone.annotations.CheckReturnValue;

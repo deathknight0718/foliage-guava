@@ -16,9 +16,6 @@ package page.foliage.guava.common.io;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
@@ -26,6 +23,11 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.stream.Stream;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A destination to which characters can be written, such as a text file. Unlike a {@link Writer}, a
@@ -50,7 +52,9 @@ import java.util.stream.Stream;
  * @since 14.0
  * @author Colin Decker
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public abstract class CharSink {
 
   /** Constructor for use by subclasses. */
@@ -134,7 +138,6 @@ public abstract class CharSink {
    * @throws IOException if an I/O error occurs while writing to this sink
    * @since 22.0
    */
-  @Beta
   public void writeLines(Stream<? extends CharSequence> lines) throws IOException {
     writeLines(lines, System.getProperty("line.separator"));
   }
@@ -146,7 +149,6 @@ public abstract class CharSink {
    * @throws IOException if an I/O error occurs while writing to this sink
    * @since 22.0
    */
-  @Beta
   public void writeLines(Stream<? extends CharSequence> lines, String lineSeparator)
       throws IOException {
     writeLines(lines.iterator(), lineSeparator);

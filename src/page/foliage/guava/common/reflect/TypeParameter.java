@@ -16,10 +16,10 @@ package page.foliage.guava.common.reflect;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
-import page.foliage.guava.common.annotations.Beta;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
 
 /**
  * Captures a free type variable that can be used in {@link TypeToken#where}. For example:
@@ -34,7 +34,17 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Ben Yu
  * @since 12.0
  */
-@Beta
+@ElementTypesAreNonnullByDefault
+/*
+ * A nullable bound would let users create a TypeParameter instance for a parameter with a nullable
+ * bound. However, it would also let them create `new TypeParameter<@Nullable T>() {}`, which
+ * wouldn't behave as users might expect. Additionally, it's not clear how the TypeToken API could
+ * support even a "normal" `TypeParameter<T>` when `<T>` has a nullable bound. (See the discussion
+ * on TypeToken.where.) So, in the interest of failing fast and encouraging the user to switch to a
+ * non-null bound if possible, let's require a non-null bound here.
+ *
+ * TODO(cpovirk): Elaborate on "wouldn't behave as users might expect."
+ */
 public abstract class TypeParameter<T> extends TypeCapture<T> {
 
   final TypeVariable<?> typeVariable;
@@ -51,7 +61,7 @@ public abstract class TypeParameter<T> extends TypeCapture<T> {
   }
 
   @Override
-  public final boolean equals(@NullableDecl Object o) {
+  public final boolean equals(@CheckForNull Object o) {
     if (o instanceof TypeParameter) {
       TypeParameter<?> that = (TypeParameter<?>) o;
       return typeVariable.equals(that.typeVariable);

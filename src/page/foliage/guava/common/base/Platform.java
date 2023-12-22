@@ -14,16 +14,16 @@
 
 package page.foliage.guava.common.base;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Methods factored out so that they can be emulated differently in GWT.
@@ -31,16 +31,12 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Jesse Wilson
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 final class Platform {
   private static final Logger logger = Logger.getLogger(Platform.class.getName());
   private static final PatternCompiler patternCompiler = loadPatternCompiler();
 
   private Platform() {}
-
-  /** Calls {@link System#nanoTime()}. */
-  static long systemNanoTime() {
-    return System.nanoTime();
-  }
 
   static CharMatcher precomputeCharMatcher(CharMatcher matcher) {
     return matcher.precomputedInternal();
@@ -55,8 +51,29 @@ final class Platform {
     return String.format(Locale.ROOT, "%.4g", value);
   }
 
-  static boolean stringIsNullOrEmpty(@NullableDecl String string) {
+  static boolean stringIsNullOrEmpty(@CheckForNull String string) {
     return string == null || string.isEmpty();
+  }
+
+  /**
+   * Returns the string if it is not null, or an empty string otherwise.
+   *
+   * @param string the string to test and possibly return
+   * @return {@code string} if it is not null; {@code ""} otherwise
+   */
+  static String nullToEmpty(@CheckForNull String string) {
+    return (string == null) ? "" : string;
+  }
+
+  /**
+   * Returns the string if it is not empty, or a null string otherwise.
+   *
+   * @param string the string to test and possibly return
+   * @return {@code string} if it is not empty; {@code null} otherwise
+   */
+  @CheckForNull
+  static String emptyToNull(@CheckForNull String string) {
+    return stringIsNullOrEmpty(string) ? null : string;
   }
 
   static CommonPattern compilePattern(String pattern) {
@@ -64,25 +81,11 @@ final class Platform {
     return patternCompiler.compile(pattern);
   }
 
-  static boolean usingJdkPatternCompiler() {
-    return patternCompiler instanceof JdkPatternCompiler;
+  static boolean patternCompilerIsPcreLike() {
+    return patternCompiler.isPcreLike();
   }
 
   private static PatternCompiler loadPatternCompiler() {
-    ServiceLoader<PatternCompiler> loader = ServiceLoader.load(PatternCompiler.class);
-    // Returns the first PatternCompiler that loads successfully.
-    try {
-      for (Iterator<PatternCompiler> it = loader.iterator(); it.hasNext(); ) {
-        try {
-          return it.next();
-        } catch (ServiceConfigurationError e) {
-          logPatternCompilerError(e);
-        }
-      }
-    } catch (ServiceConfigurationError e) { // from hasNext()
-      logPatternCompilerError(e);
-    }
-    // Fall back to the JDK regex library.
     return new JdkPatternCompiler();
   }
 
@@ -94,6 +97,11 @@ final class Platform {
     @Override
     public CommonPattern compile(String pattern) {
       return new JdkPattern(Pattern.compile(pattern));
+    }
+
+    @Override
+    public boolean isPcreLike() {
+      return true;
     }
   }
 }

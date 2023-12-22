@@ -22,6 +22,7 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author Louis Wasserman
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 interface LongAddable {
   void increment();
 

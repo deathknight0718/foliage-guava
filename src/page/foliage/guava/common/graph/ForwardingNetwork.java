@@ -19,6 +19,8 @@ package page.foliage.guava.common.graph;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+
 /**
  * A class to allow {@link Network} implementations to be backed by a provided delegate. This is not
  * currently planned to be released as a general-purpose forwarding class.
@@ -26,9 +28,10 @@ import java.util.Set;
  * @author James Sexton
  * @author Joshua O'Madadhain
  */
+@ElementTypesAreNonnullByDefault
 abstract class ForwardingNetwork<N, E> extends AbstractNetwork<N, E> {
 
-  protected abstract Network<N, E> delegate();
+  abstract Network<N, E> delegate();
 
   @Override
   public Set<N> nodes() {
@@ -126,17 +129,39 @@ abstract class ForwardingNetwork<N, E> extends AbstractNetwork<N, E> {
   }
 
   @Override
+  public Set<E> edgesConnecting(EndpointPair<N> endpoints) {
+    return delegate().edgesConnecting(endpoints);
+  }
+
+  @Override
   public Optional<E> edgeConnecting(N nodeU, N nodeV) {
     return delegate().edgeConnecting(nodeU, nodeV);
   }
 
   @Override
+  public Optional<E> edgeConnecting(EndpointPair<N> endpoints) {
+    return delegate().edgeConnecting(endpoints);
+  }
+
+  @Override
+  @CheckForNull
   public E edgeConnectingOrNull(N nodeU, N nodeV) {
     return delegate().edgeConnectingOrNull(nodeU, nodeV);
   }
 
   @Override
+  @CheckForNull
+  public E edgeConnectingOrNull(EndpointPair<N> endpoints) {
+    return delegate().edgeConnectingOrNull(endpoints);
+  }
+
+  @Override
   public boolean hasEdgeConnecting(N nodeU, N nodeV) {
     return delegate().hasEdgeConnecting(nodeU, nodeV);
+  }
+
+  @Override
+  public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+    return delegate().hasEdgeConnecting(endpoints);
   }
 }

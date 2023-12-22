@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * An extension of {@code DataOutput} for writing to in-memory byte arrays; its methods offer
@@ -25,7 +27,9 @@ import java.io.IOException;
  * @author Jayaprabhakar Kadarkarai
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public interface ByteArrayDataOutput extends DataOutput {
   @Override
   void write(int b);

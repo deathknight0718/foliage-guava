@@ -16,19 +16,11 @@
 
 package page.foliage.guava.common.io;
 
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.util.Objects.requireNonNull;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.collect.Iterables.getOnlyElement;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Optional;
-import page.foliage.guava.common.base.Predicate;
-import page.foliage.guava.common.collect.ImmutableList;
-import page.foliage.guava.common.collect.TreeTraverser;
-import page.foliage.guava.common.graph.SuccessorsFunction;
-import page.foliage.guava.common.graph.Traverser;
-import page.foliage.guava.common.io.ByteSource.AsCharSource;
-import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +47,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.j2objc.annotations.J2ObjCIncompatible;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.Optional;
+import page.foliage.guava.common.base.Predicate;
+import page.foliage.guava.common.collect.ImmutableList;
+import page.foliage.guava.common.graph.Traverser;
 
 /**
  * Static utilities for use with {@link Path} instances, intended to complement {@link Files}.
@@ -67,9 +69,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 21.0
  * @author Colin Decker
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
 @J2ObjCIncompatible // java.nio.file
+@ElementTypesAreNonnullByDefault
 public final class MoreFiles {
 
   private MoreFiles() {}
@@ -86,7 +89,9 @@ public final class MoreFiles {
     return new PathByteSource(path, options);
   }
 
-  private static final class PathByteSource extends ByteSource {
+  private static final class PathByteSource extends
+      ByteSource
+  {
 
     private static final LinkOption[] FOLLOW_LINKS = {};
 
@@ -159,8 +164,7 @@ public final class MoreFiles {
     @Override
     public byte[] read() throws IOException {
       try (SeekableByteChannel channel = Files.newByteChannel(path, options)) {
-        return page.foliage.guava.common.io.Files.readFile(
-            Channels.newInputStream(channel), channel.size());
+        return ByteStreams.toByteArray(Channels.newInputStream(channel), channel.size());
       }
     }
 
@@ -170,7 +174,7 @@ public final class MoreFiles {
         // If no OpenOptions were passed, delegate to Files.lines, which could have performance
         // advantages. (If OpenOptions were passed we can't, because Files.lines doesn't have an
         // overload taking OpenOptions, meaning we can't guarantee the same behavior w.r.t. things
-        // like following/not following symlinks.
+        // like following/not following symlinks.)
         return new AsCharSource(charset) {
           @SuppressWarnings("FilesLinesLeak") // the user needs to close it in this case
           @Override
@@ -269,40 +273,6 @@ public final class MoreFiles {
   }
 
   /**
-   * Returns a {@link TreeTraverser} for traversing a directory tree. The returned traverser
-   * attempts to avoid following symbolic links to directories. However, the traverser cannot
-   * guarantee that it will not follow symbolic links to directories as it is possible for a
-   * directory to be replaced with a symbolic link between checking if the file is a directory and
-   * actually reading the contents of that directory.
-   *
-   * <p>Note that if the {@link Path} passed to one of the traversal methods does not exist, no
-   * exception will be thrown and the returned {@link Iterable} will contain a single element: that
-   * path.
-   *
-   * <p>{@link DirectoryIteratorException} may be thrown when iterating {@link Iterable} instances
-   * created by this traverser if an {@link IOException} is thrown by a call to {@link
-   * #listFiles(Path)}.
-   *
-   * @deprecated The returned {@link TreeTraverser} type is deprecated. Use the replacement method
-   *     {@link #fileTraverser()} instead with the same semantics as this method. This method is
-   *     scheduled to be removed in April 2018.
-   */
-  @Deprecated
-  public static TreeTraverser<Path> directoryTreeTraverser() {
-    return DirectoryTreeTraverser.INSTANCE;
-  }
-
-  private static final class DirectoryTreeTraverser extends TreeTraverser<Path> {
-
-    private static final DirectoryTreeTraverser INSTANCE = new DirectoryTreeTraverser();
-
-    @Override
-    public Iterable<Path> children(Path dir) {
-      return fileTreeChildren(dir);
-    }
-  }
-
-  /**
    * Returns a {@link Traverser} instance for the file and directory tree. The returned traverser
    * starts from a {@link Path} and will return all files and directories it encounters.
    *
@@ -319,22 +289,15 @@ public final class MoreFiles {
    * created by this traverser if an {@link IOException} is thrown by a call to {@link
    * #listFiles(Path)}.
    *
-   * <p>Example: {@code MoreFiles.fileTraverser().breadthFirst("/")} may return files with the
-   * following paths: {@code ["/", "/etc", "/home", "/usr", "/etc/config.txt", "/etc/fonts", ...]}
+   * <p>Example: {@code MoreFiles.fileTraverser().depthFirstPreOrder(Paths.get("/"))} may return the
+   * following paths: {@code ["/", "/etc", "/etc/config.txt", "/etc/fonts", "/home", "/home/alice",
+   * ...]}
    *
    * @since 23.5
    */
   public static Traverser<Path> fileTraverser() {
-    return Traverser.forTree(FILE_TREE);
+    return Traverser.forTree(MoreFiles::fileTreeChildren);
   }
-
-  private static final SuccessorsFunction<Path> FILE_TREE =
-      new SuccessorsFunction<Path>() {
-        @Override
-        public Iterable<Path> successors(Path path) {
-          return fileTreeChildren(path);
-        }
-      };
 
   private static Iterable<Path> fileTreeChildren(Path dir) {
     if (Files.isDirectory(dir, NOFOLLOW_LINKS)) {
@@ -427,6 +390,7 @@ public final class MoreFiles {
    * Like the unix command of the same name, creates an empty file or updates the last modified
    * timestamp of the existing file at the given path to the current system time.
    */
+  @SuppressWarnings("GoodTime") // reading system time without TimeSource
   public static void touch(Path path) throws IOException {
     checkNotNull(path);
 
@@ -567,7 +531,13 @@ public final class MoreFiles {
         if (parent instanceof SecureDirectoryStream) {
           sdsSupported = true;
           exceptions =
-              deleteRecursivelySecure((SecureDirectoryStream<Path>) parent, path.getFileName());
+              deleteRecursivelySecure(
+                  (SecureDirectoryStream<Path>) parent,
+                  /*
+                   * requireNonNull is safe because paths have file names when they have parents,
+                   * and we checked for a parent at the beginning of the method.
+                   */
+                  requireNonNull(path.getFileName()));
         }
       }
 
@@ -647,7 +617,7 @@ public final class MoreFiles {
    * Secure recursive delete using {@code SecureDirectoryStream}. Returns a collection of exceptions
    * that occurred or null if no exceptions were thrown.
    */
-  @NullableDecl
+  @CheckForNull
   private static Collection<IOException> deleteRecursivelySecure(
       SecureDirectoryStream<Path> dir, Path path) {
     Collection<IOException> exceptions = null;
@@ -676,7 +646,7 @@ public final class MoreFiles {
    * Secure method for deleting the contents of a directory using {@code SecureDirectoryStream}.
    * Returns a collection of exceptions that occurred or null if no exceptions were thrown.
    */
-  @NullableDecl
+  @CheckForNull
   private static Collection<IOException> deleteDirectoryContentsSecure(
       SecureDirectoryStream<Path> dir) {
     Collection<IOException> exceptions = null;
@@ -695,7 +665,7 @@ public final class MoreFiles {
    * Insecure recursive delete for file systems that don't support {@code SecureDirectoryStream}.
    * Returns a collection of exceptions that occurred or null if no exceptions were thrown.
    */
-  @NullableDecl
+  @CheckForNull
   private static Collection<IOException> deleteRecursivelyInsecure(Path path) {
     Collection<IOException> exceptions = null;
     try {
@@ -722,7 +692,7 @@ public final class MoreFiles {
    * support {@code SecureDirectoryStream}. Returns a collection of exceptions that occurred or null
    * if no exceptions were thrown.
    */
-  @NullableDecl
+  @CheckForNull
   private static Collection<IOException> deleteDirectoryContentsInsecure(
       DirectoryStream<Path> dir) {
     Collection<IOException> exceptions = null;
@@ -742,7 +712,7 @@ public final class MoreFiles {
    * path, this is simple. Otherwise, we need to do some trickier things. Returns null if the path
    * is a root or is the empty path.
    */
-  @NullableDecl
+  @CheckForNull
   private static Path getParentPath(Path path) {
     Path parent = path.getParent();
 
@@ -789,7 +759,7 @@ public final class MoreFiles {
    * the collection.
    */
   private static Collection<IOException> addException(
-      @NullableDecl Collection<IOException> exceptions, IOException e) {
+      @CheckForNull Collection<IOException> exceptions, IOException e) {
     if (exceptions == null) {
       exceptions = new ArrayList<>(); // don't need Set semantics
     }
@@ -802,10 +772,10 @@ public final class MoreFiles {
    * null, the other collection is returned. Otherwise, the elements of {@code other} are added to
    * {@code exceptions} and {@code exceptions} is returned.
    */
-  @NullableDecl
+  @CheckForNull
   private static Collection<IOException> concat(
-      @NullableDecl Collection<IOException> exceptions,
-      @NullableDecl Collection<IOException> other) {
+      @CheckForNull Collection<IOException> exceptions,
+      @CheckForNull Collection<IOException> other) {
     if (exceptions == null) {
       return other;
     } else if (other != null) {
@@ -815,11 +785,19 @@ public final class MoreFiles {
   }
 
   /**
-   * Throws an exception indicating that one or more files couldn't be deleted. The thrown exception
-   * contains all the exceptions in the given collection as suppressed exceptions.
+   * Throws an exception indicating that one or more files couldn't be deleted when deleting {@code
+   * path} or its contents.
+   *
+   * <p>If there is only one exception in the collection, and it is a {@link NoSuchFileException}
+   * thrown because {@code path} itself didn't exist, then throws that exception. Otherwise, the
+   * thrown exception contains all the exceptions in the given collection as suppressed exceptions.
    */
   private static void throwDeleteFailed(Path path, Collection<IOException> exceptions)
       throws FileSystemException {
+    NoSuchFileException pathNotFound = pathNotFound(path, exceptions);
+    if (pathNotFound != null) {
+      throw pathNotFound;
+    }
     // TODO(cgdecker): Should there be a custom exception type for this?
     // Also, should we try to include the Path of each file we may have failed to delete rather
     // than just the exceptions that occurred?
@@ -832,5 +810,54 @@ public final class MoreFiles {
       deleteFailed.addSuppressed(e);
     }
     throw deleteFailed;
+  }
+
+  @CheckForNull
+  private static NoSuchFileException pathNotFound(Path path, Collection<IOException> exceptions) {
+    if (exceptions.size() != 1) {
+      return null;
+    }
+    IOException exception = getOnlyElement(exceptions);
+    if (!(exception instanceof NoSuchFileException)) {
+      return null;
+    }
+    NoSuchFileException noSuchFileException = (NoSuchFileException) exception;
+    String exceptionFile = noSuchFileException.getFile();
+    if (exceptionFile == null) {
+      /*
+       * It's not clear whether this happens in practice, especially with the filesystem
+       * implementations that are built into java.nio.
+       */
+      return null;
+    }
+    Path parentPath = getParentPath(path);
+    if (parentPath == null) {
+      /*
+       * This is probably impossible:
+       *
+       * - In deleteRecursively, we require the path argument to have a parent.
+       *
+       * - In deleteDirectoryContents, the path argument may have no parent. Fortunately, all the
+       *   *other* paths we process will be descendants of that. That leaves only the original path
+       *   argument for us to consider. And the only place we call pathNotFound is from
+       *   throwDeleteFailed, and the other place that we call throwDeleteFailed inside
+       *   deleteDirectoryContents is when an exception is thrown during the recursive steps. Any
+       *   failure during the initial lookup of the path argument itself is rethrown directly. So
+       *   any exception that we're seeing here is from a descendant, which naturally has a parent.
+       *   I think.
+       *
+       * Still, if this can happen somehow (a weird filesystem implementation that lets callers
+       * change its working directly concurrently with a call to deleteDirectoryContents?), it makes
+       * more sense for us to fall back to a generic FileSystemException (by returning null here)
+       * than to dereference parentPath and end up producing NullPointerException.
+       */
+      return null;
+    }
+    // requireNonNull is safe because paths have file names when they have parents.
+    Path pathResolvedFromParent = parentPath.resolve(requireNonNull(path.getFileName()));
+    if (exceptionFile.equals(pathResolvedFromParent.toString())) {
+      return noSuchFileException;
+    }
+    return null;
   }
 }

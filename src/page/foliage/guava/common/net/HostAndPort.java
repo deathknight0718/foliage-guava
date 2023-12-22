@@ -18,13 +18,17 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.annotations.Beta;
+import java.io.Serializable;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.CharMatcher;
 import page.foliage.guava.common.base.Objects;
 import page.foliage.guava.common.base.Strings;
-import com.google.errorprone.annotations.Immutable;
-import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * An immutable representation of a host and port.
@@ -59,9 +63,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Paul Marks
  * @since 10.0
  */
-@Beta
 @Immutable
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class HostAndPort implements Serializable {
   /** Magic value indicating the absence of a port number. */
   private static final int NO_PORT = -1;
@@ -162,6 +166,7 @@ public final class HostAndPort implements Serializable {
    * @return if parsing was successful, a populated HostAndPort object.
    * @throws IllegalArgumentException if nothing meaningful could be parsed.
    */
+  @CanIgnoreReturnValue // TODO(b/219820829): consider removing
   public static HostAndPort fromString(String hostPortString) {
     checkNotNull(hostPortString);
     String host;
@@ -189,7 +194,10 @@ public final class HostAndPort implements Serializable {
     if (!Strings.isNullOrEmpty(portString)) {
       // Try to parse the whole port string as a number.
       // JDK7 accepts leading plus signs. We don't want to.
-      checkArgument(!portString.startsWith("+"), "Unparseable port number: %s", hostPortString);
+      checkArgument(
+          !portString.startsWith("+") && CharMatcher.ascii().matchesAllOf(portString),
+          "Unparseable port number: %s",
+          hostPortString);
       try {
         port = Integer.parseInt(portString);
       } catch (NumberFormatException e) {
@@ -204,19 +212,17 @@ public final class HostAndPort implements Serializable {
   /**
    * Parses a bracketed host-port string, throwing IllegalArgumentException if parsing fails.
    *
-   * @param hostPortString the full bracketed host-port specification. Post might not be specified.
+   * @param hostPortString the full bracketed host-port specification. Port might not be specified.
    * @return an array with 2 strings: host and port, in that order.
    * @throws IllegalArgumentException if parsing the bracketed host-port string fails.
    */
   private static String[] getHostAndPortFromBracketedHost(String hostPortString) {
-    int colonIndex = 0;
-    int closeBracketIndex = 0;
     checkArgument(
         hostPortString.charAt(0) == '[',
         "Bracketed host-port string must start with a bracket: %s",
         hostPortString);
-    colonIndex = hostPortString.indexOf(':');
-    closeBracketIndex = hostPortString.lastIndexOf(']');
+    int colonIndex = hostPortString.indexOf(':');
+    int closeBracketIndex = hostPortString.lastIndexOf(']');
     checkArgument(
         colonIndex > -1 && closeBracketIndex > colonIndex,
         "Invalid bracketed host/port: %s",
@@ -271,28 +277,27 @@ public final class HostAndPort implements Serializable {
    * @return {@code this}, to enable chaining of calls.
    * @throws IllegalArgumentException if bracketless IPv6 is detected.
    */
+  @CanIgnoreReturnValue
   public HostAndPort requireBracketsForIPv6() {
     checkArgument(!hasBracketlessColons, "Possible bracketless IPv6 literal: %s", host);
     return this;
   }
 
   @Override
-  public boolean equals(@NullableDecl Object other) {
+  public boolean equals(@CheckForNull Object other) {
     if (this == other) {
       return true;
     }
     if (other instanceof HostAndPort) {
       HostAndPort that = (HostAndPort) other;
-      return Objects.equal(this.host, that.host)
-          && this.port == that.port
-          && this.hasBracketlessColons == that.hasBracketlessColons;
+      return Objects.equal(this.host, that.host) && this.port == that.port;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(host, port, hasBracketlessColons);
+    return Objects.hashCode(host, port);
   }
 
   /** Rebuild the host:port string, including brackets if necessary. */

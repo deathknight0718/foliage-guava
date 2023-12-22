@@ -16,11 +16,13 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** An ordering that uses the natural order of the string representation of the values. */
 @GwtCompatible(serializable = true)
+@ElementTypesAreNonnullByDefault
 final class UsingToStringOrdering extends Ordering<Object> implements Serializable {
   static final UsingToStringOrdering INSTANCE = new UsingToStringOrdering();
 

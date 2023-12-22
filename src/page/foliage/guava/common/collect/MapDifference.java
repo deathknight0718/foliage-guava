@@ -16,9 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Map;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.DoNotMock;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An object representing the differences between two maps.
@@ -26,8 +32,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Kevin Bourrillion
  * @since 2.0
  */
+@DoNotMock("Use Maps.difference")
 @GwtCompatible
-public interface MapDifference<K, V> {
+@ElementTypesAreNonnullByDefault
+public interface MapDifference<K extends @Nullable Object, V extends @Nullable Object> {
   /**
    * Returns {@code true} if there are no differences between the two maps; that is, if the maps are
    * equal.
@@ -65,7 +73,7 @@ public interface MapDifference<K, V> {
    * #entriesDiffering()} of the two instances are equal.
    */
   @Override
-  boolean equals(@NullableDecl Object object);
+  boolean equals(@CheckForNull Object object);
 
   /**
    * Returns the hash code for this instance. This is defined as the hash code of
@@ -84,11 +92,14 @@ public interface MapDifference<K, V> {
    *
    * @since 2.0
    */
-  interface ValueDifference<V> {
+  @DoNotMock("Use Maps.difference")
+  interface ValueDifference<V extends @Nullable Object> {
     /** Returns the value from the left map (possibly null). */
+    @ParametricNullness
     V leftValue();
 
     /** Returns the value from the right map (possibly null). */
+    @ParametricNullness
     V rightValue();
 
     /**
@@ -96,7 +107,7 @@ public interface MapDifference<K, V> {
      * {@link #rightValue()} values are also equal.
      */
     @Override
-    boolean equals(@NullableDecl Object other);
+    boolean equals(@CheckForNull Object other);
 
     /**
      * The hash code equals the value {@code Arrays.asList(leftValue(), rightValue()).hashCode()}.

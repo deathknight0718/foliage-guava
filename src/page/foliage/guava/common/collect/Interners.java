@@ -16,8 +16,10 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.Equivalence;
 import page.foliage.guava.common.base.Function;
@@ -30,8 +32,9 @@ import page.foliage.guava.common.collect.MapMakerInternalMap.InternalEntry;
  * @author Kevin Bourrillion
  * @since 3.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class Interners {
   private Interners() {}
 
@@ -81,7 +84,7 @@ public final class Interners {
       if (!strong) {
         mapMaker.weakKeys();
       }
-      return new InternerImpl<E>(mapMaker);
+      return new InternerImpl<>(mapMaker);
     }
   }
 
@@ -124,11 +127,15 @@ public final class Interners {
     public E intern(E sample) {
       while (true) {
         // trying to read the canonical...
-        InternalEntry<E, Dummy, ?> entry = map.getEntry(sample);
+        @SuppressWarnings("rawtypes") // using raw types to avoid a bug in our nullness checker :(
+        InternalEntry entry = map.getEntry(sample);
         if (entry != null) {
-          E canonical = entry.getKey();
+          Object canonical = entry.getKey();
           if (canonical != null) { // only matters if weak/soft keys are used
-            return canonical;
+            // The compiler would know this is safe if not for our use of raw types (see above).
+            @SuppressWarnings("unchecked")
+            E result = (E) canonical;
+            return result;
           }
         }
 
@@ -154,7 +161,7 @@ public final class Interners {
    * @since 8.0
    */
   public static <E> Function<E, E> asFunction(Interner<E> interner) {
-    return new InternerFunction<E>(checkNotNull(interner));
+    return new InternerFunction<>(checkNotNull(interner));
   }
 
   private static class InternerFunction<E> implements Function<E, E> {
@@ -176,7 +183,7 @@ public final class Interners {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@CheckForNull Object other) {
       if (other instanceof InternerFunction) {
         InternerFunction<?> that = (InternerFunction<?>) other;
         return interner.equals(that.interner);

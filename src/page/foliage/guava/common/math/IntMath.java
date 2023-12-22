@@ -14,24 +14,25 @@
 
 package page.foliage.guava.common.math;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.math.RoundingMode.HALF_UP;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.math.MathPreconditions.checkNoOverflow;
 import static page.foliage.guava.common.math.MathPreconditions.checkNonNegative;
 import static page.foliage.guava.common.math.MathPreconditions.checkPositive;
 import static page.foliage.guava.common.math.MathPreconditions.checkRoundingUnnecessary;
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
-import static java.math.RoundingMode.HALF_EVEN;
-import static java.math.RoundingMode.HALF_UP;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.primitives.Ints;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.primitives.Ints;
 
 /**
  * A class for arithmetic on values of type {@code int}. Where possible, methods are defined and
@@ -48,6 +49,7 @@ import java.math.RoundingMode;
  * @since 11.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class IntMath {
   // NOTE: Whenever both tests are cheap and functional, it's faster to use &, | instead of &&, ||
 
@@ -62,7 +64,6 @@ public final class IntMath {
    *     int}, i.e. when {@code x > 2^30}
    * @since 20.0
    */
-  @Beta
   public static int ceilingPowerOfTwo(int x) {
     checkPositive("x", x);
     if (x > MAX_SIGNED_POWER_OF_TWO) {
@@ -78,7 +79,6 @@ public final class IntMath {
    * @throws IllegalArgumentException if {@code x <= 0}
    * @since 20.0
    */
-  @Beta
   public static int floorPowerOfTwo(int x) {
     checkPositive("x", x);
     return Integer.highestOneBit(x);
@@ -154,6 +154,7 @@ public final class IntMath {
    * @throws ArithmeticException if {@code mode} is {@link RoundingMode#UNNECESSARY} and {@code x}
    *     is not a power of ten
    */
+  @J2ktIncompatible
   @GwtIncompatible // need BigIntegerMath to adequately test
   @SuppressWarnings("fallthrough")
   public static int log10(int x, RoundingMode mode) {
@@ -223,6 +224,7 @@ public final class IntMath {
    *
    * @throws IllegalArgumentException if {@code k < 0}
    */
+  @J2ktIncompatible
   @GwtIncompatible // failing tests
   public static int pow(int b, int k) {
     checkNonNegative("exponent", k);
@@ -531,7 +533,6 @@ public final class IntMath {
    *
    * @since 20.0
    */
-  @Beta
   public static int saturatedAdd(int a, int b) {
     return Ints.saturatedCast((long) a + b);
   }
@@ -542,7 +543,6 @@ public final class IntMath {
    *
    * @since 20.0
    */
-  @Beta
   public static int saturatedSubtract(int a, int b) {
     return Ints.saturatedCast((long) a - b);
   }
@@ -553,7 +553,6 @@ public final class IntMath {
    *
    * @since 20.0
    */
-  @Beta
   public static int saturatedMultiply(int a, int b) {
     return Ints.saturatedCast((long) a * b);
   }
@@ -564,7 +563,6 @@ public final class IntMath {
    *
    * @since 20.0
    */
-  @Beta
   public static int saturatedPow(int b, int k) {
     checkNonNegative("exponent", k);
     switch (b) {
@@ -718,8 +716,8 @@ public final class IntMath {
    * @throws IllegalArgumentException if {@code n} is negative
    * @since 20.0
    */
+  @J2ktIncompatible
   @GwtIncompatible // TODO
-  @Beta
   public static boolean isPrime(int n) {
     return LongMath.isPrime(n);
   }

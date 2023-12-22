@@ -16,18 +16,23 @@
 
 package page.foliage.guava.common.graph;
 
+import static page.foliage.guava.common.graph.GraphConstants.SELF_LOOPS_NOT_ALLOWED;
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
-import static page.foliage.guava.common.graph.GraphConstants.SELF_LOOPS_NOT_ALLOWED;
 import static page.foliage.guava.common.graph.Graphs.checkNonNegative;
 import static page.foliage.guava.common.graph.Graphs.checkPositive;
 
+import javax.annotation.CheckForNull;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
+import page.foliage.guava.common.collect.ImmutableList;
+
 /**
- * Configurable implementation of {@link MutableValueGraph} that supports both directed and
- * undirected graphs. Instances of this class should be constructed with {@link ValueGraphBuilder}.
+ * Standard implementation of {@link MutableValueGraph} that supports both directed and undirected
+ * graphs. Instances of this class should be constructed with {@link ValueGraphBuilder}.
  *
  * <p>Time complexities for mutation methods are all O(1) except for {@code removeNode(N node)},
  * which is in O(d_node) where d_node is the degree of {@code node}.
@@ -38,12 +43,21 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
  * @param <N> Node parameter type
  * @param <V> Value parameter type
  */
-final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N, V>
+@ElementTypesAreNonnullByDefault
+final class StandardMutableValueGraph<N, V> extends StandardValueGraph<N, V>
     implements MutableValueGraph<N, V> {
 
+  private final ElementOrder<N> incidentEdgeOrder;
+
   /** Constructs a mutable graph with the properties specified in {@code builder}. */
-  ConfigurableMutableValueGraph(AbstractGraphBuilder<? super N> builder) {
+  StandardMutableValueGraph(AbstractGraphBuilder<? super N> builder) {
     super(builder);
+    incidentEdgeOrder = builder.incidentEdgeOrder.cast();
+  }
+
+  @Override
+  public ElementOrder<N> incidentEdgeOrder() {
+    return incidentEdgeOrder;
   }
 
   @Override
@@ -73,6 +87,7 @@ final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N
 
   @Override
   @CanIgnoreReturnValue
+  @CheckForNull
   public V putEdgeValue(N nodeU, N nodeV, V value) {
     checkNotNull(nodeU, "nodeU");
     checkNotNull(nodeV, "nodeV");
@@ -100,6 +115,14 @@ final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N
 
   @Override
   @CanIgnoreReturnValue
+  @CheckForNull
+  public V putEdgeValue(EndpointPair<N> endpoints, V value) {
+    validateEndpoints(endpoints);
+    return putEdgeValue(endpoints.nodeU(), endpoints.nodeV(), value);
+  }
+
+  @Override
+  @CanIgnoreReturnValue
   public boolean removeNode(N node) {
     checkNotNull(node, "node");
 
@@ -116,13 +139,21 @@ final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N
       }
     }
 
-    for (N successor : connections.successors()) {
-      nodeConnections.getWithoutCaching(successor).removePredecessor(node);
+    for (N successor : ImmutableList.copyOf(connections.successors())) {
+      // requireNonNull is safe because the node is a successor.
+      requireNonNull(nodeConnections.getWithoutCaching(successor)).removePredecessor(node);
+      requireNonNull(connections.removeSuccessor(successor));
       --edgeCount;
     }
     if (isDirected()) { // In undirected graphs, the successor and predecessor sets are equal.
-      for (N predecessor : connections.predecessors()) {
-        checkState(nodeConnections.getWithoutCaching(predecessor).removeSuccessor(node) != null);
+      // Since views are returned, we need to copy the predecessors that will be removed.
+      // Thus we avoid modifying the underlying view while iterating over it.
+      for (N predecessor : ImmutableList.copyOf(connections.predecessors())) {
+        // requireNonNull is safe because the node is a predecessor.
+        checkState(
+            requireNonNull(nodeConnections.getWithoutCaching(predecessor)).removeSuccessor(node)
+                != null);
+        connections.removePredecessor(predecessor);
         --edgeCount;
       }
     }
@@ -133,6 +164,7 @@ final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N
 
   @Override
   @CanIgnoreReturnValue
+  @CheckForNull
   public V removeEdge(N nodeU, N nodeV) {
     checkNotNull(nodeU, "nodeU");
     checkNotNull(nodeV, "nodeV");
@@ -151,9 +183,17 @@ final class ConfigurableMutableValueGraph<N, V> extends ConfigurableValueGraph<N
     return previousValue;
   }
 
+  @Override
+  @CanIgnoreReturnValue
+  @CheckForNull
+  public V removeEdge(EndpointPair<N> endpoints) {
+    validateEndpoints(endpoints);
+    return removeEdge(endpoints.nodeU(), endpoints.nodeV());
+  }
+
   private GraphConnections<N, V> newConnections() {
     return isDirected()
-        ? DirectedGraphConnections.<N, V>of()
-        : UndirectedGraphConnections.<N, V>of();
+        ? DirectedGraphConnections.<N, V>of(incidentEdgeOrder)
+        : UndirectedGraphConnections.<N, V>of(incidentEdgeOrder);
   }
 }

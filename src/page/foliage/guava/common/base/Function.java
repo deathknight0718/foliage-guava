@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.base;
 
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Legacy version of {@link java.util.function.Function java.util.function.Function}.
@@ -41,11 +43,12 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  */
 @GwtCompatible
 @FunctionalInterface
-public interface Function<F, T> extends java.util.function.Function<F, T> {
+@ElementTypesAreNonnullByDefault
+public interface Function<F extends @Nullable Object, T extends @Nullable Object>
+    extends java.util.function.Function<F, T> {
   @Override
-  @NullableDecl
-  @CanIgnoreReturnValue // TODO(kevinb): remove this
-  T apply(@NullableDecl F input);
+  @ParametricNullness
+  T apply(@ParametricNullness F input);
 
   /**
    * <i>May</i> return {@code true} if {@code object} is a {@code Function} that behaves identically
@@ -59,5 +62,5 @@ public interface Function<F, T> extends java.util.function.Function<F, T> {
    * disappear. It is best not to depend on it.
    */
   @Override
-  boolean equals(@NullableDecl Object object);
+  boolean equals(@CheckForNull Object object);
 }

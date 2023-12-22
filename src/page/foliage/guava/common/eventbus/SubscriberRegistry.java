@@ -16,6 +16,22 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Throwables.throwIfUnchecked;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.annotation.CheckForNull;
+
+import com.google.j2objc.annotations.Weak;
 
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.MoreObjects;
@@ -31,26 +47,16 @@ import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.Lists;
 import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.collect.Multimap;
+import page.foliage.guava.common.primitives.Primitives;
 import page.foliage.guava.common.reflect.TypeToken;
 import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-import com.google.j2objc.annotations.Weak;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Registry of subscribers to a single event bus.
  *
  * @author Colin Decker
  */
+@ElementTypesAreNonnullByDefault
 final class SubscriberRegistry {
 
   /**
@@ -170,7 +176,12 @@ final class SubscriberRegistry {
   }
 
   private static ImmutableList<Method> getAnnotatedMethods(Class<?> clazz) {
-    return subscriberMethodsCache.getUnchecked(clazz);
+    try {
+      return subscriberMethodsCache.getUnchecked(clazz);
+    } catch (UncheckedExecutionException e) {
+      throwIfUnchecked(e.getCause());
+      throw e;
+    }
   }
 
   private static ImmutableList<Method> getAnnotatedMethodsNotCached(Class<?> clazz) {
@@ -183,10 +194,19 @@ final class SubscriberRegistry {
           Class<?>[] parameterTypes = method.getParameterTypes();
           checkArgument(
               parameterTypes.length == 1,
-              "Method %s has @Subscribe annotation but has %s parameters."
+              "Method %s has @Subscribe annotation but has %s parameters. "
                   + "Subscriber methods must have exactly 1 parameter.",
               method,
               parameterTypes.length);
+
+          checkArgument(
+              !parameterTypes[0].isPrimitive(),
+              "@Subscribe method %s's parameter is %s. "
+                  + "Subscriber methods cannot accept primitives. "
+                  + "Consider changing the parameter to %s.",
+              method,
+              parameterTypes[0].getName(),
+              Primitives.wrap(parameterTypes[0]).getSimpleName());
 
           MethodIdentifier ident = new MethodIdentifier(method);
           if (!identifiers.containsKey(ident)) {
@@ -242,7 +262,7 @@ final class SubscriberRegistry {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object o) {
+    public boolean equals(@CheckForNull Object o) {
       if (o instanceof MethodIdentifier) {
         MethodIdentifier ident = (MethodIdentifier) o;
         return name.equals(ident.name) && parameterTypes.equals(ident.parameterTypes);

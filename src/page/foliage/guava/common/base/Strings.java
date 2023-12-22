@@ -14,12 +14,21 @@
 
 package page.foliage.guava.common.base;
 
+import static java.util.logging.Level.WARNING;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
+import java.util.logging.Logger;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.InlineMe;
+import com.google.errorprone.annotations.InlineMeValidationDisabled;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Static utility methods pertaining to {@code String} or {@code CharSequence} instances.
@@ -28,6 +37,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 3.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Strings {
   private Strings() {}
 
@@ -37,8 +47,8 @@ public final class Strings {
    * @param string the string to test and possibly return
    * @return {@code string} itself if it is non-null; {@code ""} if it is null
    */
-  public static String nullToEmpty(@NullableDecl String string) {
-    return (string == null) ? "" : string;
+  public static String nullToEmpty(@CheckForNull String string) {
+    return Platform.nullToEmpty(string);
   }
 
   /**
@@ -47,9 +57,9 @@ public final class Strings {
    * @param string the string to test and possibly return
    * @return {@code string} itself if it is nonempty; {@code null} if it is empty or null
    */
-  @NullableDecl
-  public static String emptyToNull(@NullableDecl String string) {
-    return isNullOrEmpty(string) ? null : string;
+  @CheckForNull
+  public static String emptyToNull(@CheckForNull String string) {
+    return Platform.emptyToNull(string);
   }
 
   /**
@@ -63,7 +73,7 @@ public final class Strings {
    * @param string a string reference to check
    * @return {@code true} if the string is null or is the empty string
    */
-  public static boolean isNullOrEmpty(@NullableDecl String string) {
+  public static boolean isNullOrEmpty(@CheckForNull String string) {
     return Platform.stringIsNullOrEmpty(string);
   }
 
@@ -133,12 +143,16 @@ public final class Strings {
    * Returns a string consisting of a specific number of concatenated copies of an input string. For
    * example, {@code repeat("hey", 3)} returns the string {@code "heyheyhey"}.
    *
+   * <p><b>Java 11+ users:</b> use {@code string.repeat(count)} instead.
+   *
    * @param string any non-null string
    * @param count the number of times to repeat it; a nonnegative integer
    * @return a string containing {@code string} repeated {@code count} times (the empty string if
    *     {@code count} is zero)
    * @throws IllegalArgumentException if {@code count} is negative
    */
+  @InlineMe(replacement = "string.repeat(count)")
+  @InlineMeValidationDisabled("Java 11+ API only")
   public static String repeat(String string, int count) {
     checkNotNull(string); // eager for GWT.
 
@@ -220,5 +234,96 @@ public final class Strings {
         && index <= (string.length() - 2)
         && Character.isHighSurrogate(string.charAt(index))
         && Character.isLowSurrogate(string.charAt(index + 1));
+  }
+
+  /**
+   * Returns the given {@code template} string with each occurrence of {@code "%s"} replaced with
+   * the corresponding argument value from {@code args}; or, if the placeholder and argument counts
+   * do not match, returns a best-effort form of that string. Will not throw an exception under
+   * normal conditions.
+   *
+   * <p><b>Note:</b> For most string-formatting needs, use {@link String#format String.format},
+   * {@link java.io.PrintWriter#format PrintWriter.format}, and related methods. These support the
+   * full range of <a
+   * href="https://docs.oracle.com/javase/9/docs/api/java/util/Formatter.html#syntax">format
+   * specifiers</a>, and alert you to usage errors by throwing {@link
+   * java.util.IllegalFormatException}.
+   *
+   * <p>In certain cases, such as outputting debugging information or constructing a message to be
+   * used for another unchecked exception, an exception during string formatting would serve little
+   * purpose except to supplant the real information you were trying to provide. These are the cases
+   * this method is made for; it instead generates a best-effort string with all supplied argument
+   * values present. This method is also useful in environments such as GWT where {@code
+   * String.format} is not available. As an example, method implementations of the {@link
+   * Preconditions} class use this formatter, for both of the reasons just discussed.
+   *
+   * <p><b>Warning:</b> Only the exact two-character placeholder sequence {@code "%s"} is
+   * recognized.
+   *
+   * @param template a string containing zero or more {@code "%s"} placeholder sequences. {@code
+   *     null} is treated as the four-character string {@code "null"}.
+   * @param args the arguments to be substituted into the message template. The first argument
+   *     specified is substituted for the first occurrence of {@code "%s"} in the template, and so
+   *     forth. A {@code null} argument is converted to the four-character string {@code "null"};
+   *     non-null values are converted to strings using {@link Object#toString()}.
+   * @since 25.1
+   */
+  // TODO(diamondm) consider using Arrays.toString() for array parameters
+  public static String lenientFormat(
+      @CheckForNull String template, @CheckForNull @Nullable Object... args) {
+    template = String.valueOf(template); // null -> "null"
+
+    if (args == null) {
+      args = new Object[] {"(Object[])null"};
+    } else {
+      for (int i = 0; i < args.length; i++) {
+        args[i] = lenientToString(args[i]);
+      }
+    }
+
+    // start substituting the arguments into the '%s' placeholders
+    StringBuilder builder = new StringBuilder(template.length() + 16 * args.length);
+    int templateStart = 0;
+    int i = 0;
+    while (i < args.length) {
+      int placeholderStart = template.indexOf("%s", templateStart);
+      if (placeholderStart == -1) {
+        break;
+      }
+      builder.append(template, templateStart, placeholderStart);
+      builder.append(args[i++]);
+      templateStart = placeholderStart + 2;
+    }
+    builder.append(template, templateStart, template.length());
+
+    // if we run out of placeholders, append the extra args in square braces
+    if (i < args.length) {
+      builder.append(" [");
+      builder.append(args[i++]);
+      while (i < args.length) {
+        builder.append(", ");
+        builder.append(args[i++]);
+      }
+      builder.append(']');
+    }
+
+    return builder.toString();
+  }
+
+  private static String lenientToString(@CheckForNull Object o) {
+    if (o == null) {
+      return "null";
+    }
+    try {
+      return o.toString();
+    } catch (Exception e) {
+      // Default toString() behavior - see Object.toString()
+      String objectToString =
+          o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
+      // Logger is created inline with fixed name to avoid forcing Proguard to create another class.
+      Logger.getLogger("page.foliage.guava.common.base.Strings")
+          .log(WARNING, "Exception during lenientFormat for " + objectToString, e);
+      return "<" + objectToString + " threw " + e.getClass().getName() + ">";
+    }
   }
 }

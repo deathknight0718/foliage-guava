@@ -14,11 +14,14 @@
 
 package page.foliage.guava.common.hash;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.primitives.Ints;
-import com.google.errorprone.annotations.Immutable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.Immutable;
+
+import page.foliage.guava.common.primitives.Ints;
 
 /**
  * A hash function is a collision-averse pure function that maps an arbitrary block of data to a
@@ -74,9 +77,7 @@ import java.nio.charset.Charset;
  *       these feats has become computationally feasible, the function is deemed "broken" and should
  *       no longer be used for secure purposes. (This is the likely eventual fate of <i>all</i>
  *       cryptographic hashes.)
- *   <li><b>fast:</b> perhaps self-explanatory, but often the most important consideration. We have
- *       published <a href="#noWeHaventYet">microbenchmark results</a> for many common hash
- *       functions.
+ *   <li><b>fast:</b> perhaps self-explanatory, but often the most important consideration.
  * </ul>
  *
  * <h3>Providing input to a hash function</h3>
@@ -117,8 +118,8 @@ import java.nio.charset.Charset;
  * @author Kevin Bourrillion
  * @since 11.0
  */
-@Beta
 @Immutable
+@ElementTypesAreNonnullByDefault
 public interface HashFunction {
   /**
    * Begins a new hash code computation by returning an initialized, stateful {@code Hasher}
@@ -213,7 +214,8 @@ public interface HashFunction {
    *
    * @since 14.0
    */
-  <T> HashCode hashObject(T instance, Funnel<? super T> funnel);
+  <T extends @Nullable Object> HashCode hashObject(
+      @ParametricNullness T instance, Funnel<? super T> funnel);
 
   /**
    * Returns the number of bits (a multiple of 32) that each hash code produced by this hash

@@ -15,19 +15,19 @@
 /**
  * Concurrency utilities.
  *
- * <p>Commonly used types include {@link page.foliage.guava.common.util.concurrent.ListenableFuture} and
- * {@link page.foliage.guava.common.util.concurrent.Service}.
+ * <p>Commonly used types include {@link ClosingFuture}, {@link ListenableFuture}, and {@link
+ * Service}.
  *
- * <p>Commonly used utilities include {@link page.foliage.guava.common.util.concurrent.Futures}, {@link
- * page.foliage.guava.common.util.concurrent.MoreExecutors}, and {@link
- * page.foliage.guava.common.util.concurrent.ThreadFactoryBuilder}.
+ * <p>Commonly used utilities include {@link Futures}, {@link MoreExecutors}, {@link
+ * ThreadFactoryBuilder}, and {@link Uninterruptibles}.
  *
- * <p>This package is a part of the open-source <a href="http://github.com/google/guava">Guava</a>
+ * <p>This package is a part of the open-source <a href="https://github.com/google/guava">Guava</a>
  * library.
  */
 @CheckReturnValue
 @ParametersAreNonnullByDefault
 package page.foliage.guava.common.util.concurrent;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.errorprone.annotations.CheckReturnValue;

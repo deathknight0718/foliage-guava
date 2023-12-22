@@ -18,9 +18,8 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.collect.NullnessCasts.uncheckedCastNullableTToT;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.math.IntMath;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +27,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.math.IntMath;
 
 /**
  * An accumulator that selects the "top" {@code k} elements added to it, relative to a provided
@@ -51,14 +56,17 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  *
  * @author Louis Wasserman
  */
-@GwtCompatible final class TopKSelector<T> {
+@GwtCompatible
+@ElementTypesAreNonnullByDefault
+final class TopKSelector<
+    T extends @Nullable Object> {
 
   /**
    * Returns a {@code TopKSelector} that collects the lowest {@code k} elements added to it,
    * relative to the natural ordering of the elements, and returns them via {@link #topK} in
    * ascending order.
    *
-   * @throws IllegalArgumentException if {@code k < 0}
+   * @throws IllegalArgumentException if {@code k < 0} or {@code k > Integer.MAX_VALUE / 2}
    */
   public static <T extends Comparable<? super T>> TopKSelector<T> least(int k) {
     return least(k, Ordering.natural());
@@ -68,9 +76,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * Returns a {@code TopKSelector} that collects the lowest {@code k} elements added to it,
    * relative to the specified comparator, and returns them via {@link #topK} in ascending order.
    *
-   * @throws IllegalArgumentException if {@code k < 0}
+   * @throws IllegalArgumentException if {@code k < 0} or {@code k > Integer.MAX_VALUE / 2}
    */
-  public static <T> TopKSelector<T> least(int k, Comparator<? super T> comparator) {
+  public static <T extends @Nullable Object> TopKSelector<T> least(
+      int k, Comparator<? super T> comparator) {
     return new TopKSelector<T>(comparator, k);
   }
 
@@ -79,7 +88,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * relative to the natural ordering of the elements, and returns them via {@link #topK} in
    * descending order.
    *
-   * @throws IllegalArgumentException if {@code k < 0}
+   * @throws IllegalArgumentException if {@code k < 0} or {@code k > Integer.MAX_VALUE / 2}
    */
   public static <T extends Comparable<? super T>> TopKSelector<T> greatest(int k) {
     return greatest(k, Ordering.natural());
@@ -89,9 +98,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * Returns a {@code TopKSelector} that collects the greatest {@code k} elements added to it,
    * relative to the specified comparator, and returns them via {@link #topK} in descending order.
    *
-   * @throws IllegalArgumentException if {@code k < 0}
+   * @throws IllegalArgumentException if {@code k < 0} or {@code k > Integer.MAX_VALUE / 2}
    */
-  public static <T> TopKSelector<T> greatest(int k, Comparator<? super T> comparator) {
+  public static <T extends @Nullable Object> TopKSelector<T> greatest(
+      int k, Comparator<? super T> comparator) {
     return new TopKSelector<T>(Ordering.from(comparator).reverse(), k);
   }
 
@@ -103,20 +113,21 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * for the top k elements. Whenever the buffer is filled, we quickselect the top k elements to the
    * range [0, k) and ignore the remaining elements.
    */
-  private final T[] buffer;
+  private final @Nullable T[] buffer;
   private int bufferSize;
 
   /**
    * The largest of the lowest k elements we've seen so far relative to this comparator. If
    * bufferSize ≥ k, then we can ignore any elements greater than this value.
    */
-  @NullableDecl private T threshold;
+  @CheckForNull private T threshold;
 
   private TopKSelector(Comparator<? super T> comparator, int k) {
     this.comparator = checkNotNull(comparator, "comparator");
     this.k = k;
-    checkArgument(k >= 0, "k must be nonnegative, was %s", k);
-    this.buffer = (T[]) new Object[k * 2];
+    checkArgument(k >= 0, "k (%s) must be >= 0", k);
+    checkArgument(k <= Integer.MAX_VALUE / 2, "k (%s) must be <= Integer.MAX_VALUE / 2", k);
+    this.buffer = (T[]) new Object[IntMath.checkedMultiply(k, 2)];
     this.bufferSize = 0;
     this.threshold = null;
   }
@@ -125,7 +136,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * Adds {@code elem} as a candidate for the top {@code k} elements. This operation takes amortized
    * O(1) time.
    */
-  public void offer(@NullableDecl T elem) {
+  public void offer(@ParametricNullness T elem) {
     if (k == 0) {
       return;
     } else if (bufferSize == 0) {
@@ -134,10 +145,12 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
       bufferSize = 1;
     } else if (bufferSize < k) {
       buffer[bufferSize++] = elem;
-      if (comparator.compare(elem, threshold) > 0) {
+      // uncheckedCastNullableTToT is safe because bufferSize > 0.
+      if (comparator.compare(elem, uncheckedCastNullableTToT(threshold)) > 0) {
         threshold = elem;
       }
-    } else if (comparator.compare(elem, threshold) < 0) {
+      // uncheckedCastNullableTToT is safe because bufferSize > 0.
+    } else if (comparator.compare(elem, uncheckedCastNullableTToT(threshold)) < 0) {
       // Otherwise, we can ignore elem; we've seen k better elements.
       buffer[bufferSize++] = elem;
       if (bufferSize == 2 * k) {
@@ -175,16 +188,20 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
       }
       iterations++;
       if (iterations >= maxIterations) {
+        @SuppressWarnings("nullness") // safe because we pass sort() a range that contains real Ts
+        T[] castBuffer = (T[]) buffer;
         // We've already taken O(k log k), let's make sure we don't take longer than O(k log k).
-        Arrays.sort(buffer, left, right, comparator);
+        Arrays.sort(castBuffer, left, right + 1, comparator);
         break;
       }
     }
     bufferSize = k;
 
-    threshold = buffer[minThresholdPosition];
+    threshold = uncheckedCastNullableTToT(buffer[minThresholdPosition]);
     for (int i = minThresholdPosition + 1; i < k; i++) {
-      if (comparator.compare(buffer[i], threshold) > 0) {
+      if (comparator.compare(
+              uncheckedCastNullableTToT(buffer[i]), uncheckedCastNullableTToT(threshold))
+          > 0) {
         threshold = buffer[i];
       }
     }
@@ -197,12 +214,12 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * (pivotNewIndex, right] is greater than pivotValue.
    */
   private int partition(int left, int right, int pivotIndex) {
-    T pivotValue = buffer[pivotIndex];
+    T pivotValue = uncheckedCastNullableTToT(buffer[pivotIndex]);
     buffer[pivotIndex] = buffer[right];
 
     int pivotNewIndex = left;
     for (int i = left; i < right; i++) {
-      if (comparator.compare(buffer[i], pivotValue) < 0) {
+      if (comparator.compare(uncheckedCastNullableTToT(buffer[i]), pivotValue) < 0) {
         swap(pivotNewIndex, i);
         pivotNewIndex++;
       }
@@ -220,7 +237,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
   TopKSelector<T> combine(TopKSelector<T> other) {
     for (int i = 0; i < other.bufferSize; i++) {
-      this.offer(other.buffer[i]);
+      this.offer(uncheckedCastNullableTToT(other.buffer[i]));
     }
     return this;
   }
@@ -259,13 +276,17 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
    * this {@code TopKSelector}. This method returns in O(k log k) time.
    */
   public List<T> topK() {
-    Arrays.sort(buffer, 0, bufferSize, comparator);
+    @SuppressWarnings("nullness") // safe because we pass sort() a range that contains real Ts
+    T[] castBuffer = (T[]) buffer;
+    Arrays.sort(castBuffer, 0, bufferSize, comparator);
     if (bufferSize > k) {
       Arrays.fill(buffer, k, buffer.length, null);
       bufferSize = k;
       threshold = buffer[k - 1];
     }
+    // Up to bufferSize, all elements of buffer are real Ts (not null unless T includes null)
+    T[] topK = Arrays.copyOf(castBuffer, bufferSize);
     // we have to support null elements, so no ImmutableList for us
-    return Collections.unmodifiableList(Arrays.asList(Arrays.copyOf(buffer, bufferSize)));
+    return Collections.unmodifiableList(Arrays.asList(topK));
   }
 }

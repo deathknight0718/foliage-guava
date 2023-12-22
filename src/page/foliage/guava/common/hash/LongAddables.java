@@ -14,21 +14,24 @@
 
 package page.foliage.guava.common.hash;
 
-import page.foliage.guava.common.base.Supplier;
 import java.util.concurrent.atomic.AtomicLong;
+
+import page.foliage.guava.common.base.Supplier;
 
 /**
  * Source of {@link LongAddable} objects that deals with GWT, Unsafe, and all that.
  *
  * @author Louis Wasserman
  */
+@ElementTypesAreNonnullByDefault
 final class LongAddables {
   private static final Supplier<LongAddable> SUPPLIER;
 
   static {
     Supplier<LongAddable> supplier;
     try {
-      new LongAdder(); // trigger static initialization of the LongAdder class, which may fail
+      // trigger static initialization of the LongAdder class, which may fail
+      LongAdder unused = new LongAdder();
       supplier =
           new Supplier<LongAddable>() {
             @Override

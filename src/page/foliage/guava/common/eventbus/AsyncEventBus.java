@@ -14,7 +14,6 @@
 
 package page.foliage.guava.common.eventbus;
 
-import page.foliage.guava.common.annotations.Beta;
 import java.util.concurrent.Executor;
 
 /**
@@ -24,7 +23,7 @@ import java.util.concurrent.Executor;
  * @author Cliff Biffle
  * @since 10.0
  */
-@Beta
+@ElementTypesAreNonnullByDefault
 public class AsyncEventBus extends EventBus {
 
   /**

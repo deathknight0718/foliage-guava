@@ -14,15 +14,18 @@
 
 package page.foliage.guava.common.collect;
 
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import com.google.errorprone.annotations.DoNotCall;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
 
 /**
  * A sorted set of contiguous values in a given {@link DiscreteDomain}. Example:
@@ -48,6 +51,7 @@ import java.util.Set;
  */
 @GwtCompatible(emulated = true)
 @SuppressWarnings("rawtypes") // allow ungenerified Comparable types
+@ElementTypesAreNonnullByDefault
 public abstract class ContiguousSet<C extends Comparable> extends ImmutableSortedSet<C> {
   /**
    * Returns a {@code ContiguousSet} containing the same values in the given domain {@linkplain
@@ -73,13 +77,19 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
       throw new IllegalArgumentException(e);
     }
 
-    // Per class spec, we are allowed to throw CCE if necessary
-    boolean empty =
-        effectiveRange.isEmpty()
-            || Range.compareOrThrow(
-                    range.lowerBound.leastValueAbove(domain),
-                    range.upperBound.greatestValueBelow(domain))
-                > 0;
+    boolean empty;
+    if (effectiveRange.isEmpty()) {
+      empty = true;
+    } else {
+      /*
+       * requireNonNull is safe because the effectiveRange operations above would have thrown or
+       * effectiveRange.isEmpty() would have returned true.
+       */
+      C afterLower = requireNonNull(range.lowerBound.leastValueAbove(domain));
+      C beforeUpper = requireNonNull(range.upperBound.greatestValueBelow(domain));
+      // Per class spec, we are allowed to throw CCE if necessary
+      empty = Range.compareOrThrow(afterLower, beforeUpper) > 0;
+    }
 
     return empty
         ? new EmptyContiguousSet<C>(domain)
@@ -94,7 +104,6 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
    * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    * @since 23.0
    */
-  @Beta
   public static ContiguousSet<Integer> closed(int lower, int upper) {
     return create(Range.closed(lower, upper), DiscreteDomain.integers());
   }
@@ -107,7 +116,6 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
    * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    * @since 23.0
    */
-  @Beta
   public static ContiguousSet<Long> closed(long lower, long upper) {
     return create(Range.closed(lower, upper), DiscreteDomain.longs());
   }
@@ -120,7 +128,6 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
    * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    * @since 23.0
    */
-  @Beta
   public static ContiguousSet<Integer> closedOpen(int lower, int upper) {
     return create(Range.closedOpen(lower, upper), DiscreteDomain.integers());
   }
@@ -133,7 +140,6 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
    * @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    * @since 23.0
    */
-  @Beta
   public static ContiguousSet<Long> closedOpen(long lower, long upper) {
     return create(Range.closedOpen(lower, upper), DiscreteDomain.longs());
   }
@@ -191,15 +197,14 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
   /*
    * These methods perform most headSet, subSet, and tailSet logic, besides parameter validation.
    */
-  // TODO(kevinb): we can probably make these real @Overrides now
-  /* @Override */
+  @SuppressWarnings("MissingOverride") // Supermethod does not exist under GWT.
   abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
 
-  /* @Override */
+  @SuppressWarnings("MissingOverride") // Supermethod does not exist under GWT.
   abstract ContiguousSet<C> subSetImpl(
       C fromElement, boolean fromInclusive, C toElement, boolean toInclusive);
 
-  /* @Override */
+  @SuppressWarnings("MissingOverride") // Supermethod does not exist under GWT.
   abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
 
   /**
@@ -234,10 +239,10 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
   @Override
   @GwtIncompatible // NavigableSet
   ImmutableSortedSet<C> createDescendingSet() {
-    return new DescendingImmutableSortedSet<C>(this);
+    return new DescendingImmutableSortedSet<>(this);
   }
 
-  /** Returns a short-hand representation of the contents such as {@code "[1..100]"}. */
+  /** Returns a shorthand representation of the contents such as {@code "[1..100]"}. */
   @Override
   public String toString() {
     return range().toString();
@@ -252,6 +257,7 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
    * @deprecated Use {@link #create}.
    */
   @Deprecated
+  @DoNotCall("Always throws UnsupportedOperationException")
   public static <E> ImmutableSortedSet.Builder<E> builder() {
     throw new UnsupportedOperationException();
   }

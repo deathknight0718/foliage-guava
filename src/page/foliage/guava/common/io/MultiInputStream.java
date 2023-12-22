@@ -16,11 +16,14 @@ package page.foliage.guava.common.io;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * An {@link InputStream} that concatenates multiple substreams. At most one stream will be open at
@@ -29,11 +32,13 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Chris Nokleberg
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 final class MultiInputStream extends InputStream {
 
   private Iterator<? extends ByteSource> it;
-  @NullableDecl private InputStream in;
+  @CheckForNull private InputStream in;
 
   /**
    * Creates a new instance.
@@ -90,7 +95,8 @@ final class MultiInputStream extends InputStream {
   }
 
   @Override
-  public int read(@NullableDecl byte[] b, int off, int len) throws IOException {
+  public int read(byte[] b, int off, int len) throws IOException {
+    checkNotNull(b);
     while (in != null) {
       int result = in.read(b, off, len);
       if (result != -1) {

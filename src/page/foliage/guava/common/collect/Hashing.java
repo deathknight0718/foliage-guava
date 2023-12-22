@@ -16,9 +16,10 @@
 
 package page.foliage.guava.common.collect;
 
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.primitives.Ints;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Static methods for implementing hash-based collections.
@@ -28,6 +29,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Austin Appleby
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 final class Hashing {
   private Hashing() {}
 
@@ -50,7 +52,7 @@ final class Hashing {
     return (int) (C2 * Integer.rotateLeft((int) (hashCode * C1), 15));
   }
 
-  static int smearedHash(@NullableDecl Object o) {
+  static int smearedHash(@CheckForNull Object o) {
     return smear((o == null) ? 0 : o.hashCode());
   }
 

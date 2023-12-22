@@ -16,11 +16,12 @@ package page.foliage.guava.common.primitives;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Contains static utility methods pertaining to primitive types and their corresponding wrapper
@@ -29,7 +30,8 @@ import java.util.Set;
  * @author Kevin Bourrillion
  * @since 1.0
  */
-@GwtIncompatible
+@GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Primitives {
   private Primitives() {}
 
@@ -42,8 +44,8 @@ public final class Primitives {
   // Sad that we can't use a BiMap. :(
 
   static {
-    Map<Class<?>, Class<?>> primToWrap = new HashMap<>(16);
-    Map<Class<?>, Class<?>> wrapToPrim = new HashMap<>(16);
+    Map<Class<?>, Class<?>> primToWrap = new LinkedHashMap<>(16);
+    Map<Class<?>, Class<?>> wrapToPrim = new LinkedHashMap<>(16);
 
     add(primToWrap, wrapToPrim, boolean.class, Boolean.class);
     add(primToWrap, wrapToPrim, byte.class, Byte.class);

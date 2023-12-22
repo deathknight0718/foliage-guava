@@ -16,17 +16,19 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.graph.GraphConstants.DEFAULT_NODE_COUNT;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.graph.Graphs.checkNonNegative;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
 
 /**
- * Configurable implementation of {@link ValueGraph} that supports the options supplied by {@link
+ * Standard implementation of {@link ValueGraph} that supports the options supplied by {@link
  * AbstractGraphBuilder}.
  *
  * <p>This class maintains a map of nodes to {@link GraphConnections}.
@@ -42,17 +44,18 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @param <N> Node parameter type
  * @param <V> Value parameter type
  */
-class ConfigurableValueGraph<N, V> extends AbstractValueGraph<N, V> {
+@ElementTypesAreNonnullByDefault
+class StandardValueGraph<N, V> extends AbstractValueGraph<N, V> {
   private final boolean isDirected;
   private final boolean allowsSelfLoops;
   private final ElementOrder<N> nodeOrder;
 
-  protected final MapIteratorCache<N, GraphConnections<N, V>> nodeConnections;
+  final MapIteratorCache<N, GraphConnections<N, V>> nodeConnections;
 
-  protected long edgeCount; // must be updated when edges are added or removed
+  long edgeCount; // must be updated when edges are added or removed
 
   /** Constructs a graph with the properties specified in {@code builder}. */
-  ConfigurableValueGraph(AbstractGraphBuilder<? super N> builder) {
+  StandardValueGraph(AbstractGraphBuilder<? super N> builder) {
     this(
         builder,
         builder.nodeOrder.<N, GraphConnections<N, V>>createMap(
@@ -64,7 +67,7 @@ class ConfigurableValueGraph<N, V> extends AbstractValueGraph<N, V> {
    * Constructs a graph with the properties specified in {@code builder}, initialized with the given
    * node map.
    */
-  ConfigurableValueGraph(
+  StandardValueGraph(
       AbstractGraphBuilder<? super N> builder,
       Map<N, GraphConnections<N, V>> nodeConnections,
       long edgeCount) {
@@ -115,21 +118,40 @@ class ConfigurableValueGraph<N, V> extends AbstractValueGraph<N, V> {
   }
 
   @Override
-  public boolean hasEdgeConnecting(N nodeU, N nodeV) {
-    checkNotNull(nodeU);
-    checkNotNull(nodeV);
-    GraphConnections<N, V> connectionsU = nodeConnections.get(nodeU);
-    return (connectionsU != null) && connectionsU.successors().contains(nodeV);
+  public Set<EndpointPair<N>> incidentEdges(N node) {
+    GraphConnections<N, V> connections = checkedConnections(node);
+
+    return new IncidentEdgeSet<N>(this, node) {
+      @Override
+      public Iterator<EndpointPair<N>> iterator() {
+        return connections.incidentEdgeIterator(node);
+      }
+    };
   }
 
   @Override
-  @NullableDecl
-  public V edgeValueOrDefault(N nodeU, N nodeV, @NullableDecl V defaultValue) {
-    checkNotNull(nodeU);
-    checkNotNull(nodeV);
-    GraphConnections<N, V> connectionsU = nodeConnections.get(nodeU);
-    V value = (connectionsU == null) ? null : connectionsU.value(nodeV);
-    return value == null ? defaultValue : value;
+  public boolean hasEdgeConnecting(N nodeU, N nodeV) {
+    return hasEdgeConnectingInternal(checkNotNull(nodeU), checkNotNull(nodeV));
+  }
+
+  @Override
+  public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+    checkNotNull(endpoints);
+    return isOrderingCompatible(endpoints)
+        && hasEdgeConnectingInternal(endpoints.nodeU(), endpoints.nodeV());
+  }
+
+  @Override
+  @CheckForNull
+  public V edgeValueOrDefault(N nodeU, N nodeV, @CheckForNull V defaultValue) {
+    return edgeValueOrDefaultInternal(checkNotNull(nodeU), checkNotNull(nodeV), defaultValue);
+  }
+
+  @Override
+  @CheckForNull
+  public V edgeValueOrDefault(EndpointPair<N> endpoints, @CheckForNull V defaultValue) {
+    validateEndpoints(endpoints);
+    return edgeValueOrDefaultInternal(endpoints.nodeU(), endpoints.nodeV(), defaultValue);
   }
 
   @Override
@@ -137,7 +159,7 @@ class ConfigurableValueGraph<N, V> extends AbstractValueGraph<N, V> {
     return edgeCount;
   }
 
-  protected final GraphConnections<N, V> checkedConnections(N node) {
+  private final GraphConnections<N, V> checkedConnections(N node) {
     GraphConnections<N, V> connections = nodeConnections.get(node);
     if (connections == null) {
       checkNotNull(node);
@@ -146,7 +168,24 @@ class ConfigurableValueGraph<N, V> extends AbstractValueGraph<N, V> {
     return connections;
   }
 
-  protected final boolean containsNode(@NullableDecl N node) {
+  final boolean containsNode(@CheckForNull N node) {
     return nodeConnections.containsKey(node);
+  }
+
+  private final boolean hasEdgeConnectingInternal(N nodeU, N nodeV) {
+    GraphConnections<N, V> connectionsU = nodeConnections.get(nodeU);
+    return (connectionsU != null) && connectionsU.successors().contains(nodeV);
+  }
+
+  @CheckForNull
+  private final V edgeValueOrDefaultInternal(N nodeU, N nodeV, @CheckForNull V defaultValue) {
+    GraphConnections<N, V> connectionsU = nodeConnections.get(nodeU);
+    V value = (connectionsU == null) ? null : connectionsU.value(nodeV);
+    // TODO(b/192579700): Use a ternary once it no longer confuses our nullness checker.
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
   }
 }

@@ -14,11 +14,19 @@
 
 package page.foliage.guava.common.base;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
+import static page.foliage.guava.common.base.NullnessCasts.uncheckedCastNullableTToT;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
 
 /**
  * Useful suppliers.
@@ -30,6 +38,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 2.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Suppliers {
   private Suppliers() {}
 
@@ -39,28 +48,29 @@ public final class Suppliers {
    * and then applying {@code function} to that value. Note that the resulting supplier will not
    * call {@code supplier} or invoke {@code function} until it is called.
    */
-  public static <F, T> Supplier<T> compose(Function<? super F, T> function, Supplier<F> supplier) {
-    Preconditions.checkNotNull(function);
-    Preconditions.checkNotNull(supplier);
+  public static <F extends @Nullable Object, T extends @Nullable Object> Supplier<T> compose(
+      Function<? super F, T> function, Supplier<F> supplier) {
     return new SupplierComposition<>(function, supplier);
   }
 
-  private static class SupplierComposition<F, T> implements Supplier<T>, Serializable {
+  private static class SupplierComposition<F extends @Nullable Object, T extends @Nullable Object>
+      implements Supplier<T>, Serializable {
     final Function<? super F, T> function;
     final Supplier<F> supplier;
 
     SupplierComposition(Function<? super F, T> function, Supplier<F> supplier) {
-      this.function = function;
-      this.supplier = supplier;
+      this.function = checkNotNull(function);
+      this.supplier = checkNotNull(supplier);
     }
 
     @Override
+    @ParametricNullness
     public T get() {
       return function.apply(supplier.get());
     }
 
     @Override
-    public boolean equals(@NullableDecl Object obj) {
+    public boolean equals(@CheckForNull Object obj) {
       if (obj instanceof SupplierComposition) {
         SupplierComposition<?, ?> that = (SupplierComposition<?, ?>) obj;
         return function.equals(that.function) && supplier.equals(that.supplier);
@@ -89,7 +99,7 @@ public final class Suppliers {
    * <p>The returned supplier is thread-safe. The delegate's {@code get()} method will be invoked at
    * most once unless the underlying {@code get()} throws an exception. The supplier's serialized
    * form does not contain the cached value, which will be recalculated when {@code get()} is called
-   * on the reserialized instance.
+   * on the deserialized instance.
    *
    * <p>When the underlying delegate throws an exception then this memoizing supplier will keep
    * delegating calls until it returns valid data.
@@ -97,7 +107,7 @@ public final class Suppliers {
    * <p>If {@code delegate} is an instance created by an earlier call to {@code memoize}, it is
    * returned directly.
    */
-  public static <T> Supplier<T> memoize(Supplier<T> delegate) {
+  public static <T extends @Nullable Object> Supplier<T> memoize(Supplier<T> delegate) {
     if (delegate instanceof NonSerializableMemoizingSupplier
         || delegate instanceof MemoizingSupplier) {
       return delegate;
@@ -108,18 +118,19 @@ public final class Suppliers {
   }
 
   @VisibleForTesting
-  static class MemoizingSupplier<T> implements Supplier<T>, Serializable {
+  static class MemoizingSupplier<T extends @Nullable Object> implements Supplier<T>, Serializable {
     final Supplier<T> delegate;
     transient volatile boolean initialized;
     // "value" does not need to be volatile; visibility piggy-backs
     // on volatile read of "initialized".
-    @NullableDecl transient T value;
+    @CheckForNull transient T value;
 
     MemoizingSupplier(Supplier<T> delegate) {
-      this.delegate = Preconditions.checkNotNull(delegate);
+      this.delegate = checkNotNull(delegate);
     }
 
     @Override
+    @ParametricNullness
     public T get() {
       // A 2-field variant of Double Checked Locking.
       if (!initialized) {
@@ -132,50 +143,63 @@ public final class Suppliers {
           }
         }
       }
-      return value;
+      // This is safe because we checked `initialized.`
+      return uncheckedCastNullableTToT(value);
     }
 
     @Override
     public String toString() {
-      return "Suppliers.memoize(" + delegate + ")";
+      return "Suppliers.memoize("
+          + (initialized ? "<supplier that returned " + value + ">" : delegate)
+          + ")";
     }
 
     private static final long serialVersionUID = 0;
   }
 
   @VisibleForTesting
-  static class NonSerializableMemoizingSupplier<T> implements Supplier<T> {
-    volatile Supplier<T> delegate;
-    volatile boolean initialized;
-    // "value" does not need to be volatile; visibility piggy-backs
-    // on volatile read of "initialized".
-    @NullableDecl T value;
+  static class NonSerializableMemoizingSupplier<T extends @Nullable Object> implements Supplier<T> {
+    @SuppressWarnings("UnnecessaryLambda") // Must be a fixed singleton object
+    private static final Supplier<Void> SUCCESSFULLY_COMPUTED =
+        () -> {
+          throw new IllegalStateException(); // Should never get called.
+        };
+
+    private volatile Supplier<T> delegate;
+    // "value" does not need to be volatile; visibility piggy-backs on volatile read of "delegate".
+    @CheckForNull private T value;
 
     NonSerializableMemoizingSupplier(Supplier<T> delegate) {
-      this.delegate = Preconditions.checkNotNull(delegate);
+      this.delegate = checkNotNull(delegate);
     }
 
     @Override
+    @ParametricNullness
+    @SuppressWarnings("unchecked") // Cast from Supplier<Void> to Supplier<T> is always valid
     public T get() {
-      // A 2-field variant of Double Checked Locking.
-      if (!initialized) {
+      // Because Supplier is read-heavy, we use the "double-checked locking" pattern.
+      if (delegate != SUCCESSFULLY_COMPUTED) {
         synchronized (this) {
-          if (!initialized) {
+          if (delegate != SUCCESSFULLY_COMPUTED) {
             T t = delegate.get();
             value = t;
-            initialized = true;
-            // Release the delegate to GC.
-            delegate = null;
+            delegate = (Supplier<T>) SUCCESSFULLY_COMPUTED;
             return t;
           }
         }
       }
-      return value;
+      // This is safe because we checked `delegate.`
+      return uncheckedCastNullableTToT(value);
     }
 
     @Override
     public String toString() {
-      return "Suppliers.memoize(" + delegate + ")";
+      Supplier<T> delegate = this.delegate;
+      return "Suppliers.memoize("
+          + (delegate == SUCCESSFULLY_COMPUTED
+              ? "<supplier that returned " + value + ">"
+              : delegate)
+          + ")";
     }
   }
 
@@ -200,26 +224,31 @@ public final class Suppliers {
    * @throws IllegalArgumentException if {@code duration} is not positive
    * @since 2.0
    */
-  public static <T> Supplier<T> memoizeWithExpiration(
+  @SuppressWarnings("GoodTime") // should accept a java.time.Duration
+  public static <T extends @Nullable Object> Supplier<T> memoizeWithExpiration(
       Supplier<T> delegate, long duration, TimeUnit unit) {
-    return new ExpiringMemoizingSupplier<T>(delegate, duration, unit);
+    return new ExpiringMemoizingSupplier<>(delegate, duration, unit);
   }
 
   @VisibleForTesting
-  static class ExpiringMemoizingSupplier<T> implements Supplier<T>, Serializable {
+  @SuppressWarnings("GoodTime") // lots of violations
+  static class ExpiringMemoizingSupplier<T extends @Nullable Object>
+      implements Supplier<T>, Serializable {
     final Supplier<T> delegate;
     final long durationNanos;
-    @NullableDecl transient volatile T value;
+    @CheckForNull transient volatile T value;
     // The special value 0 means "not yet initialized".
     transient volatile long expirationNanos;
 
     ExpiringMemoizingSupplier(Supplier<T> delegate, long duration, TimeUnit unit) {
-      this.delegate = Preconditions.checkNotNull(delegate);
+      this.delegate = checkNotNull(delegate);
       this.durationNanos = unit.toNanos(duration);
-      Preconditions.checkArgument(duration > 0);
+      checkArgument(duration > 0, "duration (%s %s) must be > 0", duration, unit);
     }
 
     @Override
+    @ParametricNullness
+    @SuppressWarnings("GoodTime") // reading system time without TimeSource
     public T get() {
       // Another variant of Double Checked Locking.
       //
@@ -228,7 +257,7 @@ public final class Suppliers {
       // the extra memory consumption and indirection are more
       // expensive than the extra volatile reads.
       long nanos = expirationNanos;
-      long now = Platform.systemNanoTime();
+      long now = System.nanoTime();
       if (nanos == 0 || now - nanos >= 0) {
         synchronized (this) {
           if (nanos == expirationNanos) { // recheck for lost race
@@ -242,7 +271,8 @@ public final class Suppliers {
           }
         }
       }
-      return value;
+      // This is safe because we checked `expirationNanos.`
+      return uncheckedCastNullableTToT(value);
     }
 
     @Override
@@ -256,24 +286,27 @@ public final class Suppliers {
   }
 
   /** Returns a supplier that always supplies {@code instance}. */
-  public static <T> Supplier<T> ofInstance(@NullableDecl T instance) {
-    return new SupplierOfInstance<T>(instance);
+  public static <T extends @Nullable Object> Supplier<T> ofInstance(
+      @ParametricNullness T instance) {
+    return new SupplierOfInstance<>(instance);
   }
 
-  private static class SupplierOfInstance<T> implements Supplier<T>, Serializable {
-    @NullableDecl final T instance;
+  private static class SupplierOfInstance<T extends @Nullable Object>
+      implements Supplier<T>, Serializable {
+    @ParametricNullness final T instance;
 
-    SupplierOfInstance(@NullableDecl T instance) {
+    SupplierOfInstance(@ParametricNullness T instance) {
       this.instance = instance;
     }
 
     @Override
+    @ParametricNullness
     public T get() {
       return instance;
     }
 
     @Override
-    public boolean equals(@NullableDecl Object obj) {
+    public boolean equals(@CheckForNull Object obj) {
       if (obj instanceof SupplierOfInstance) {
         SupplierOfInstance<?> that = (SupplierOfInstance<?>) obj;
         return Objects.equal(instance, that.instance);
@@ -298,18 +331,21 @@ public final class Suppliers {
    * Returns a supplier whose {@code get()} method synchronizes on {@code delegate} before calling
    * it, making it thread-safe.
    */
-  public static <T> Supplier<T> synchronizedSupplier(Supplier<T> delegate) {
-    return new ThreadSafeSupplier<T>(Preconditions.checkNotNull(delegate));
+  public static <T extends @Nullable Object> Supplier<T> synchronizedSupplier(
+      Supplier<T> delegate) {
+    return new ThreadSafeSupplier<>(delegate);
   }
 
-  private static class ThreadSafeSupplier<T> implements Supplier<T>, Serializable {
+  private static class ThreadSafeSupplier<T extends @Nullable Object>
+      implements Supplier<T>, Serializable {
     final Supplier<T> delegate;
 
     ThreadSafeSupplier(Supplier<T> delegate) {
-      this.delegate = delegate;
+      this.delegate = checkNotNull(delegate);
     }
 
     @Override
+    @ParametricNullness
     public T get() {
       synchronized (delegate) {
         return delegate.get();
@@ -332,20 +368,21 @@ public final class Suppliers {
    *
    * @since 8.0
    */
-  public static <T> Function<Supplier<T>, T> supplierFunction() {
+  public static <T extends @Nullable Object> Function<Supplier<T>, T> supplierFunction() {
     @SuppressWarnings("unchecked") // implementation is "fully variant"
     SupplierFunction<T> sf = (SupplierFunction<T>) SupplierFunctionImpl.INSTANCE;
     return sf;
   }
 
-  private interface SupplierFunction<T> extends Function<Supplier<T>, T> {}
+  private interface SupplierFunction<T extends @Nullable Object> extends Function<Supplier<T>, T> {}
 
-  private enum SupplierFunctionImpl implements SupplierFunction<Object> {
+  private enum SupplierFunctionImpl implements SupplierFunction<@Nullable Object> {
     INSTANCE;
 
     // Note: This makes T a "pass-through type"
     @Override
-    public Object apply(Supplier<Object> input) {
+    @CheckForNull
+    public Object apply(Supplier<@Nullable Object> input) {
       return input.get();
     }
 

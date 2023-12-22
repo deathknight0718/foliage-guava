@@ -16,12 +16,16 @@ package page.foliage.guava.common.util.concurrent;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.concurrent.GuardedBy;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A support class for {@code ListenableFuture} implementations to manage their listeners. An
@@ -39,7 +43,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Sven Mawson
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class ExecutionList {
   /** Logger to log exceptions caught when running runnables. */
   private static final Logger log = Logger.getLogger(ExecutionList.class.getName());
@@ -49,7 +55,8 @@ public final class ExecutionList {
    * RunnableExecutorPair#next} field.
    */
   @GuardedBy("this")
-  @NullableDecl private RunnableExecutorPair runnables;
+  @CheckForNull
+  private RunnableExecutorPair runnables;
 
   @GuardedBy("this")
   private boolean executed;
@@ -153,9 +160,10 @@ public final class ExecutionList {
   private static final class RunnableExecutorPair {
     final Runnable runnable;
     final Executor executor;
-    @NullableDecl RunnableExecutorPair next;
+    @CheckForNull RunnableExecutorPair next;
 
-    RunnableExecutorPair(Runnable runnable, Executor executor, RunnableExecutorPair next) {
+    RunnableExecutorPair(
+        Runnable runnable, Executor executor, @CheckForNull RunnableExecutorPair next) {
       this.runnable = runnable;
       this.executor = executor;
       this.next = next;

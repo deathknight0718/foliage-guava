@@ -14,7 +14,6 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
@@ -22,8 +21,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  *
  * @since 16.0
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Runnables {
 
   private static final Runnable EMPTY_RUNNABLE =

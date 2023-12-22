@@ -14,12 +14,14 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import page.foliage.guava.common.annotations.Beta;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Utility methods for working with {@link Flushable} objects.
@@ -27,8 +29,9 @@ import java.util.logging.Logger;
  * @author Michael Lancaster
  * @since 1.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class Flushables {
   private static final Logger logger = Logger.getLogger(Flushables.class.getName());
 
@@ -65,6 +68,7 @@ public final class Flushables {
    *
    * @param flushable the {@code Flushable} object to be flushed.
    */
+  @Beta
   public static void flushQuietly(Flushable flushable) {
     try {
       flush(flushable, true);

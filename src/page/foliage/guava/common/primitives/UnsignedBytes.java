@@ -14,17 +14,20 @@
 
 package page.foliage.guava.common.primitives;
 
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
 import sun.misc.Unsafe;
 
 /**
@@ -42,7 +45,9 @@ import sun.misc.Unsafe;
  * @author Louis Wasserman
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class UnsignedBytes {
   private UnsignedBytes() {}
 
@@ -121,11 +126,11 @@ public final class UnsignedBytes {
   }
 
   /**
-   * Returns the least value present in {@code array}.
+   * Returns the least value present in {@code array}, treating values as unsigned.
    *
    * @param array a <i>nonempty</i> array of {@code byte} values
    * @return the value present in {@code array} that is less than or equal to every other value in
-   *     the array
+   *     the array according to {@link #compare}
    * @throws IllegalArgumentException if {@code array} is empty
    */
   public static byte min(byte... array) {
@@ -141,11 +146,11 @@ public final class UnsignedBytes {
   }
 
   /**
-   * Returns the greatest value present in {@code array}.
+   * Returns the greatest value present in {@code array}, treating values as unsigned.
    *
    * @param array a <i>nonempty</i> array of {@code byte} values
    * @return the value present in {@code array} that is greater than or equal to every other value
-   *     in the array
+   *     in the array according to {@link #compare}
    * @throws IllegalArgumentException if {@code array} is empty
    */
   public static byte max(byte... array) {
@@ -165,7 +170,6 @@ public final class UnsignedBytes {
    *
    * @since 13.0
    */
-  @Beta
   public static String toString(byte x) {
     return toString(x, 10);
   }
@@ -180,7 +184,6 @@ public final class UnsignedBytes {
    *     and {@link Character#MAX_RADIX}.
    * @since 13.0
    */
-  @Beta
   public static String toString(byte x, int radix) {
     checkArgument(
         radix >= Character.MIN_RADIX && radix <= Character.MAX_RADIX,
@@ -199,7 +202,6 @@ public final class UnsignedBytes {
    *     Byte#parseByte(String)})
    * @since 13.0
    */
-  @Beta
   @CanIgnoreReturnValue
   public static byte parseUnsignedByte(String string) {
     return parseUnsignedByte(string, 10);
@@ -217,7 +219,6 @@ public final class UnsignedBytes {
    *     Byte#parseByte(String)})
    * @since 13.0
    */
-  @Beta
   @CanIgnoreReturnValue
   public static byte parseUnsignedByte(String string, int radix) {
     int parse = Integer.parseInt(checkNotNull(string), radix);
@@ -363,7 +364,7 @@ public final class UnsignedBytes {
 
       @Override
       public int compare(byte[] left, byte[] right) {
-        final int stride = 8;
+        int stride = 8;
         int minLength = Math.min(left.length, right.length);
         int strideLimit = minLength & ~(stride - 1);
         int i;
@@ -437,9 +438,12 @@ public final class UnsignedBytes {
       try {
         Class<?> theClass = Class.forName(UNSAFE_COMPARATOR_NAME);
 
+        // requireNonNull is safe because the class is an enum.
+        Object[] constants = requireNonNull(theClass.getEnumConstants());
+
         // yes, UnsafeComparator does implement Comparator<byte[]>
         @SuppressWarnings("unchecked")
-        Comparator<byte[]> comparator = (Comparator<byte[]>) theClass.getEnumConstants()[0];
+        Comparator<byte[]> comparator = (Comparator<byte[]>) constants[0];
         return comparator;
       } catch (Throwable t) { // ensure we really catch *everything*
         return lexicographicalComparatorJavaImpl();

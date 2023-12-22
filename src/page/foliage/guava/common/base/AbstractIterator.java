@@ -14,20 +14,27 @@
 
 package page.foliage.guava.common.base;
 
+import static page.foliage.guava.common.base.NullnessCasts.uncheckedCastNullableTToT;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Note this class is a copy of {@link page.foliage.guava.common.collect.AbstractIterator} (for dependency
  * reasons).
  */
 @GwtCompatible
-abstract class AbstractIterator<T> implements Iterator<T> {
+@ElementTypesAreNonnullByDefault
+abstract class AbstractIterator<T extends @Nullable Object> implements Iterator<T> {
   private State state = State.NOT_READY;
 
   protected AbstractIterator() {}
@@ -39,12 +46,13 @@ abstract class AbstractIterator<T> implements Iterator<T> {
     FAILED,
   }
 
-  @NullableDecl private T next;
+  @CheckForNull private T next;
 
+  @CheckForNull
   protected abstract T computeNext();
 
-  @NullableDecl
   @CanIgnoreReturnValue
+  @CheckForNull
   protected final T endOfData() {
     state = State.DONE;
     return null;
@@ -54,10 +62,10 @@ abstract class AbstractIterator<T> implements Iterator<T> {
   public final boolean hasNext() {
     checkState(state != State.FAILED);
     switch (state) {
-      case READY:
-        return true;
       case DONE:
         return false;
+      case READY:
+        return true;
       default:
     }
     return tryToComputeNext();
@@ -74,12 +82,14 @@ abstract class AbstractIterator<T> implements Iterator<T> {
   }
 
   @Override
+  @ParametricNullness
   public final T next() {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
     state = State.NOT_READY;
-    T result = next;
+    // Safe because hasNext() ensures that tryToComputeNext() has put a T into `next`.
+    T result = uncheckedCastNullableTToT(next);
     next = null;
     return result;
   }

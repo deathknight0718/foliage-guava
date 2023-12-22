@@ -14,11 +14,10 @@
 
 package page.foliage.guava.common.base;
 
-import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 import static java.lang.Character.MAX_SURROGATE;
 import static java.lang.Character.MIN_SURROGATE;
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.Beta;
 import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
@@ -36,8 +35,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * @author Clément Roux
  * @since 16.0
  */
-@Beta
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class Utf8 {
   /**
    * Returns the number of bytes in the UTF-8-encoded form of {@code sequence}. For a string, this

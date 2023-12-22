@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.base;
 
+import java.nio.charset.Charset;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.annotations.GwtIncompatible;
-import java.nio.charset.Charset;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Contains constant definitions for the six standard {@link Charset} instances, which are
@@ -31,6 +33,7 @@ import java.nio.charset.Charset;
  * @since 1.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class Charsets {
   private Charsets() {}
 
@@ -41,6 +44,7 @@ public final class Charsets {
    * java.nio.charset.StandardCharsets#US_ASCII} instead.
    *
    */
+  @J2ktIncompatible
   @GwtIncompatible // Charset not supported by GWT
   public static final Charset US_ASCII = Charset.forName("US-ASCII");
 
@@ -69,6 +73,7 @@ public final class Charsets {
    * java.nio.charset.StandardCharsets#UTF_16BE} instead.
    *
    */
+  @J2ktIncompatible
   @GwtIncompatible // Charset not supported by GWT
   public static final Charset UTF_16BE = Charset.forName("UTF-16BE");
 
@@ -79,6 +84,7 @@ public final class Charsets {
    * java.nio.charset.StandardCharsets#UTF_16LE} instead.
    *
    */
+  @J2ktIncompatible
   @GwtIncompatible // Charset not supported by GWT
   public static final Charset UTF_16LE = Charset.forName("UTF-16LE");
 
@@ -90,6 +96,7 @@ public final class Charsets {
    * java.nio.charset.StandardCharsets#UTF_16} instead.
    *
    */
+  @J2ktIncompatible
   @GwtIncompatible // Charset not supported by GWT
   public static final Charset UTF_16 = Charset.forName("UTF-16");
 

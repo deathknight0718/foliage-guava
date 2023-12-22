@@ -15,6 +15,7 @@
 package page.foliage.guava.common.io;
 
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Modes for opening a file for writing. The default when mode when none is specified is to truncate
@@ -22,7 +23,9 @@ import page.foliage.guava.common.annotations.GwtIncompatible;
  *
  * @author Colin Decker
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public enum FileWriteMode {
   /** Specifies that writes to the opened file should append to the end of the file. */
   APPEND

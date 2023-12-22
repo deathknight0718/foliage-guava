@@ -14,16 +14,21 @@
 
 package page.foliage.guava.common.cache;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.util.concurrent.ExecutionError;
-import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
-import com.google.errorprone.annotations.CompatibleWith;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.CompatibleWith;
+import com.google.errorprone.annotations.DoNotMock;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.util.concurrent.ExecutionError;
+import page.foliage.guava.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * A semi-persistent mapping from keys to values. Cache entries are manually added using {@link
@@ -33,10 +38,14 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>Implementations of this interface are expected to be thread-safe, and can be safely accessed
  * by multiple concurrent threads.
  *
+ * @param <K> the type of the cache's keys, which are not permitted to be null
+ * @param <V> the type of the cache's values, which are not permitted to be null
  * @author Charles Fry
  * @since 10.0
  */
+@DoNotMock("Use CacheBuilder.newBuilder().build()")
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public interface Cache<K, V> {
 
   /**
@@ -45,7 +54,8 @@ public interface Cache<K, V> {
    *
    * @since 11.0
    */
-  @NullableDecl
+  @CheckForNull
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this?
   V getIfPresent(@CompatibleWith("K") Object key);
 
   /**
@@ -94,6 +104,7 @@ public interface Cache<K, V> {
    * @throws ExecutionError if an error was thrown while loading the value
    * @since 11.0
    */
+  @CanIgnoreReturnValue // TODO(b/27479612): consider removing this
   V get(K key, Callable<? extends V> loader) throws ExecutionException;
 
   /**
@@ -102,7 +113,11 @@ public interface Cache<K, V> {
    *
    * @since 11.0
    */
-  ImmutableMap<K, V> getAllPresent(Iterable<?> keys);
+  /*
+   * <? extends Object> is mostly the same as <?> to plain Java. But to nullness checkers, they
+   * differ: <? extends Object> means "non-null types," while <?> means "all types."
+   */
+  ImmutableMap<K, V> getAllPresent(Iterable<? extends Object> keys);
 
   /**
    * Associates {@code value} with {@code key} in this cache. If the cache previously contained a
@@ -133,7 +148,8 @@ public interface Cache<K, V> {
    *
    * @since 11.0
    */
-  void invalidateAll(Iterable<?> keys);
+  // For discussion of <? extends Object>, see getAllPresent.
+  void invalidateAll(Iterable<? extends Object> keys);
 
   /** Discards all entries in the cache. */
   void invalidateAll();

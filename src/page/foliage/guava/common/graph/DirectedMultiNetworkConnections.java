@@ -16,21 +16,24 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_CAPACITY;
 import static page.foliage.guava.common.graph.GraphConstants.INNER_LOAD_FACTOR;
+import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.collect.HashMultiset;
-import page.foliage.guava.common.collect.ImmutableMap;
-import page.foliage.guava.common.collect.Multiset;
-import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.concurrent.LazyInit;
+
+import page.foliage.guava.common.collect.HashMultiset;
+import page.foliage.guava.common.collect.ImmutableMap;
+import page.foliage.guava.common.collect.Multiset;
 
 /**
  * An implementation of {@link NetworkConnections} for directed networks with parallel edges.
@@ -39,6 +42,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetworkConnections<N, E> {
 
   private DirectedMultiNetworkConnections(
@@ -59,7 +63,7 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
         ImmutableMap.copyOf(inEdges), ImmutableMap.copyOf(outEdges), selfLoopCount);
   }
 
-  @LazyInit private transient Reference<Multiset<N>> predecessorsReference;
+  @CheckForNull @LazyInit private transient Reference<Multiset<N>> predecessorsReference;
 
   @Override
   public Set<N> predecessors() {
@@ -75,7 +79,7 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
     return predecessors;
   }
 
-  @LazyInit private transient Reference<Multiset<N>> successorsReference;
+  @CheckForNull @LazyInit private transient Reference<Multiset<N>> successorsReference;
 
   @Override
   public Set<N> successors() {
@@ -92,7 +96,7 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
   }
 
   @Override
-  public Set<E> edgesConnecting(final N node) {
+  public Set<E> edgesConnecting(N node) {
     return new MultiEdgesConnecting<E>(outEdgeMap, node) {
       @Override
       public int size() {
@@ -139,8 +143,8 @@ final class DirectedMultiNetworkConnections<N, E> extends AbstractDirectedNetwor
     }
   }
 
-  @NullableDecl
-  private static <T> T getReference(@NullableDecl Reference<T> reference) {
+  @CheckForNull
+  private static <T> T getReference(@CheckForNull Reference<T> reference) {
     return (reference == null) ? null : reference.get();
   }
 }

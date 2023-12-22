@@ -19,6 +19,7 @@ package page.foliage.guava.common.eventbus;
  *
  * @since 16.0
  */
+@ElementTypesAreNonnullByDefault
 public interface SubscriberExceptionHandler {
   /** Handles exceptions thrown by subscribers. */
   void handleException(Throwable exception, SubscriberExceptionContext context);

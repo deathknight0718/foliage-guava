@@ -16,10 +16,12 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.j2objc.annotations.J2ObjCIncompatible;
 import java.nio.file.SecureDirectoryStream;
+
+import com.google.j2objc.annotations.J2ObjCIncompatible;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Options for use with recursive delete methods ({@link MoreFiles#deleteRecursively} and {@link
@@ -28,9 +30,10 @@ import java.nio.file.SecureDirectoryStream;
  * @since 21.0
  * @author Colin Decker
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
 @J2ObjCIncompatible // java.nio.file
+@ElementTypesAreNonnullByDefault
 public enum RecursiveDeleteOption {
   /**
    * Specifies that the recursive delete should not throw an exception when it can't be guaranteed

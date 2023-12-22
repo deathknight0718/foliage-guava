@@ -23,5 +23,6 @@
 @ParametersAreNonnullByDefault
 package page.foliage.guava.common.hash;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.errorprone.annotations.CheckReturnValue;

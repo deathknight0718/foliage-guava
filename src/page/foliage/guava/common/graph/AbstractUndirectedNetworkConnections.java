@@ -16,12 +16,15 @@
 
 package page.foliage.guava.common.graph;
 
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
 
 /**
  * A base implementation of {@link NetworkConnections} for undirected networks.
@@ -30,11 +33,12 @@ import java.util.Set;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 abstract class AbstractUndirectedNetworkConnections<N, E> implements NetworkConnections<N, E> {
   /** Keys are edges incident to the origin node, values are the node at the other end. */
-  protected final Map<E, N> incidentEdgeMap;
+  final Map<E, N> incidentEdgeMap;
 
-  protected AbstractUndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
+  AbstractUndirectedNetworkConnections(Map<E, N> incidentEdgeMap) {
     this.incidentEdgeMap = checkNotNull(incidentEdgeMap);
   }
 
@@ -65,10 +69,12 @@ abstract class AbstractUndirectedNetworkConnections<N, E> implements NetworkConn
 
   @Override
   public N adjacentNode(E edge) {
-    return checkNotNull(incidentEdgeMap.get(edge));
+    // We're relying on callers to call this method only with an edge that's in the graph.
+    return requireNonNull(incidentEdgeMap.get(edge));
   }
 
   @Override
+  @CheckForNull
   public N removeInEdge(E edge, boolean isSelfLoop) {
     if (!isSelfLoop) {
       return removeOutEdge(edge);
@@ -79,7 +85,8 @@ abstract class AbstractUndirectedNetworkConnections<N, E> implements NetworkConn
   @Override
   public N removeOutEdge(E edge) {
     N previousNode = incidentEdgeMap.remove(edge);
-    return checkNotNull(previousNode);
+    // We're relying on callers to call this method only with an edge that's in the graph.
+    return requireNonNull(previousNode);
   }
 
   @Override

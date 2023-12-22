@@ -17,19 +17,23 @@ package page.foliage.guava.common.util.concurrent;
 import static java.lang.Math.min;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.math.LongMath;
 import java.util.concurrent.TimeUnit;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.math.LongMath;
+
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 abstract class SmoothRateLimiter extends RateLimiter {
   /*
    * How is the RateLimiter designed, and why?
    *
-   * The primary feature of a RateLimiter is its "stable rate", the maximum rate that is should
-   * allow at normal conditions. This is enforced by "throttling" incoming requests as needed, i.e.
-   * compute, for an incoming request, the appropriate throttle time, and make the calling thread
-   * wait as much.
+   * The primary feature of a RateLimiter is its "stable rate", the maximum rate that it should
+   * allow in normal conditions. This is enforced by "throttling" incoming requests as needed. For
+   * example, we could compute the appropriate throttle time for an incoming request, and make the
+   * calling thread wait for that time.
    *
    * The simplest way to maintain a rate of QPS is to keep the timestamp of the last granted
    * request, and ensure that (1/QPS) seconds have elapsed since then. For example, for a rate of
@@ -83,7 +87,7 @@ abstract class SmoothRateLimiter extends RateLimiter {
    * with underutilization, then we want stored permits to be given out /faster/ than fresh ones,
    * because underutilization = free resources for the taking. If we are primarily interested to
    * deal with overflow, then stored permits could be given out /slower/ than fresh ones. Thus, we
-   * require a (different in each case) function that translates storedPermits to throtting time.
+   * require a (different in each case) function that translates storedPermits to throttling time.
    *
    * This role is played by storedPermitsToWaitTime(double storedPermits, double permitsToTake). The
    * underlying model is a continuous function mapping storedPermits (from 0.0 to maxStoredPermits)

@@ -14,9 +14,10 @@
 
 package page.foliage.guava.common.cache;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Supplier;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Source of {@link LongAddable} objects that deals with GWT, Unsafe, and all that.
@@ -24,13 +25,15 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Louis Wasserman
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 final class LongAddables {
   private static final Supplier<LongAddable> SUPPLIER;
 
   static {
     Supplier<LongAddable> supplier;
     try {
-      new LongAdder(); // trigger static initialization of the LongAdder class, which may fail
+      // trigger static initialization of the LongAdder class, which may fail
+      LongAdder unused = new LongAdder();
       supplier =
           new Supplier<LongAddable>() {
             @Override

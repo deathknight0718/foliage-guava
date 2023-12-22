@@ -16,8 +16,9 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An abstract base class for implementing the <a
@@ -44,6 +45,7 @@ import java.io.Serializable;
  * @since 2.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class ForwardingObject {
 
   /** Constructor for use by subclasses. */

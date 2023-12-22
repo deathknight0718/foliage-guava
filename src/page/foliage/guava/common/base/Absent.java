@@ -16,13 +16,16 @@ package page.foliage.guava.common.base;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collections;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** Implementation of an {@link Optional} not containing a reference. */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 final class Absent<T> extends Optional<T> {
   static final Absent<Object> INSTANCE = new Absent<>();
 
@@ -61,7 +64,7 @@ final class Absent<T> extends Optional<T> {
   }
 
   @Override
-  @NullableDecl
+  @CheckForNull
   public T orNull() {
     return null;
   }
@@ -78,7 +81,7 @@ final class Absent<T> extends Optional<T> {
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     return object == this;
   }
 

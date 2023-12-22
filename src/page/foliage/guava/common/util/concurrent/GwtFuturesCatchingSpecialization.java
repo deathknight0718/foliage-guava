@@ -15,6 +15,7 @@
 package page.foliage.guava.common.util.concurrent;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Hidden superclass of {@link Futures} that provides us a place to declare special GWT versions of
@@ -23,6 +24,8 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  * different signatures.
  */
 @GwtCompatible(emulated = true)
+@J2ktIncompatible // Super-sourced
+@ElementTypesAreNonnullByDefault
 abstract class GwtFuturesCatchingSpecialization {
   /*
    * This server copy of the class is empty. The corresponding GWT copy contains alternative

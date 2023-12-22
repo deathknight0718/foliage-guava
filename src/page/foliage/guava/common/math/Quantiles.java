@@ -14,21 +14,22 @@
 
 package page.foliage.guava.common.math;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.NaN;
 import static java.lang.Double.POSITIVE_INFINITY;
 import static java.util.Arrays.sort;
 import static java.util.Collections.unmodifiableMap;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.primitives.Doubles;
-import page.foliage.guava.common.primitives.Ints;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.primitives.Doubles;
+import page.foliage.guava.common.primitives.Ints;
 
 /**
  * Provides a fluent API for calculating <a
@@ -126,8 +127,9 @@ import java.util.Map;
  * @author Pete Gillin
  * @since 20.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class Quantiles {
 
   /** Specifies the computation of a median (i.e. the 1st 2-quantile). */
@@ -186,6 +188,7 @@ public final class Quantiles {
      * @param indexes the quantile indexes, each of which must be in the inclusive range [0, q] for
      *     q-quantiles; the order of the indexes is unimportant, duplicates will be ignored, and the
      *     set will be snapshotted when this method is called
+     * @throws IllegalArgumentException if {@code indexes} is empty
      */
     public ScaleAndIndexes indexes(int... indexes) {
       return new ScaleAndIndexes(scale, indexes.clone());
@@ -198,6 +201,7 @@ public final class Quantiles {
      * @param indexes the quantile indexes, each of which must be in the inclusive range [0, q] for
      *     q-quantiles; the order of the indexes is unimportant, duplicates will be ignored, and the
      *     set will be snapshotted when this method is called
+     * @throws IllegalArgumentException if {@code indexes} is empty
      */
     public ScaleAndIndexes indexes(Collection<Integer> indexes) {
       return new ScaleAndIndexes(scale, Ints.toArray(indexes));
@@ -318,6 +322,7 @@ public final class Quantiles {
       for (int index : indexes) {
         checkIndex(index, scale);
       }
+      checkArgument(indexes.length > 0, "Indexes must be a non empty array");
       this.scale = scale;
       this.indexes = indexes;
     }
@@ -328,8 +333,10 @@ public final class Quantiles {
      * @param dataset the dataset to do the calculation on, which must be non-empty, which will be
      *     cast to doubles (with any associated lost of precision), and which will not be mutated by
      *     this call (it is copied instead)
-     * @return an unmodifiable map of results: the keys will be the specified quantile indexes, and
-     *     the values the corresponding quantile values
+     * @return an unmodifiable, ordered map of results: the keys will be the specified quantile
+     *     indexes, and the values the corresponding quantile values. When iterating, entries in the
+     *     map are ordered by quantile index in the same order they were passed to the {@code
+     *     indexes} method.
      */
     public Map<Integer, Double> compute(Collection<? extends Number> dataset) {
       return computeInPlace(Doubles.toArray(dataset));
@@ -340,8 +347,10 @@ public final class Quantiles {
      *
      * @param dataset the dataset to do the calculation on, which must be non-empty, which will not
      *     be mutated by this call (it is copied instead)
-     * @return an unmodifiable map of results: the keys will be the specified quantile indexes, and
-     *     the values the corresponding quantile values
+     * @return an unmodifiable, ordered map of results: the keys will be the specified quantile
+     *     indexes, and the values the corresponding quantile values. When iterating, entries in the
+     *     map are ordered by quantile index in the same order they were passed to the {@code
+     *     indexes} method.
      */
     public Map<Integer, Double> compute(double... dataset) {
       return computeInPlace(dataset.clone());
@@ -353,8 +362,10 @@ public final class Quantiles {
      * @param dataset the dataset to do the calculation on, which must be non-empty, which will be
      *     cast to doubles (with any associated lost of precision), and which will not be mutated by
      *     this call (it is copied instead)
-     * @return an unmodifiable map of results: the keys will be the specified quantile indexes, and
-     *     the values the corresponding quantile values
+     * @return an unmodifiable, ordered map of results: the keys will be the specified quantile
+     *     indexes, and the values the corresponding quantile values. When iterating, entries in the
+     *     map are ordered by quantile index in the same order they were passed to the {@code
+     *     indexes} method.
      */
     public Map<Integer, Double> compute(long... dataset) {
       return computeInPlace(longsToDoubles(dataset));
@@ -365,8 +376,10 @@ public final class Quantiles {
      *
      * @param dataset the dataset to do the calculation on, which must be non-empty, which will be
      *     cast to doubles, and which will not be mutated by this call (it is copied instead)
-     * @return an unmodifiable map of results: the keys will be the specified quantile indexes, and
-     *     the values the corresponding quantile values
+     * @return an unmodifiable, ordered map of results: the keys will be the specified quantile
+     *     indexes, and the values the corresponding quantile values. When iterating, entries in the
+     *     map are ordered by quantile index in the same order they were passed to the {@code
+     *     indexes} method.
      */
     public Map<Integer, Double> compute(int... dataset) {
       return computeInPlace(intsToDoubles(dataset));
@@ -377,13 +390,15 @@ public final class Quantiles {
      *
      * @param dataset the dataset to do the calculation on, which must be non-empty, and which will
      *     be arbitrarily reordered by this method call
-     * @return an unmodifiable map of results: the keys will be the specified quantile indexes, and
-     *     the values the corresponding quantile values
+     * @return an unmodifiable, ordered map of results: the keys will be the specified quantile
+     *     indexes, and the values the corresponding quantile values. When iterating, entries in the
+     *     map are ordered by quantile index in the same order that the indexes were passed to the
+     *     {@code indexes} method.
      */
     public Map<Integer, Double> computeInPlace(double... dataset) {
       checkArgument(dataset.length > 0, "Cannot calculate quantiles of an empty dataset");
       if (containsNaN(dataset)) {
-        Map<Integer, Double> nanMap = new HashMap<>();
+        Map<Integer, Double> nanMap = new LinkedHashMap<>();
         for (int index : indexes) {
           nanMap.put(index, NaN);
         }
@@ -422,7 +437,7 @@ public final class Quantiles {
       sort(requiredSelections, 0, requiredSelectionsCount);
       selectAllInPlace(
           requiredSelections, 0, requiredSelectionsCount - 1, dataset, 0, dataset.length - 1);
-      Map<Integer, Double> ret = new HashMap<>();
+      Map<Integer, Double> ret = new LinkedHashMap<>();
       for (int i = 0; i < indexes.length; i++) {
         int quotient = quotients[i];
         int remainder = remainders[i];

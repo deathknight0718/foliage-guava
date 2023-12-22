@@ -16,8 +16,11 @@
 
 package page.foliage.guava.common.graph;
 
-import page.foliage.guava.common.annotations.Beta;
+import javax.annotation.CheckForNull;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.Beta;
 
 /**
  * A subinterface of {@link ValueGraph} which adds mutation methods. When mutation is not required,
@@ -29,6 +32,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
  * @since 20.0
  */
 @Beta
+@ElementTypesAreNonnullByDefault
 public interface MutableValueGraph<N, V> extends ValueGraph<N, V> {
 
   /**
@@ -42,9 +46,11 @@ public interface MutableValueGraph<N, V> extends ValueGraph<N, V> {
   boolean addNode(N node);
 
   /**
-   * Adds an edge connecting {@code nodeU} to {@code nodeV} if one is not already present; associate
-   * that edge with {@code value}. In an undirected graph, the edge will also connect {@code nodeV}
-   * to {@code nodeU}.
+   * Adds an edge connecting {@code nodeU} to {@code nodeV} if one is not already present, and sets
+   * a value for that edge to {@code value} (overwriting the existing value, if any).
+   *
+   * <p>If the graph is directed, the resultant edge will be directed; otherwise, it will be
+   * undirected.
    *
    * <p>Values do not have to be unique. However, values must be non-null.
    *
@@ -57,7 +63,33 @@ public interface MutableValueGraph<N, V> extends ValueGraph<N, V> {
    *     #allowsSelfLoops()}
    */
   @CanIgnoreReturnValue
+  @CheckForNull
   V putEdgeValue(N nodeU, N nodeV, V value);
+
+  /**
+   * Adds an edge connecting {@code endpoints} if one is not already present, and sets a value for
+   * that edge to {@code value} (overwriting the existing value, if any).
+   *
+   * <p>If the graph is directed, the resultant edge will be directed; otherwise, it will be
+   * undirected.
+   *
+   * <p>If this graph is directed, {@code endpoints} must be ordered.
+   *
+   * <p>Values do not have to be unique. However, values must be non-null.
+   *
+   * <p>If either or both endpoints are not already present in this graph, this method will silently
+   * {@link #addNode(Object) add} each missing endpoint to the graph.
+   *
+   * @return the value previously associated with the edge connecting {@code nodeU} to {@code
+   *     nodeV}, or null if there was no such edge.
+   * @throws IllegalArgumentException if the introduction of the edge would violate {@link
+   *     #allowsSelfLoops()}
+   * @throws IllegalArgumentException if the endpoints are unordered and the graph is directed
+   * @since 27.1
+   */
+  @CanIgnoreReturnValue
+  @CheckForNull
+  V putEdgeValue(EndpointPair<N> endpoints, V value);
 
   /**
    * Removes {@code node} if it is present; all edges incident to {@code node} will also be removed.
@@ -74,5 +106,19 @@ public interface MutableValueGraph<N, V> extends ValueGraph<N, V> {
    *     nodeV}, or null if there was no such edge.
    */
   @CanIgnoreReturnValue
+  @CheckForNull
   V removeEdge(N nodeU, N nodeV);
+
+  /**
+   * Removes the edge connecting {@code endpoints}, if it is present.
+   *
+   * <p>If this graph is directed, {@code endpoints} must be ordered.
+   *
+   * @return the value previously associated with the edge connecting {@code endpoints}, or null if
+   *     there was no such edge.
+   * @since 27.1
+   */
+  @CanIgnoreReturnValue
+  @CheckForNull
+  V removeEdge(EndpointPair<N> endpoints);
 }

@@ -18,19 +18,23 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Ascii;
-import page.foliage.guava.common.base.Equivalence;
-import page.foliage.guava.common.base.MoreObjects;
-import page.foliage.guava.common.collect.MapMakerInternalMap.Strength;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.Ascii;
+import page.foliage.guava.common.base.Equivalence;
+import page.foliage.guava.common.base.MoreObjects;
+import page.foliage.guava.common.collect.MapMakerInternalMap.Strength;
 
 /**
  * A builder of {@link ConcurrentMap} instances that can have keys or values automatically wrapped
@@ -66,10 +70,10 @@ import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
  * present in the map to be reclaimed by the garbage collector. Entries with reclaimed keys or
  * values may be removed from the map on each map modification or on occasional map accesses; such
  * entries may be counted by {@link Map#size}, but will never be visible to read or write
- * operations. A partially-reclaimed entry is never exposed to the user. Any {@link java.util.Entry}
+ * operations. A partially-reclaimed entry is never exposed to the user. Any {@link Map.Entry}
  * instance retrieved from the map's {@linkplain Map#entrySet entry set} is a snapshot of that
  * entry's state at the time of retrieval; such entries do, however, support {@link
- * java.util.Entry#setValue}, which simply calls {@link Map#put} on the entry's key.
+ * Map.Entry#setValue}, which simply calls {@link Map#put} on the entry's key.
  *
  * <p>The maps produced by {@code MapMaker} are serializable, and the deserialized maps retain all
  * the configuration properties of the original map. During deserialization, if the original map had
@@ -85,7 +89,9 @@ import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
  * @author Kevin Bourrillion
  * @since 2.0
  */
+@J2ktIncompatible
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class MapMaker {
   private static final int DEFAULT_INITIAL_CAPACITY = 16;
   private static final int DEFAULT_CONCURRENCY_LEVEL = 4;
@@ -98,10 +104,10 @@ public final class MapMaker {
   int initialCapacity = UNSET_INT;
   int concurrencyLevel = UNSET_INT;
 
-  @MonotonicNonNullDecl Strength keyStrength;
-  @MonotonicNonNullDecl Strength valueStrength;
+  @CheckForNull Strength keyStrength;
+  @CheckForNull Strength valueStrength;
 
-  @MonotonicNonNullDecl Equivalence<Object> keyEquivalence;
+  @CheckForNull Equivalence<Object> keyEquivalence;
 
   /**
    * Constructs a new {@code MapMaker} instance with default settings, including strong keys, strong

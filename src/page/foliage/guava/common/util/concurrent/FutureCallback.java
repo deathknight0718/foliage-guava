@@ -14,10 +14,12 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A callback for accepting the results of a {@link java.util.concurrent.Future} computation
@@ -29,9 +31,10 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 10.0
  */
 @GwtCompatible
-public interface FutureCallback<V> {
+@ElementTypesAreNonnullByDefault
+public interface FutureCallback<V extends @Nullable Object> {
   /** Invoked with the result of the {@code Future} computation when it is successful. */
-  void onSuccess(@NullableDecl V result);
+  void onSuccess(@ParametricNullness V result);
 
   /**
    * Invoked when a {@code Future} computation fails or is canceled.

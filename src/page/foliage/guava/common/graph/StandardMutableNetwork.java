@@ -16,18 +16,20 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
-import static page.foliage.guava.common.base.Preconditions.checkState;
 import static page.foliage.guava.common.graph.GraphConstants.PARALLEL_EDGES_NOT_ALLOWED;
 import static page.foliage.guava.common.graph.GraphConstants.REUSING_EDGE;
 import static page.foliage.guava.common.graph.GraphConstants.SELF_LOOPS_NOT_ALLOWED;
+import static java.util.Objects.requireNonNull;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
+import page.foliage.guava.common.collect.ImmutableList;
+
 /**
- * Configurable implementation of {@link MutableNetwork} that supports both directed and undirected
+ * Standard implementation of {@link MutableNetwork} that supports both directed and undirected
  * graphs. Instances of this class should be constructed with {@link NetworkBuilder}.
  *
  * <p>Time complexities for mutation methods are all O(1) except for {@code removeNode(N node)},
@@ -39,11 +41,12 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
-final class ConfigurableMutableNetwork<N, E> extends ConfigurableNetwork<N, E>
+@ElementTypesAreNonnullByDefault
+final class StandardMutableNetwork<N, E> extends StandardNetwork<N, E>
     implements MutableNetwork<N, E> {
 
   /** Constructs a mutable graph with the properties specified in {@code builder}. */
-  ConfigurableMutableNetwork(NetworkBuilder<? super N, ? super E> builder) {
+  StandardMutableNetwork(NetworkBuilder<? super N, ? super E> builder) {
     super(builder);
   }
 
@@ -118,6 +121,13 @@ final class ConfigurableMutableNetwork<N, E> extends ConfigurableNetwork<N, E>
 
   @Override
   @CanIgnoreReturnValue
+  public boolean addEdge(EndpointPair<N> endpoints, E edge) {
+    validateEndpoints(endpoints);
+    return addEdge(endpoints.nodeU(), endpoints.nodeV(), edge);
+  }
+
+  @Override
+  @CanIgnoreReturnValue
   public boolean removeNode(N node) {
     checkNotNull(node, "node");
 
@@ -145,9 +155,10 @@ final class ConfigurableMutableNetwork<N, E> extends ConfigurableNetwork<N, E>
       return false;
     }
 
-    NetworkConnections<N, E> connectionsU = nodeConnections.get(nodeU);
+    // requireNonNull is safe because of the edgeToReferenceNode check above.
+    NetworkConnections<N, E> connectionsU = requireNonNull(nodeConnections.get(nodeU));
     N nodeV = connectionsU.adjacentNode(edge);
-    NetworkConnections<N, E> connectionsV = nodeConnections.get(nodeV);
+    NetworkConnections<N, E> connectionsV = requireNonNull(nodeConnections.get(nodeV));
     connectionsU.removeOutEdge(edge);
     connectionsV.removeInEdge(edge, allowsSelfLoops() && nodeU.equals(nodeV));
     edgeToReferenceNode.remove(edge);

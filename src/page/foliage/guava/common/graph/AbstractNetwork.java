@@ -18,21 +18,25 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.graph.GraphConstants.MULTIPLE_EDGES_CONNECTING;
 import static java.util.Collections.unmodifiableSet;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+import static page.foliage.guava.common.graph.GraphConstants.ENDPOINTS_MISMATCH;
+
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.CheckForNull;
 
 import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.base.Function;
 import page.foliage.guava.common.base.Predicate;
 import page.foliage.guava.common.collect.ImmutableSet;
 import page.foliage.guava.common.collect.Iterators;
 import page.foliage.guava.common.collect.Maps;
 import page.foliage.guava.common.collect.Sets;
 import page.foliage.guava.common.math.IntMath;
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * This class provides a skeletal implementation of {@link Network}. It is recommended to extend
@@ -47,6 +51,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 20.0
  */
 @Beta
+@ElementTypesAreNonnullByDefault
 public abstract class AbstractNetwork<N, E> implements Network<N, E> {
 
   @Override
@@ -68,13 +73,7 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
           @Override
           public Iterator<EndpointPair<N>> iterator() {
             return Iterators.transform(
-                AbstractNetwork.this.edges().iterator(),
-                new Function<E, EndpointPair<N>>() {
-                  @Override
-                  public EndpointPair<N> apply(E edge) {
-                    return incidentNodes(edge);
-                  }
-                });
+                AbstractNetwork.this.edges().iterator(), edge -> incidentNodes(edge));
           }
 
           @Override
@@ -87,12 +86,12 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
           // Network<LinkedList>.
           @SuppressWarnings("unchecked")
           @Override
-          public boolean contains(@NullableDecl Object obj) {
+          public boolean contains(@CheckForNull Object obj) {
             if (!(obj instanceof EndpointPair)) {
               return false;
             }
             EndpointPair<?> endpointPair = (EndpointPair<?>) obj;
-            return isDirected() == endpointPair.isOrdered()
+            return isOrderingCompatible(endpointPair)
                 && nodes().contains(endpointPair.nodeU())
                 && successors((N) endpointPair.nodeU()).contains(endpointPair.nodeV());
           }
@@ -102,6 +101,13 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
       @Override
       public ElementOrder<N> nodeOrder() {
         return AbstractNetwork.this.nodeOrder();
+      }
+
+      @Override
+      public ElementOrder<N> incidentEdgeOrder() {
+        // TODO(b/142723300): Return AbstractNetwork.this.incidentEdgeOrder() once Network has that
+        //   method.
+        return ElementOrder.unordered();
       }
 
       @Override
@@ -169,6 +175,12 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
         : unmodifiableSet(Sets.filter(inEdgesV, connectedPredicate(nodeV, nodeU)));
   }
 
+  @Override
+  public Set<E> edgesConnecting(EndpointPair<N> endpoints) {
+    validateEndpoints(endpoints);
+    return edgesConnecting(endpoints.nodeU(), endpoints.nodeV());
+  }
+
   private Predicate<E> connectedPredicate(final N nodePresent, final N nodeToCheck) {
     return new Predicate<E>() {
       @Override
@@ -180,30 +192,67 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
 
   @Override
   public Optional<E> edgeConnecting(N nodeU, N nodeV) {
+    return Optional.ofNullable(edgeConnectingOrNull(nodeU, nodeV));
+  }
+
+  @Override
+  public Optional<E> edgeConnecting(EndpointPair<N> endpoints) {
+    validateEndpoints(endpoints);
+    return edgeConnecting(endpoints.nodeU(), endpoints.nodeV());
+  }
+
+  @Override
+  @CheckForNull
+  public E edgeConnectingOrNull(N nodeU, N nodeV) {
     Set<E> edgesConnecting = edgesConnecting(nodeU, nodeV);
     switch (edgesConnecting.size()) {
       case 0:
-        return Optional.empty();
+        return null;
       case 1:
-        return Optional.of(edgesConnecting.iterator().next());
+        return edgesConnecting.iterator().next();
       default:
         throw new IllegalArgumentException(String.format(MULTIPLE_EDGES_CONNECTING, nodeU, nodeV));
     }
   }
 
   @Override
-  @NullableDecl
-  public E edgeConnectingOrNull(N nodeU, N nodeV) {
-    return edgeConnecting(nodeU, nodeV).orElse(null);
+  @CheckForNull
+  public E edgeConnectingOrNull(EndpointPair<N> endpoints) {
+    validateEndpoints(endpoints);
+    return edgeConnectingOrNull(endpoints.nodeU(), endpoints.nodeV());
   }
 
   @Override
   public boolean hasEdgeConnecting(N nodeU, N nodeV) {
-    return !edgesConnecting(nodeU, nodeV).isEmpty();
+    checkNotNull(nodeU);
+    checkNotNull(nodeV);
+    return nodes().contains(nodeU) && successors(nodeU).contains(nodeV);
   }
 
   @Override
-  public final boolean equals(@NullableDecl Object obj) {
+  public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
+    checkNotNull(endpoints);
+    if (!isOrderingCompatible(endpoints)) {
+      return false;
+    }
+    return hasEdgeConnecting(endpoints.nodeU(), endpoints.nodeV());
+  }
+
+  /**
+   * Throws an IllegalArgumentException if the ordering of {@code endpoints} is not compatible with
+   * the directionality of this graph.
+   */
+  protected final void validateEndpoints(EndpointPair<?> endpoints) {
+    checkNotNull(endpoints);
+    checkArgument(isOrderingCompatible(endpoints), ENDPOINTS_MISMATCH);
+  }
+
+  protected final boolean isOrderingCompatible(EndpointPair<?> endpoints) {
+    return endpoints.isOrdered() == this.isDirected();
+  }
+
+  @Override
+  public final boolean equals(@CheckForNull Object obj) {
     if (obj == this) {
       return true;
     }
@@ -238,13 +287,6 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
   }
 
   private static <N, E> Map<E, EndpointPair<N>> edgeIncidentNodesMap(final Network<N, E> network) {
-    Function<E, EndpointPair<N>> edgeToIncidentNodesFn =
-        new Function<E, EndpointPair<N>>() {
-          @Override
-          public EndpointPair<N> apply(E edge) {
-            return network.incidentNodes(edge);
-          }
-        };
-    return Maps.asMap(network.edges(), edgeToIncidentNodesFn);
+    return Maps.asMap(network.edges(), network::incidentNodes);
   }
 }

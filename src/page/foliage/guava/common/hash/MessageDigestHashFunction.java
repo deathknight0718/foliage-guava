@@ -18,12 +18,15 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import com.google.errorprone.annotations.Immutable;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import com.google.errorprone.annotations.Immutable;
 
 /**
  * {@link HashFunction} adapter for {@link MessageDigest} instances.
@@ -32,10 +35,12 @@ import java.util.Arrays;
  * @author Dimitris Andreou
  */
 @Immutable
+@ElementTypesAreNonnullByDefault
 final class MessageDigestHashFunction extends AbstractHashFunction implements Serializable {
 
   @SuppressWarnings("Immutable") // cloned before each use
   private final MessageDigest prototype;
+
   private final int bytes;
   private final boolean supportsClone;
   private final String toString;
@@ -59,7 +64,7 @@ final class MessageDigestHashFunction extends AbstractHashFunction implements Se
 
   private static boolean supportsClone(MessageDigest digest) {
     try {
-      digest.clone();
+      Object unused = digest.clone();
       return true;
     } catch (CloneNotSupportedException e) {
       return false;
@@ -116,6 +121,10 @@ final class MessageDigestHashFunction extends AbstractHashFunction implements Se
 
   Object writeReplace() {
     return new SerializedForm(prototype.getAlgorithm(), bytes, toString);
+  }
+
+  private void readObject(ObjectInputStream stream) throws InvalidObjectException {
+    throw new InvalidObjectException("Use SerializedForm");
   }
 
   /** Hasher that updates a message digest. */

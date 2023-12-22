@@ -17,9 +17,10 @@ package page.foliage.guava.common.hash;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.zip.Checksum;
+
+import com.google.errorprone.annotations.Immutable;
 
 /**
  * {@link HashFunction} adapter for {@link Checksum} instances.
@@ -27,6 +28,7 @@ import java.util.zip.Checksum;
  * @author Colin Decker
  */
 @Immutable
+@ElementTypesAreNonnullByDefault
 final class ChecksumHashFunction extends AbstractHashFunction implements Serializable {
   private final ImmutableSupplier<? extends Checksum> checksumSupplier;
   private final int bits;

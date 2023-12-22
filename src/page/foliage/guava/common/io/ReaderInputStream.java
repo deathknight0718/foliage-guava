@@ -18,8 +18,6 @@ import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.primitives.UnsignedBytes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -32,6 +30,10 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.util.Arrays;
 
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.primitives.UnsignedBytes;
+
 /**
  * An {@link InputStream} that converts characters from a {@link Reader} into bytes using an
  * arbitrary Charset.
@@ -43,7 +45,9 @@ import java.util.Arrays;
  *
  * @author Chris Nokleberg
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 final class ReaderInputStream extends InputStream {
   private final Reader reader;
   private final CharsetEncoder encoder;
@@ -104,7 +108,7 @@ final class ReaderInputStream extends InputStream {
     encoder.reset();
 
     charBuffer = CharBuffer.allocate(bufferSize);
-    charBuffer.flip();
+    Java8Compatibility.flip(charBuffer);
 
     byteBuffer = ByteBuffer.allocate(bufferSize);
   }
@@ -143,7 +147,7 @@ final class ReaderInputStream extends InputStream {
           return (totalBytesRead > 0) ? totalBytesRead : -1;
         }
         draining = false;
-        byteBuffer.clear();
+        Java8Compatibility.clear(byteBuffer);
       }
 
       while (true) {
@@ -189,16 +193,16 @@ final class ReaderInputStream extends InputStream {
   private static CharBuffer grow(CharBuffer buf) {
     char[] copy = Arrays.copyOf(buf.array(), buf.capacity() * 2);
     CharBuffer bigger = CharBuffer.wrap(copy);
-    bigger.position(buf.position());
-    bigger.limit(buf.limit());
+    Java8Compatibility.position(bigger, buf.position());
+    Java8Compatibility.limit(bigger, buf.limit());
     return bigger;
   }
 
   /** Handle the case of underflow caused by needing more input characters. */
   private void readMoreChars() throws IOException {
     // Possibilities:
-    // 1) array has space available on right hand side (between limit and capacity)
-    // 2) array has space available on left hand side (before position)
+    // 1) array has space available on right-hand side (between limit and capacity)
+    // 2) array has space available on left-hand side (before position)
     // 3) array has no space available
     //
     // In case 2 we shift the existing chars to the left, and in case 3 we create a bigger
@@ -207,7 +211,7 @@ final class ReaderInputStream extends InputStream {
     if (availableCapacity(charBuffer) == 0) {
       if (charBuffer.position() > 0) {
         // (2) There is room in the buffer. Move existing bytes to the beginning.
-        charBuffer.compact().flip();
+        Java8Compatibility.flip(charBuffer.compact());
       } else {
         // (3) Entire buffer is full, need bigger buffer.
         charBuffer = grow(charBuffer);
@@ -220,7 +224,7 @@ final class ReaderInputStream extends InputStream {
     if (numChars == -1) {
       endOfInput = true;
     } else {
-      charBuffer.limit(limit + numChars);
+      Java8Compatibility.limit(charBuffer, limit + numChars);
     }
   }
 
@@ -235,7 +239,7 @@ final class ReaderInputStream extends InputStream {
    * overflow must be due to a small output buffer.
    */
   private void startDraining(boolean overflow) {
-    byteBuffer.flip();
+    Java8Compatibility.flip(byteBuffer);
     if (overflow && byteBuffer.remaining() == 0) {
       byteBuffer = ByteBuffer.allocate(byteBuffer.capacity() * 2);
     } else {

@@ -16,10 +16,14 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.io.Serializable;
 import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * An ordering that treats all references as equals, even nulls.
@@ -27,16 +31,17 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Emily Soldal
  */
 @GwtCompatible(serializable = true)
-final class AllEqualOrdering extends Ordering<Object> implements Serializable {
+@ElementTypesAreNonnullByDefault
+final class AllEqualOrdering extends Ordering<@Nullable Object> implements Serializable {
   static final AllEqualOrdering INSTANCE = new AllEqualOrdering();
 
   @Override
-  public int compare(@NullableDecl Object left, @NullableDecl Object right) {
+  public int compare(@CheckForNull Object left, @CheckForNull Object right) {
     return 0;
   }
 
   @Override
-  public <E> List<E> sortedCopy(Iterable<E> iterable) {
+  public <E extends @Nullable Object> List<E> sortedCopy(Iterable<E> iterable) {
     return Lists.newArrayList(iterable);
   }
 
@@ -47,7 +52,7 @@ final class AllEqualOrdering extends Ordering<Object> implements Serializable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S> Ordering<S> reverse() {
+  public <S extends @Nullable Object> Ordering<S> reverse() {
     return (Ordering<S>) this;
   }
 

@@ -16,11 +16,9 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import static java.util.Objects.requireNonNull;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -29,7 +27,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
-import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.LazyInit;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A map containing {@code long} values that can be atomically updated. While writes to a
@@ -44,6 +49,8 @@ import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
  * <p>Instances of this class may be used by multiple threads concurrently. All operations are
  * atomic unless otherwise noted.
  *
+ * <p>Instances of this class are serializable if the keys are serializable.
+ *
  * <p><b>Note:</b> If your values are always positive and less than 2^31, you may wish to use a
  * {@link page.foliage.guava.common.collect.Multiset} such as {@link
  * page.foliage.guava.common.collect.ConcurrentHashMultiset} instead.
@@ -55,6 +62,8 @@ import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
  * @since 11.0
  */
 @GwtCompatible
+@J2ktIncompatible
+@ElementTypesAreNonnullByDefault
 public final class AtomicLongMap<K> implements Serializable {
   private final ConcurrentHashMap<K, Long> map;
 
@@ -142,8 +151,11 @@ public final class AtomicLongMap<K> implements Serializable {
   @CanIgnoreReturnValue
   public long updateAndGet(K key, LongUnaryOperator updaterFunction) {
     checkNotNull(updaterFunction);
-    return map.compute(
-        key, (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value.longValue()));
+    Long result =
+        map.compute(
+            key,
+            (k, value) -> updaterFunction.applyAsLong((value == null) ? 0L : value.longValue()));
+    return requireNonNull(result);
   }
 
   /**
@@ -237,7 +249,6 @@ public final class AtomicLongMap<K> implements Serializable {
    *
    * @since 20.0
    */
-  @Beta
   @CanIgnoreReturnValue
   public boolean removeIfZero(K key) {
     return remove(key, 0);
@@ -262,7 +273,7 @@ public final class AtomicLongMap<K> implements Serializable {
     return map.values().stream().mapToLong(Long::longValue).sum();
   }
 
-  @MonotonicNonNullDecl private transient Map<K, Long> asMap;
+  @LazyInit @CheckForNull private transient Map<K, Long> asMap;
 
   /** Returns a live, read-only view of the map backing this {@code AtomicLongMap}. */
   public Map<K, Long> asMap() {
@@ -325,7 +336,7 @@ public final class AtomicLongMap<K> implements Serializable {
                 return oldValue;
               }
             });
-    return noValue.get() ? 0L : result.longValue();
+    return noValue.get() ? 0L : requireNonNull(result).longValue();
   }
 
   /**

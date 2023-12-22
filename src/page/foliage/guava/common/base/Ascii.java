@@ -32,11 +32,12 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  *       which operate only on the ASCII characters of a string.
  * </ul>
  *
- * @author Craig Berry
+ * @author Catherine Berry
  * @author Gregory Kick
  * @since 7.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Ascii {
 
   private Ascii() {}
@@ -395,6 +396,9 @@ public final class Ascii {
    */
   public static final char MAX = 127;
 
+  /** A bit mask which selects the bit encoding ASCII character case. */
+  private static final char CASE_MASK = 0x20;
+
   /**
    * Returns a copy of the input string in which all {@linkplain #isUpperCase(char) uppercase ASCII
    * characters} have been converted to lowercase. All other characters are copied without
@@ -408,7 +412,7 @@ public final class Ascii {
         for (; i < length; i++) {
           char c = chars[i];
           if (isUpperCase(c)) {
-            chars[i] = (char) (c ^ 0x20);
+            chars[i] = (char) (c ^ CASE_MASK);
           }
         }
         return String.valueOf(chars);
@@ -436,11 +440,11 @@ public final class Ascii {
   }
 
   /**
-   * If the argument is an {@linkplain #isUpperCase(char) uppercase ASCII character} returns the
+   * If the argument is an {@linkplain #isUpperCase(char) uppercase ASCII character}, returns the
    * lowercase equivalent. Otherwise returns the argument.
    */
   public static char toLowerCase(char c) {
-    return isUpperCase(c) ? (char) (c ^ 0x20) : c;
+    return isUpperCase(c) ? (char) (c ^ CASE_MASK) : c;
   }
 
   /**
@@ -456,7 +460,7 @@ public final class Ascii {
         for (; i < length; i++) {
           char c = chars[i];
           if (isLowerCase(c)) {
-            chars[i] = (char) (c & 0x5f);
+            chars[i] = (char) (c ^ CASE_MASK);
           }
         }
         return String.valueOf(chars);
@@ -484,11 +488,11 @@ public final class Ascii {
   }
 
   /**
-   * If the argument is a {@linkplain #isLowerCase(char) lowercase ASCII character} returns the
+   * If the argument is a {@linkplain #isLowerCase(char) lowercase ASCII character}, returns the
    * uppercase equivalent. Otherwise returns the argument.
    */
   public static char toUpperCase(char c) {
-    return isLowerCase(c) ? (char) (c & 0x5f) : c;
+    return isLowerCase(c) ? (char) (c ^ CASE_MASK) : c;
   }
 
   /**
@@ -538,7 +542,6 @@ public final class Ascii {
    *   <li>the appropriate truncation indicator may be locale-dependent
    *   <li>it is safe to use non-ASCII characters in the truncation indicator
    * </ul>
-   *
    *
    * @throws IllegalArgumentException if {@code maxLength} is less than the length of {@code
    *     truncationIndicator}
@@ -627,6 +630,6 @@ public final class Ascii {
    */
   private static int getAlphaIndex(char c) {
     // Fold upper-case ASCII to lower-case and make zero-indexed and unsigned (by casting to char).
-    return (char) ((c | 0x20) - 'a');
+    return (char) ((c | CASE_MASK) - 'a');
   }
 }

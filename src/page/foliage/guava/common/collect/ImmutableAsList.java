@@ -16,11 +16,15 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * List returned by {@link ImmutableCollection#asList} that delegates {@code contains} checks to the
@@ -31,11 +35,12 @@ import java.io.Serializable;
  */
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial")
+@ElementTypesAreNonnullByDefault
 abstract class ImmutableAsList<E> extends ImmutableList<E> {
   abstract ImmutableCollection<E> delegateCollection();
 
   @Override
-  public boolean contains(Object target) {
+  public boolean contains(@CheckForNull Object target) {
     // The collection's contains() is at least as fast as ImmutableList's
     // and is often faster.
     return delegateCollection().contains(target);
@@ -58,6 +63,7 @@ abstract class ImmutableAsList<E> extends ImmutableList<E> {
 
   /** Serialized form that leads to the same performance as the original list. */
   @GwtIncompatible // serialization
+  @J2ktIncompatible
   static class SerializedForm implements Serializable {
     final ImmutableCollection<?> collection;
 
@@ -73,11 +79,13 @@ abstract class ImmutableAsList<E> extends ImmutableList<E> {
   }
 
   @GwtIncompatible // serialization
+  @J2ktIncompatible
   private void readObject(ObjectInputStream stream) throws InvalidObjectException {
     throw new InvalidObjectException("Use SerializedForm");
   }
 
   @GwtIncompatible // serialization
+  @J2ktIncompatible
   @Override
   Object writeReplace() {
     return new SerializedForm(delegateCollection());

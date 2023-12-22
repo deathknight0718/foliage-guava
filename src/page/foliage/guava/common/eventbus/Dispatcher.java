@@ -16,10 +16,11 @@ package page.foliage.guava.common.eventbus;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.collect.Queues;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import page.foliage.guava.common.collect.Queues;
 
 /**
  * Handler for dispatching events to subscribers, providing different event ordering guarantees that
@@ -31,6 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author Colin Decker
  */
+@ElementTypesAreNonnullByDefault
 abstract class Dispatcher {
 
   /**
@@ -132,7 +134,7 @@ abstract class Dispatcher {
     // This dispatcher matches the original dispatch behavior of AsyncEventBus.
     //
     // We can't really make any guarantees about the overall dispatch order for this dispatcher in
-    // a multithreaded environment for a couple reasons:
+    // a multithreaded environment for a couple of reasons:
     //
     // 1. Subscribers to events posted on different threads can be interleaved with each other
     //    freely. (A event on one thread, B event on another could yield any of

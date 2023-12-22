@@ -16,14 +16,18 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * A list which forwards all its method calls to another list. Subclasses should override one or
@@ -51,7 +55,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 2.0
  */
 @GwtCompatible
-public abstract class ForwardingList<E> extends ForwardingCollection<E> implements List<E> {
+@ElementTypesAreNonnullByDefault
+public abstract class ForwardingList<E extends @Nullable Object> extends ForwardingCollection<E>
+    implements List<E> {
   // TODO(lowasser): identify places where thread safety is actually lost
 
   /** Constructor for use by subclasses. */
@@ -61,7 +67,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
   protected abstract List<E> delegate();
 
   @Override
-  public void add(int index, E element) {
+  public void add(int index, @ParametricNullness E element) {
     delegate().add(index, element);
   }
 
@@ -72,17 +78,18 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
   }
 
   @Override
+  @ParametricNullness
   public E get(int index) {
     return delegate().get(index);
   }
 
   @Override
-  public int indexOf(Object element) {
+  public int indexOf(@CheckForNull Object element) {
     return delegate().indexOf(element);
   }
 
   @Override
-  public int lastIndexOf(Object element) {
+  public int lastIndexOf(@CheckForNull Object element) {
     return delegate().lastIndexOf(element);
   }
 
@@ -98,13 +105,15 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 
   @CanIgnoreReturnValue
   @Override
+  @ParametricNullness
   public E remove(int index) {
     return delegate().remove(index);
   }
 
   @CanIgnoreReturnValue
   @Override
-  public E set(int index, E element) {
+  @ParametricNullness
+  public E set(int index, @ParametricNullness E element) {
     return delegate().set(index, element);
   }
 
@@ -114,7 +123,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     return object == this || delegate().equals(object);
   }
 
@@ -130,7 +139,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  protected boolean standardAdd(E element) {
+  protected boolean standardAdd(@ParametricNullness E element) {
     add(size(), element);
     return true;
   }
@@ -153,7 +162,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  protected int standardIndexOf(@NullableDecl Object element) {
+  protected int standardIndexOf(@CheckForNull Object element) {
     return Lists.indexOfImpl(this, element);
   }
 
@@ -164,7 +173,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  protected int standardLastIndexOf(@NullableDecl Object element) {
+  protected int standardLastIndexOf(@CheckForNull Object element) {
     return Lists.lastIndexOfImpl(this, element);
   }
 
@@ -198,7 +207,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  @Beta
   protected ListIterator<E> standardListIterator(int start) {
     return Lists.listIteratorImpl(this, start);
   }
@@ -209,7 +217,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  @Beta
   protected List<E> standardSubList(int fromIndex, int toIndex) {
     return Lists.subListImpl(this, fromIndex, toIndex);
   }
@@ -221,8 +228,7 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  @Beta
-  protected boolean standardEquals(@NullableDecl Object object) {
+  protected boolean standardEquals(@CheckForNull Object object) {
     return Lists.equalsImpl(this, object);
   }
 
@@ -233,7 +239,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
    *
    * @since 7.0
    */
-  @Beta
   protected int standardHashCode() {
     return Lists.hashCodeImpl(this);
   }

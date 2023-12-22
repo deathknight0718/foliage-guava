@@ -16,8 +16,11 @@
 
 package page.foliage.guava.common.graph;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Set;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * An interface for representing and manipulating an origin node's adjacent nodes and incident edges
@@ -27,6 +30,7 @@ import java.util.Set;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 interface NetworkConnections<N, E> {
 
   Set<N> adjacentNodes();
@@ -60,6 +64,7 @@ interface NetworkConnections<N, E> {
    * <p>In the undirected case, returns {@code null} if {@code isSelfLoop} is true.
    */
   @CanIgnoreReturnValue
+  @CheckForNull
   N removeInEdge(E edge, boolean isSelfLoop);
 
   /** Remove {@code edge} from the set of outgoing edges. Returns the former successor node. */

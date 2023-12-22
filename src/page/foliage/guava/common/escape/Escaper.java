@@ -14,6 +14,8 @@
 
 package page.foliage.guava.common.escape;
 
+import com.google.errorprone.annotations.DoNotMock;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Function;
 
@@ -53,9 +55,11 @@ import page.foliage.guava.common.base.Function;
  * @author David Beaumont
  * @since 15.0
  */
+@DoNotMock("Use Escapers.nullEscaper() or another methods from the *Escapers classes")
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public abstract class Escaper {
-  // TODO(user): evaluate custom implementations, considering package private constructor.
+  // TODO(dbeaumont): evaluate custom implementations, considering package private constructor.
   /** Constructor for use by subclasses. */
   protected Escaper() {}
 
@@ -82,13 +86,7 @@ public abstract class Escaper {
    */
   public abstract String escape(String string);
 
-  private final Function<String, String> asFunction =
-      new Function<String, String>() {
-        @Override
-        public String apply(String from) {
-          return escape(from);
-        }
-      };
+  private final Function<String, String> asFunction = this::escape;
 
   /** Returns a {@link Function} that invokes {@link #escape(String)} on this escaper. */
   public final Function<String, String> asFunction() {

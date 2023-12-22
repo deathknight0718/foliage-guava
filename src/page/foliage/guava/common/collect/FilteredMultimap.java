@@ -16,9 +16,12 @@
 
 package page.foliage.guava.common.collect;
 
+import java.util.Map.Entry;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.Predicate;
-import java.util.Map.Entry;
 
 /**
  * An interface for all filtered multimap types.
@@ -26,7 +29,9 @@ import java.util.Map.Entry;
  * @author Louis Wasserman
  */
 @GwtCompatible
-interface FilteredMultimap<K, V> extends Multimap<K, V> {
+@ElementTypesAreNonnullByDefault
+interface FilteredMultimap<K extends @Nullable Object, V extends @Nullable Object>
+    extends Multimap<K, V> {
   Multimap<K, V> unfiltered();
 
   Predicate<? super Entry<K, V>> entryPredicate();

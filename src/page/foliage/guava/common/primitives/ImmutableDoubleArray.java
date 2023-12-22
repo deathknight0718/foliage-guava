@@ -17,12 +17,6 @@ package page.foliage.guava.common.primitives;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Preconditions;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.CheckReturnValue;
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -33,7 +27,14 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.DoubleConsumer;
 import java.util.stream.DoubleStream;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Preconditions;
 
 /**
  * An immutable array of {@code double} values, with an API resembling {@link List}.
@@ -41,8 +42,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>Advantages compared to {@code double[]}:
  *
  * <ul>
- *   <li>All the many well-known advantages of immutability (read <i>Effective Java</i>, second
- *       edition, Item 15).
+ *   <li>All the many well-known advantages of immutability (read <i>Effective Java</i>, third
+ *       edition, Item 17).
  *   <li>Has the value-based (not identity-based) {@link #equals}, {@link #hashCode}, and {@link
  *       #toString} behavior you expect.
  *   <li>Offers useful operations beyond just {@code get} and {@code length}, so you don't have to
@@ -62,7 +63,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  *       APIs are offered that don't).
  *   <li>Can't be passed directly to methods that expect {@code double[]} (though the most common
  *       utilities do have replacements here).
- *   <li>Dependency on {@code com.google.common} / Guava.
+ *   <li>Dependency on {@code page.foliage.guava.common} / Guava.
  * </ul>
  *
  * <p>Advantages compared to {@link page.foliage.guava.common.collect.ImmutableList ImmutableList}{@code
@@ -85,9 +86,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  *
  * @since 22.0
  */
-@Beta
 @GwtCompatible
 @Immutable
+@ElementTypesAreNonnullByDefault
 public final class ImmutableDoubleArray implements Serializable {
   private static final ImmutableDoubleArray EMPTY = new ImmutableDoubleArray(new double[0]);
 
@@ -138,8 +139,7 @@ public final class ImmutableDoubleArray implements Serializable {
   // is okay since we have to copy the just-created array anyway.
   public static ImmutableDoubleArray of(double first, double... rest) {
     checkArgument(
-        rest.length <= Integer.MAX_VALUE - 1,
-        "the total number of elements must fit in an int");
+        rest.length <= Integer.MAX_VALUE - 1, "the total number of elements must fit in an int");
     double[] array = new double[rest.length + 1];
     array[0] = first;
     System.arraycopy(rest, 0, array, 1, rest.length);
@@ -210,7 +210,6 @@ public final class ImmutableDoubleArray implements Serializable {
    * A builder for {@link ImmutableDoubleArray} instances; obtained using {@link
    * ImmutableDoubleArray#builder}.
    */
-  @CanIgnoreReturnValue
   public static final class Builder {
     private double[] array;
     private int count = 0; // <= array.length
@@ -223,6 +222,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends {@code value} to the end of the values the built {@link ImmutableDoubleArray} will
      * contain.
      */
+    @CanIgnoreReturnValue
     public Builder add(double value) {
       ensureRoomFor(1);
       array[count] = value;
@@ -234,6 +234,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends {@code values}, in order, to the end of the values the built {@link
      * ImmutableDoubleArray} will contain.
      */
+    @CanIgnoreReturnValue
     public Builder addAll(double[] values) {
       ensureRoomFor(values.length);
       System.arraycopy(values, 0, array, count, values.length);
@@ -245,6 +246,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends {@code values}, in order, to the end of the values the built {@link
      * ImmutableDoubleArray} will contain.
      */
+    @CanIgnoreReturnValue
     public Builder addAll(Iterable<Double> values) {
       if (values instanceof Collection) {
         return addAll((Collection<Double>) values);
@@ -259,6 +261,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends {@code values}, in order, to the end of the values the built {@link
      * ImmutableDoubleArray} will contain.
      */
+    @CanIgnoreReturnValue
     public Builder addAll(Collection<Double> values) {
       ensureRoomFor(values.size());
       for (Double value : values) {
@@ -271,6 +274,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends all values from {@code stream}, in order, to the end of the values the built {@link
      * ImmutableDoubleArray} will contain.
      */
+    @CanIgnoreReturnValue
     public Builder addAll(DoubleStream stream) {
       Spliterator.OfDouble spliterator = stream.spliterator();
       long size = spliterator.getExactSizeIfKnown();
@@ -285,6 +289,7 @@ public final class ImmutableDoubleArray implements Serializable {
      * Appends {@code values}, in order, to the end of the values the built {@link
      * ImmutableDoubleArray} will contain.
      */
+    @CanIgnoreReturnValue
     public Builder addAll(ImmutableDoubleArray values) {
       ensureRoomFor(values.length());
       System.arraycopy(values.array, values.start, array, count, values.length());
@@ -295,9 +300,7 @@ public final class ImmutableDoubleArray implements Serializable {
     private void ensureRoomFor(int numberToAdd) {
       int newCount = count + numberToAdd; // TODO(kevinb): check overflow now?
       if (newCount > array.length) {
-        double[] newArray = new double[expandedCapacity(array.length, newCount)];
-        System.arraycopy(array, 0, newArray, 0, count);
-        this.array = newArray;
+        array = Arrays.copyOf(array, expandedCapacity(array.length, newCount));
       }
     }
 
@@ -325,7 +328,6 @@ public final class ImmutableDoubleArray implements Serializable {
      * no data is copied as part of this step, but this may occupy more memory than strictly
      * necessary. To copy the data to a right-sized backing array, use {@code .build().trimmed()}.
      */
-    @CheckReturnValue
     public ImmutableDoubleArray build() {
       return count == 0 ? EMPTY : new ImmutableDoubleArray(array, 0, count);
     }
@@ -486,17 +488,17 @@ public final class ImmutableDoubleArray implements Serializable {
     }
 
     @Override
-    public boolean contains(Object target) {
+    public boolean contains(@CheckForNull Object target) {
       return indexOf(target) >= 0;
     }
 
     @Override
-    public int indexOf(Object target) {
+    public int indexOf(@CheckForNull Object target) {
       return target instanceof Double ? parent.indexOf((Double) target) : -1;
     }
 
     @Override
-    public int lastIndexOf(Object target) {
+    public int lastIndexOf(@CheckForNull Object target) {
       return target instanceof Double ? parent.lastIndexOf((Double) target) : -1;
     }
 
@@ -512,7 +514,7 @@ public final class ImmutableDoubleArray implements Serializable {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@CheckForNull Object object) {
       if (object instanceof AsList) {
         AsList that = (AsList) object;
         return this.parent.equals(that.parent);
@@ -552,7 +554,7 @@ public final class ImmutableDoubleArray implements Serializable {
    * values as this one, in the same order. Values are compared as if by {@link Double#equals}.
    */
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     if (object == this) {
       return true;
     }

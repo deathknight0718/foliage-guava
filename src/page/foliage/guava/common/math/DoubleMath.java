@@ -14,6 +14,11 @@
 
 package page.foliage.guava.common.math;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.copySign;
+import static java.lang.Math.getExponent;
+import static java.lang.Math.log;
+import static java.lang.Math.rint;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.math.DoubleUtils.IMPLICIT_BIT;
 import static page.foliage.guava.common.math.DoubleUtils.SIGNIFICAND_BITS;
@@ -21,23 +26,21 @@ import static page.foliage.guava.common.math.DoubleUtils.getSignificand;
 import static page.foliage.guava.common.math.DoubleUtils.isFinite;
 import static page.foliage.guava.common.math.DoubleUtils.isNormal;
 import static page.foliage.guava.common.math.DoubleUtils.scaleNormalize;
-import static page.foliage.guava.common.math.MathPreconditions.checkInRange;
+import static page.foliage.guava.common.math.MathPreconditions.checkInRangeForRoundingInputs;
 import static page.foliage.guava.common.math.MathPreconditions.checkNonNegative;
 import static page.foliage.guava.common.math.MathPreconditions.checkRoundingUnnecessary;
-import static java.lang.Math.abs;
-import static java.lang.Math.copySign;
-import static java.lang.Math.getExponent;
-import static java.lang.Math.log;
-import static java.lang.Math.rint;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.annotations.VisibleForTesting;
-import page.foliage.guava.common.primitives.Booleans;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Iterator;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.annotations.VisibleForTesting;
+import page.foliage.guava.common.primitives.Booleans;
 
 /**
  * A class for arithmetic on doubles that is not covered by {@link java.lang.Math}.
@@ -46,11 +49,13 @@ import java.util.Iterator;
  * @since 11.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class DoubleMath {
   /*
    * This method returns a value y such that rounding y DOWN (towards zero) gives the same result as
    * rounding x according to the specified mode.
    */
+  @J2ktIncompatible
   @GwtIncompatible // #isMathematicalInteger, page.foliage.guava.common.math.DoubleUtils
   static double roundIntermediate(double x, RoundingMode mode) {
     if (!isFinite(x)) {
@@ -127,10 +132,12 @@ public final class DoubleMath {
    *           RoundingMode#UNNECESSARY}
    *     </ul>
    */
+  @J2ktIncompatible
   @GwtIncompatible // #roundIntermediate
   public static int roundToInt(double x, RoundingMode mode) {
     double z = roundIntermediate(x, mode);
-    checkInRange(z > MIN_INT_AS_DOUBLE - 1.0 & z < MAX_INT_AS_DOUBLE + 1.0);
+    checkInRangeForRoundingInputs(
+        z > MIN_INT_AS_DOUBLE - 1.0 & z < MAX_INT_AS_DOUBLE + 1.0, x, mode);
     return (int) z;
   }
 
@@ -151,10 +158,12 @@ public final class DoubleMath {
    *           RoundingMode#UNNECESSARY}
    *     </ul>
    */
+  @J2ktIncompatible
   @GwtIncompatible // #roundIntermediate
   public static long roundToLong(double x, RoundingMode mode) {
     double z = roundIntermediate(x, mode);
-    checkInRange(MIN_LONG_AS_DOUBLE - z < 1.0 & z < MAX_LONG_AS_DOUBLE_PLUS_ONE);
+    checkInRangeForRoundingInputs(
+        MIN_LONG_AS_DOUBLE - z < 1.0 & z < MAX_LONG_AS_DOUBLE_PLUS_ONE, x, mode);
     return (long) z;
   }
 
@@ -177,6 +186,7 @@ public final class DoubleMath {
    *     </ul>
    */
   // #roundIntermediate, java.lang.Math.getExponent, page.foliage.guava.common.math.DoubleUtils
+  @J2ktIncompatible
   @GwtIncompatible
   public static BigInteger roundToBigInteger(double x, RoundingMode mode) {
     x = roundIntermediate(x, mode);
@@ -193,6 +203,7 @@ public final class DoubleMath {
    * Returns {@code true} if {@code x} is exactly equal to {@code 2^k} for some finite integer
    * {@code k}.
    */
+  @J2ktIncompatible
   @GwtIncompatible // page.foliage.guava.common.math.DoubleUtils
   public static boolean isPowerOfTwo(double x) {
     if (x > 0.0 && isFinite(x)) {
@@ -231,6 +242,7 @@ public final class DoubleMath {
    * @throws IllegalArgumentException if {@code x <= 0.0}, {@code x} is NaN, or {@code x} is
    *     infinite
    */
+  @J2ktIncompatible
   @GwtIncompatible // java.lang.Math.getExponent, page.foliage.guava.common.math.DoubleUtils
   @SuppressWarnings("fallthrough")
   public static int log2(double x, RoundingMode mode) {
@@ -401,6 +413,7 @@ public final class DoubleMath {
    */
   @Deprecated
   // page.foliage.guava.common.math.DoubleUtils
+  @J2ktIncompatible
   @GwtIncompatible
   public static double mean(double... values) {
     checkArgument(values.length > 0, "Cannot take mean of 0 values");
@@ -430,7 +443,7 @@ public final class DoubleMath {
   @Deprecated
   public static double mean(int... values) {
     checkArgument(values.length > 0, "Cannot take mean of 0 values");
-    // The upper bound on the the length of an array and the bounds on the int values mean that, in
+    // The upper bound on the length of an array and the bounds on the int values mean that, in
     // this case only, we can compute the sum as a long without risking overflow or loss of
     // precision. So we do that, as it's slightly quicker than the Knuth algorithm.
     long sum = 0;
@@ -481,6 +494,7 @@ public final class DoubleMath {
    */
   @Deprecated
   // page.foliage.guava.common.math.DoubleUtils
+  @J2ktIncompatible
   @GwtIncompatible
   public static double mean(Iterable<? extends Number> values) {
     return mean(values.iterator());
@@ -501,6 +515,7 @@ public final class DoubleMath {
    */
   @Deprecated
   // page.foliage.guava.common.math.DoubleUtils
+  @J2ktIncompatible
   @GwtIncompatible
   public static double mean(Iterator<? extends Number> values) {
     checkArgument(values.hasNext(), "Cannot take mean of 0 values");
@@ -515,6 +530,7 @@ public final class DoubleMath {
     return mean;
   }
 
+  @J2ktIncompatible
   @GwtIncompatible // page.foliage.guava.common.math.DoubleUtils
   @CanIgnoreReturnValue
   private static double checkFinite(double argument) {

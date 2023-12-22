@@ -16,21 +16,22 @@
 
 package page.foliage.guava.common.graph;
 
-import static page.foliage.guava.common.base.Preconditions.checkArgument;
-import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.graph.GraphConstants.DEFAULT_EDGE_COUNT;
 import static page.foliage.guava.common.graph.GraphConstants.DEFAULT_NODE_COUNT;
 import static page.foliage.guava.common.graph.GraphConstants.EDGE_NOT_IN_GRAPH;
 import static page.foliage.guava.common.graph.GraphConstants.NODE_NOT_IN_GRAPH;
+import static java.util.Objects.requireNonNull;
+import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import page.foliage.guava.common.collect.ImmutableSet;
 
 /**
- * Configurable implementation of {@link Network} that supports the options supplied by {@link
+ * Standard implementation of {@link Network} that supports the options supplied by {@link
  * NetworkBuilder}.
  *
  * <p>This class maintains a map of nodes to {@link NetworkConnections}. This class also maintains a
@@ -48,21 +49,22 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @param <N> Node parameter type
  * @param <E> Edge parameter type
  */
-class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
+@ElementTypesAreNonnullByDefault
+class StandardNetwork<N, E> extends AbstractNetwork<N, E> {
   private final boolean isDirected;
   private final boolean allowsParallelEdges;
   private final boolean allowsSelfLoops;
   private final ElementOrder<N> nodeOrder;
   private final ElementOrder<E> edgeOrder;
 
-  protected final MapIteratorCache<N, NetworkConnections<N, E>> nodeConnections;
+  final MapIteratorCache<N, NetworkConnections<N, E>> nodeConnections;
 
   // We could make this a Map<E, EndpointPair<N>>. It would make incidentNodes(edge) slightly
   // faster, but also make Networks consume 5 to 20+% (increasing with average degree) more memory.
-  protected final MapIteratorCache<E, N> edgeToReferenceNode; // referenceNode == source if directed
+  final MapIteratorCache<E, N> edgeToReferenceNode; // referenceNode == source if directed
 
   /** Constructs a graph with the properties specified in {@code builder}. */
-  ConfigurableNetwork(NetworkBuilder<? super N, ? super E> builder) {
+  StandardNetwork(NetworkBuilder<? super N, ? super E> builder) {
     this(
         builder,
         builder.nodeOrder.<N, NetworkConnections<N, E>>createMap(
@@ -74,7 +76,7 @@ class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
    * Constructs a graph with the properties specified in {@code builder}, initialized with the given
    * node and edge maps.
    */
-  ConfigurableNetwork(
+  StandardNetwork(
       NetworkBuilder<? super N, ? super E> builder,
       Map<N, NetworkConnections<N, E>> nodeConnections,
       Map<E, N> edgeToReferenceNode) {
@@ -135,7 +137,8 @@ class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
   @Override
   public EndpointPair<N> incidentNodes(E edge) {
     N nodeU = checkedReferenceNode(edge);
-    N nodeV = nodeConnections.get(nodeU).adjacentNode(edge);
+    // requireNonNull is safe because checkedReferenceNode made sure the edge is in the network.
+    N nodeV = requireNonNull(nodeConnections.get(nodeU)).adjacentNode(edge);
     return EndpointPair.of(this, nodeU, nodeV);
   }
 
@@ -174,7 +177,7 @@ class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
     return checkedConnections(node).successors();
   }
 
-  protected final NetworkConnections<N, E> checkedConnections(N node) {
+  final NetworkConnections<N, E> checkedConnections(N node) {
     NetworkConnections<N, E> connections = nodeConnections.get(node);
     if (connections == null) {
       checkNotNull(node);
@@ -183,7 +186,7 @@ class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
     return connections;
   }
 
-  protected final N checkedReferenceNode(E edge) {
+  final N checkedReferenceNode(E edge) {
     N referenceNode = edgeToReferenceNode.get(edge);
     if (referenceNode == null) {
       checkNotNull(edge);
@@ -192,11 +195,11 @@ class ConfigurableNetwork<N, E> extends AbstractNetwork<N, E> {
     return referenceNode;
   }
 
-  protected final boolean containsNode(@NullableDecl N node) {
+  final boolean containsNode(N node) {
     return nodeConnections.containsKey(node);
   }
 
-  protected final boolean containsEdge(@NullableDecl E edge) {
+  final boolean containsEdge(E edge) {
     return edgeToReferenceNode.containsKey(edge);
   }
 }

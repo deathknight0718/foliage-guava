@@ -18,11 +18,13 @@ package page.foliage.guava.common.collect;
 
 import static page.foliage.guava.common.base.Preconditions.checkState;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /** Precondition checks useful in collection implementations. */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 final class CollectPreconditions {
 
   static void checkEntryNotNull(Object key, Object value) {

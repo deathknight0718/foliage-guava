@@ -14,13 +14,13 @@
 
 package page.foliage.guava.common.io;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.base.Preconditions.checkPositionIndex;
+import static page.foliage.guava.common.base.Preconditions.checkPositionIndexes;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -36,7 +36,19 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Queue;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.math.IntMath;
 
 /**
  * Provides utility methods for working with byte arrays and I/O streams.
@@ -45,13 +57,16 @@ import java.util.Arrays;
  * @author Colin Decker
  * @since 1.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public final class ByteStreams {
+
+  private static final int BUFFER_SIZE = 8192;
 
   /** Creates a new byte array for buffering reads or writes. */
   static byte[] createBuffer() {
-    return new byte[8192];
+    return new byte[BUFFER_SIZE];
   }
 
   /**
@@ -88,6 +103,9 @@ public final class ByteStreams {
   /**
    * Copies all bytes from the input stream to the output stream. Does not close or flush either
    * stream.
+   *
+   * <p><b>Java 9 users and later:</b> this method should be treated as deprecated; use the
+   * equivalent {@link InputStream#transferTo} method instead.
    *
    * @param from the input stream to read from
    * @param to the output stream to write to
@@ -140,13 +158,80 @@ public final class ByteStreams {
     ByteBuffer buf = ByteBuffer.wrap(createBuffer());
     long total = 0;
     while (from.read(buf) != -1) {
-      buf.flip();
+      Java8Compatibility.flip(buf);
       while (buf.hasRemaining()) {
         total += to.write(buf);
       }
-      buf.clear();
+      Java8Compatibility.clear(buf);
     }
     return total;
+  }
+
+  /** Max array length on JVM. */
+  private static final int MAX_ARRAY_LEN = Integer.MAX_VALUE - 8;
+
+  /** Large enough to never need to expand, given the geometric progression of buffer sizes. */
+  private static final int TO_BYTE_ARRAY_DEQUE_SIZE = 20;
+
+  /**
+   * Returns a byte array containing the bytes from the buffers already in {@code bufs} (which have
+   * a total combined length of {@code totalLen} bytes) followed by all bytes remaining in the given
+   * input stream.
+   */
+  private static byte[] toByteArrayInternal(InputStream in, Queue<byte[]> bufs, int totalLen)
+      throws IOException {
+    // Roughly size to match what has been read already. Some file systems, such as procfs, return 0
+    // as their length. These files are very small, so it's wasteful to allocate an 8KB buffer.
+    int initialBufferSize = min(BUFFER_SIZE, max(128, Integer.highestOneBit(totalLen) * 2));
+    // Starting with an 8k buffer, double the size of each successive buffer. Smaller buffers
+    // quadruple in size until they reach 8k, to minimize the number of small reads for longer
+    // streams. Buffers are retained in a deque so that there's no copying between buffers while
+    // reading and so all of the bytes in each new allocated buffer are available for reading from
+    // the stream.
+    for (int bufSize = initialBufferSize;
+        totalLen < MAX_ARRAY_LEN;
+        bufSize = IntMath.saturatedMultiply(bufSize, bufSize < 4096 ? 4 : 2)) {
+      byte[] buf = new byte[min(bufSize, MAX_ARRAY_LEN - totalLen)];
+      bufs.add(buf);
+      int off = 0;
+      while (off < buf.length) {
+        // always OK to fill buf; its size plus the rest of bufs is never more than MAX_ARRAY_LEN
+        int r = in.read(buf, off, buf.length - off);
+        if (r == -1) {
+          return combineBuffers(bufs, totalLen);
+        }
+        off += r;
+        totalLen += r;
+      }
+    }
+
+    // read MAX_ARRAY_LEN bytes without seeing end of stream
+    if (in.read() == -1) {
+      // oh, there's the end of the stream
+      return combineBuffers(bufs, MAX_ARRAY_LEN);
+    } else {
+      throw new OutOfMemoryError("input is too large to fit in a byte array");
+    }
+  }
+
+  private static byte[] combineBuffers(Queue<byte[]> bufs, int totalLen) {
+    if (bufs.isEmpty()) {
+      return new byte[0];
+    }
+    byte[] result = bufs.remove();
+    if (result.length == totalLen) {
+      return result;
+    }
+    int remaining = totalLen - result.length;
+    result = Arrays.copyOf(result, totalLen);
+    while (remaining > 0) {
+      byte[] buf = bufs.remove();
+      int bytesToCopy = min(remaining, buf.length);
+      int resultOffset = totalLen - remaining;
+      System.arraycopy(buf, 0, result, resultOffset, bytesToCopy);
+      remaining -= bytesToCopy;
+    }
+    return result;
   }
 
   /**
@@ -157,12 +242,8 @@ public final class ByteStreams {
    * @throws IOException if an I/O error occurs
    */
   public static byte[] toByteArray(InputStream in) throws IOException {
-    // Presize the ByteArrayOutputStream since we know how large it will need
-    // to be, unless that value is less than the default ByteArrayOutputStream
-    // size (32).
-    ByteArrayOutputStream out = new ByteArrayOutputStream(Math.max(32, in.available()));
-    copy(in, out);
-    return out.toByteArray();
+    checkNotNull(in);
+    return toByteArrayInternal(in, new ArrayDeque<byte[]>(TO_BYTE_ARRAY_DEQUE_SIZE), 0);
   }
 
   /**
@@ -170,12 +251,17 @@ public final class ByteStreams {
    * create an initial byte array, but if the actual number of bytes read from the stream differs,
    * the correct result will be returned anyway.
    */
-  static byte[] toByteArray(InputStream in, int expectedSize) throws IOException {
-    byte[] bytes = new byte[expectedSize];
-    int remaining = expectedSize;
+  static byte[] toByteArray(InputStream in, long expectedSize) throws IOException {
+    checkArgument(expectedSize >= 0, "expectedSize (%s) must be non-negative", expectedSize);
+    if (expectedSize > MAX_ARRAY_LEN) {
+      throw new OutOfMemoryError(expectedSize + " bytes is too large to fit in a byte array");
+    }
+
+    byte[] bytes = new byte[(int) expectedSize];
+    int remaining = (int) expectedSize;
 
     while (remaining > 0) {
-      int off = expectedSize - remaining;
+      int off = (int) expectedSize - remaining;
       int read = in.read(bytes, off, remaining);
       if (read == -1) {
         // end of stream before reading expectedSize bytes
@@ -192,25 +278,10 @@ public final class ByteStreams {
     }
 
     // the stream was longer, so read the rest normally
-    FastByteArrayOutputStream out = new FastByteArrayOutputStream();
-    out.write(b); // write the byte we read when testing for end of stream
-    copy(in, out);
-
-    byte[] result = new byte[bytes.length + out.size()];
-    System.arraycopy(bytes, 0, result, 0, bytes.length);
-    out.writeTo(result, bytes.length);
-    return result;
-  }
-
-  /** BAOS that provides limited access to its internal byte array. */
-  private static final class FastByteArrayOutputStream extends ByteArrayOutputStream {
-    /**
-     * Writes the contents of the internal buffer to the given array starting at the given offset.
-     * Assumes the array has space to hold count bytes.
-     */
-    void writeTo(byte[] b, int off) {
-      System.arraycopy(buf, 0, b, off, count);
-    }
+    Queue<byte[]> bufs = new ArrayDeque<>(TO_BYTE_ARRAY_DEQUE_SIZE + 2);
+    bufs.add(bytes);
+    bufs.add(new byte[] {(byte) b});
+    return toByteArrayInternal(in, bufs, bytes.length + 1);
   }
 
   /**
@@ -388,6 +459,7 @@ public final class ByteStreams {
     }
 
     @Override
+    @CheckForNull
     public String readLine() {
       try {
         return input.readLine();
@@ -438,19 +510,18 @@ public final class ByteStreams {
    *
    * @since 17.0
    */
-  public static ByteArrayDataOutput newDataOutput(ByteArrayOutputStream byteArrayOutputSteam) {
-    return new ByteArrayDataOutputStream(checkNotNull(byteArrayOutputSteam));
+  public static ByteArrayDataOutput newDataOutput(ByteArrayOutputStream byteArrayOutputStream) {
+    return new ByteArrayDataOutputStream(checkNotNull(byteArrayOutputStream));
   }
 
-  @SuppressWarnings("deprecation") // for writeBytes
   private static class ByteArrayDataOutputStream implements ByteArrayDataOutput {
 
     final DataOutput output;
-    final ByteArrayOutputStream byteArrayOutputSteam;
+    final ByteArrayOutputStream byteArrayOutputStream;
 
-    ByteArrayDataOutputStream(ByteArrayOutputStream byteArrayOutputSteam) {
-      this.byteArrayOutputSteam = byteArrayOutputSteam;
-      output = new DataOutputStream(byteArrayOutputSteam);
+    ByteArrayDataOutputStream(ByteArrayOutputStream byteArrayOutputStream) {
+      this.byteArrayOutputStream = byteArrayOutputStream;
+      output = new DataOutputStream(byteArrayOutputStream);
     }
 
     @Override
@@ -581,7 +652,7 @@ public final class ByteStreams {
 
     @Override
     public byte[] toByteArray() {
-      return byteArrayOutputSteam.toByteArray();
+      return byteArrayOutputStream.toByteArray();
     }
   }
 
@@ -601,6 +672,7 @@ public final class ByteStreams {
         @Override
         public void write(byte[] b, int off, int len) {
           checkNotNull(b);
+          checkPositionIndexes(off, off + len, b.length);
         }
 
         @Override
@@ -758,9 +830,10 @@ public final class ByteStreams {
    * either the full amount has been skipped or until the end of the stream is reached, whichever
    * happens first. Returns the total number of bytes skipped.
    */
-  static long skipUpTo(InputStream in, final long n) throws IOException {
+  static long skipUpTo(InputStream in, long n) throws IOException {
     long totalSkipped = 0;
-    byte[] buf = createBuffer();
+    // A buffer is allocated if skipSafely does not skip any bytes.
+    byte[] buf = null;
 
     while (totalSkipped < n) {
       long remaining = n - totalSkipped;
@@ -769,7 +842,13 @@ public final class ByteStreams {
       if (skipped == 0) {
         // Do a buffered read since skipSafely could return 0 repeatedly, for example if
         // in.available() always returns 0 (the default).
-        int skip = (int) Math.min(remaining, buf.length);
+        int skip = (int) Math.min(remaining, BUFFER_SIZE);
+        if (buf == null) {
+          // Allocate a buffer bounded by the maximum size that can be requested, for
+          // example an array of BUFFER_SIZE is unnecessary when the value of remaining
+          // is smaller.
+          buf = new byte[skip];
+        }
         if ((skipped = in.read(buf, 0, skip)) == -1) {
           // Reached EOF
           break;
@@ -804,7 +883,9 @@ public final class ByteStreams {
    * @since 14.0
    */
   @CanIgnoreReturnValue // some processors won't return a useful result
-  public static <T> T readBytes(InputStream input, ByteProcessor<T> processor) throws IOException {
+  @ParametricNullness
+  public static <T extends @Nullable Object> T readBytes(
+      InputStream input, ByteProcessor<T> processor) throws IOException {
     checkNotNull(input);
     checkNotNull(processor);
 
@@ -837,6 +918,8 @@ public final class ByteStreams {
    * @param len an int specifying the number of bytes to read
    * @return the number of bytes read
    * @throws IOException if an I/O error occurs
+   * @throws IndexOutOfBoundsException if {@code off} is negative, if {@code len} is negative, or if
+   *     {@code off + len} is greater than {@code b.length}
    */
   @CanIgnoreReturnValue
   // Sometimes you don't care how many bytes you actually read, I guess.
@@ -845,8 +928,9 @@ public final class ByteStreams {
     checkNotNull(in);
     checkNotNull(b);
     if (len < 0) {
-      throw new IndexOutOfBoundsException("len is negative");
+      throw new IndexOutOfBoundsException(String.format("len (%s) cannot be negative", len));
     }
+    checkPositionIndexes(off, off + len, b.length);
     int total = 0;
     while (total < len) {
       int result = in.read(b, off + total, len - total);

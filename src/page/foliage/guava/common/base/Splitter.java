@@ -17,9 +17,6 @@ package page.foliage.guava.common.base;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.annotations.GwtIncompatible;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +24,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Extracts non-overlapping substrings from an input string, typically by recognizing appearances of
@@ -97,6 +102,7 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 public final class Splitter {
   private final CharMatcher trimmer;
   private final boolean omitEmptyStrings;
@@ -210,12 +216,14 @@ public final class Splitter {
    * @return a splitter, with default settings, that uses this pattern
    * @throws IllegalArgumentException if {@code separatorPattern} matches the empty string
    */
+  @J2ktIncompatible
   @GwtIncompatible // java.util.regex
   public static Splitter on(Pattern separatorPattern) {
-    return on(new JdkPattern(separatorPattern));
+    return onPatternInternal(new JdkPattern(separatorPattern));
   }
 
-  private static Splitter on(final CommonPattern separatorPattern) {
+  /** Internal utility; see {@link #on(Pattern)} instead. */
+  static Splitter onPatternInternal(final CommonPattern separatorPattern) {
     checkArgument(
         !separatorPattern.matcher("").matches(),
         "The pattern may not match the empty string: %s",
@@ -253,15 +261,20 @@ public final class Splitter {
    * @throws IllegalArgumentException if {@code separatorPattern} matches the empty string or is a
    *     malformed expression
    */
+  @J2ktIncompatible
   @GwtIncompatible // java.util.regex
   public static Splitter onPattern(String separatorPattern) {
-    return on(Platform.compilePattern(separatorPattern));
+    return onPatternInternal(Platform.compilePattern(separatorPattern));
   }
 
   /**
    * Returns a splitter that divides strings into pieces of the given length. For example, {@code
    * Splitter.fixedLength(2).split("abcde")} returns an iterable containing {@code ["ab", "cd",
    * "e"]}. The last piece can be smaller than {@code length} but will never be empty.
+   *
+   * <p><b>Note:</b> if {@link #fixedLength} is used in conjunction with {@link #limit}, the final
+   * split piece <i>may be longer than the specified fixed length</i>. This is because the splitter
+   * will <i>stop splitting when the limit is reached</i>, and just return the final piece as-is.
    *
    * <p><b>Exception:</b> for consistency with separator-based splitters, {@code split("")} does not
    * yield an empty iterable, but an iterable containing {@code ""}. This is the only case in which
@@ -327,13 +340,13 @@ public final class Splitter {
    * trimmed, including the last. Hence {@code Splitter.on(',').limit(3).trimResults().split(" a , b
    * , c , d ")} results in {@code ["a", "b", "c , d"]}.
    *
-   * @param limit the maximum number of items returned
+   * @param maxItems the maximum number of items returned
    * @return a splitter with the desired configuration
    * @since 9.0
    */
-  public Splitter limit(int limit) {
-    checkArgument(limit > 0, "must be greater than zero: %s", limit);
-    return new Splitter(strategy, omitEmptyStrings, trimmer, limit);
+  public Splitter limit(int maxItems) {
+    checkArgument(maxItems > 0, "must be greater than zero: %s", maxItems);
+    return new Splitter(strategy, omitEmptyStrings, trimmer, maxItems);
   }
 
   /**
@@ -368,7 +381,7 @@ public final class Splitter {
   /**
    * Splits {@code sequence} into string components and makes them available through an {@link
    * Iterator}, which may be lazily evaluated. If you want an eagerly computed {@link List}, use
-   * {@link #splitToList(CharSequence)}.
+   * {@link #splitToList(CharSequence)}. Java 8 users may prefer {@link #splitToStream} instead.
    *
    * @param sequence the sequence of characters to split
    * @return an iteration over the segments split from the parameter
@@ -404,7 +417,6 @@ public final class Splitter {
    * @return an immutable list of the segments split from the parameter
    * @since 15.0
    */
-  @Beta
   public List<String> splitToList(CharSequence sequence) {
     checkNotNull(sequence);
 
@@ -419,12 +431,25 @@ public final class Splitter {
   }
 
   /**
+   * Splits {@code sequence} into string components and makes them available through an {@link
+   * Stream}, which may be lazily evaluated. If you want an eagerly computed {@link List}, use
+   * {@link #splitToList(CharSequence)}.
+   *
+   * @param sequence the sequence of characters to split
+   * @return a stream over the segments split from the parameter
+   * @since 28.2
+   */
+  public Stream<String> splitToStream(CharSequence sequence) {
+    // Can't use Streams.stream() from base
+    return StreamSupport.stream(split(sequence).spliterator(), false);
+  }
+
+  /**
    * Returns a {@code MapSplitter} which splits entries based on this splitter, and splits entries
    * into keys and values using the specified separator.
    *
    * @since 10.0
    */
-  @Beta
   public MapSplitter withKeyValueSeparator(String separator) {
     return withKeyValueSeparator(on(separator));
   }
@@ -435,7 +460,6 @@ public final class Splitter {
    *
    * @since 14.0
    */
-  @Beta
   public MapSplitter withKeyValueSeparator(char separator) {
     return withKeyValueSeparator(on(separator));
   }
@@ -444,9 +468,21 @@ public final class Splitter {
    * Returns a {@code MapSplitter} which splits entries based on this splitter, and splits entries
    * into keys and values using the specified key-value splitter.
    *
+   * <p>Note: Any configuration option configured on this splitter, such as {@link #trimResults},
+   * does not change the behavior of the {@code keyValueSplitter}.
+   *
+   * <p>Example:
+   *
+   * <pre>{@code
+   * String toSplit = " x -> y, z-> a ";
+   * Splitter outerSplitter = Splitter.on(',').trimResults();
+   * MapSplitter mapSplitter = outerSplitter.withKeyValueSeparator(Splitter.on("->"));
+   * Map<String, String> result = mapSplitter.split(toSplit);
+   * assertThat(result).isEqualTo(ImmutableMap.of("x ", " y", "z", " a"));
+   * }</pre>
+   *
    * @since 10.0
    */
-  @Beta
   public MapSplitter withKeyValueSeparator(Splitter keyValueSplitter) {
     return new MapSplitter(this, keyValueSplitter);
   }
@@ -459,7 +495,6 @@ public final class Splitter {
    *
    * @since 10.0
    */
-  @Beta
   public static final class MapSplitter {
     private static final String INVALID_ENTRY_MESSAGE = "Chunk [%s] is not a valid entry";
     private final Splitter outerSplitter;
@@ -531,6 +566,7 @@ public final class Splitter {
       this.toSplit = toSplit;
     }
 
+    @CheckForNull
     @Override
     protected String computeNext() {
       /*

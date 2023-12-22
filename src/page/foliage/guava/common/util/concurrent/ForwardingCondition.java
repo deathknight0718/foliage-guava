@@ -18,7 +18,11 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+
 /** Forwarding wrapper around a {@code Condition}. */
+@J2ktIncompatible
+@ElementTypesAreNonnullByDefault
 abstract class ForwardingCondition implements Condition {
   abstract Condition delegate();
 

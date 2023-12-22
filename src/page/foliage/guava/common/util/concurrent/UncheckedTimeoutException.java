@@ -14,8 +14,10 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * Unchecked version of {@link java.util.concurrent.TimeoutException}.
@@ -23,19 +25,21 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Kevin Bourrillion
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public class UncheckedTimeoutException extends RuntimeException {
   public UncheckedTimeoutException() {}
 
-  public UncheckedTimeoutException(@NullableDecl String message) {
+  public UncheckedTimeoutException(@CheckForNull String message) {
     super(message);
   }
 
-  public UncheckedTimeoutException(@NullableDecl Throwable cause) {
+  public UncheckedTimeoutException(@CheckForNull Throwable cause) {
     super(cause);
   }
 
-  public UncheckedTimeoutException(@NullableDecl String message, @NullableDecl Throwable cause) {
+  public UncheckedTimeoutException(@CheckForNull String message, @CheckForNull Throwable cause) {
     super(message, cause);
   }
 

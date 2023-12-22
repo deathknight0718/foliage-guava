@@ -16,11 +16,14 @@
 
 package page.foliage.guava.common.collect;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Collection;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of a {@link SortedSetMultimap} with a sorted key set.
@@ -31,7 +34,10 @@ import java.util.SortedSet;
  * @author Louis Wasserman
  */
 @GwtCompatible
-abstract class AbstractSortedKeySortedSetMultimap<K, V> extends AbstractSortedSetMultimap<K, V> {
+@ElementTypesAreNonnullByDefault
+abstract class AbstractSortedKeySortedSetMultimap<
+        K extends @Nullable Object, V extends @Nullable Object>
+    extends AbstractSortedSetMultimap<K, V> {
 
   AbstractSortedKeySortedSetMultimap(SortedMap<K, Collection<V>> map) {
     super(map);

@@ -19,13 +19,15 @@ package page.foliage.guava.common.collect;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.collect.CollectPreconditions.checkNonnegative;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Provides static methods for working with {@link Comparator} instances. For many other helpful
@@ -42,8 +44,8 @@ import java.util.stream.Collector;
  * @since 21.0
  * @author Louis Wasserman
  */
-@Beta
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class Comparators {
   private Comparators() {}
 
@@ -61,7 +63,8 @@ public final class Comparators {
   // Note: 90% of the time we don't add type parameters or wildcards that serve only to "tweak" the
   // desired return type. However, *nested* generics introduce a special class of problems that we
   // think tip it over into being worthwhile.
-  public static <T, S extends T> Comparator<Iterable<S>> lexicographical(Comparator<T> comparator) {
+  public static <T extends @Nullable Object, S extends T> Comparator<Iterable<S>> lexicographical(
+      Comparator<T> comparator) {
     return new LexicographicalOrdering<S>(checkNotNull(comparator));
   }
 
@@ -70,7 +73,8 @@ public final class Comparators {
    * equal to the element that preceded it, according to the specified comparator. Note that this is
    * always true when the iterable has fewer than two elements.
    */
-  public static <T> boolean isInOrder(Iterable<? extends T> iterable, Comparator<T> comparator) {
+  public static <T extends @Nullable Object> boolean isInOrder(
+      Iterable<? extends T> iterable, Comparator<T> comparator) {
     checkNotNull(comparator);
     Iterator<? extends T> it = iterable.iterator();
     if (it.hasNext()) {
@@ -91,7 +95,7 @@ public final class Comparators {
    * greater than the element that preceded it, according to the specified comparator. Note that
    * this is always true when the iterable has fewer than two elements.
    */
-  public static <T> boolean isInStrictOrder(
+  public static <T extends @Nullable Object> boolean isInStrictOrder(
       Iterable<? extends T> iterable, Comparator<T> comparator) {
     checkNotNull(comparator);
     Iterator<? extends T> it = iterable.iterator();
@@ -128,7 +132,8 @@ public final class Comparators {
    * @throws IllegalArgumentException if {@code k < 0}
    * @since 22.0
    */
-  public static <T> Collector<T, ?, List<T>> least(int k, Comparator<? super T> comparator) {
+  public static <T extends @Nullable Object> Collector<T, ?, List<T>> least(
+      int k, Comparator<? super T> comparator) {
     checkNonnegative(k, "k");
     checkNotNull(comparator);
     return Collector.of(
@@ -159,7 +164,8 @@ public final class Comparators {
    * @throws IllegalArgumentException if {@code k < 0}
    * @since 22.0
    */
-  public static <T> Collector<T, ?, List<T>> greatest(int k, Comparator<? super T> comparator) {
+  public static <T extends @Nullable Object> Collector<T, ?, List<T>> greatest(
+      int k, Comparator<? super T> comparator) {
     return least(k, comparator.reversed());
   }
 
@@ -170,10 +176,10 @@ public final class Comparators {
    *
    * @since 22.0
    */
-  @Beta
   public static <T> Comparator<Optional<T>> emptiesFirst(Comparator<? super T> valueComparator) {
     checkNotNull(valueComparator);
-    return Comparator.comparing(o -> o.orElse(null), Comparator.nullsFirst(valueComparator));
+    return Comparator.<Optional<T>, @Nullable T>comparing(
+        o -> o.orElse(null), Comparator.nullsFirst(valueComparator));
   }
 
   /**
@@ -183,9 +189,85 @@ public final class Comparators {
    *
    * @since 22.0
    */
-  @Beta
   public static <T> Comparator<Optional<T>> emptiesLast(Comparator<? super T> valueComparator) {
     checkNotNull(valueComparator);
-    return Comparator.comparing(o -> o.orElse(null), Comparator.nullsLast(valueComparator));
+    return Comparator.<Optional<T>, @Nullable T>comparing(
+        o -> o.orElse(null), Comparator.nullsLast(valueComparator));
+  }
+
+  /**
+   * Returns the minimum of the two values. If the values compare as 0, the first is returned.
+   *
+   * <p>The recommended solution for finding the {@code minimum} of some values depends on the type
+   * of your data and the number of elements you have. Read more in the Guava User Guide article on
+   * <a href="https://github.com/google/guava/wiki/CollectionUtilitiesExplained#comparators">{@code
+   * Comparators}</a>.
+   *
+   * @param a first value to compare, returned if less than or equal to b.
+   * @param b second value to compare.
+   * @throws ClassCastException if the parameters are not <i>mutually comparable</i>.
+   * @since 30.0
+   */
+  public static <T extends Comparable<? super T>> T min(T a, T b) {
+    return (a.compareTo(b) <= 0) ? a : b;
+  }
+
+  /**
+   * Returns the minimum of the two values, according to the given comparator. If the values compare
+   * as equal, the first is returned.
+   *
+   * <p>The recommended solution for finding the {@code minimum} of some values depends on the type
+   * of your data and the number of elements you have. Read more in the Guava User Guide article on
+   * <a href="https://github.com/google/guava/wiki/CollectionUtilitiesExplained#comparators">{@code
+   * Comparators}</a>.
+   *
+   * @param a first value to compare, returned if less than or equal to b
+   * @param b second value to compare.
+   * @throws ClassCastException if the parameters are not <i>mutually comparable</i> using the given
+   *     comparator.
+   * @since 30.0
+   */
+  @ParametricNullness
+  public static <T extends @Nullable Object> T min(
+      @ParametricNullness T a, @ParametricNullness T b, Comparator<T> comparator) {
+    return (comparator.compare(a, b) <= 0) ? a : b;
+  }
+
+  /**
+   * Returns the maximum of the two values. If the values compare as 0, the first is returned.
+   *
+   * <p>The recommended solution for finding the {@code maximum} of some values depends on the type
+   * of your data and the number of elements you have. Read more in the Guava User Guide article on
+   * <a href="https://github.com/google/guava/wiki/CollectionUtilitiesExplained#comparators">{@code
+   * Comparators}</a>.
+   *
+   * @param a first value to compare, returned if greater than or equal to b.
+   * @param b second value to compare.
+   * @throws ClassCastException if the parameters are not <i>mutually comparable</i>.
+   * @since 30.0
+   */
+  public static <T extends Comparable<? super T>> T max(T a, T b) {
+    return (a.compareTo(b) >= 0) ? a : b;
+  }
+
+  /**
+   * Returns the maximum of the two values, according to the given comparator. If the values compare
+   * as equal, the first is returned.
+   *
+   * <p>The recommended solution for finding the {@code maximum} of some values depends on the type
+   * of your data and the number of elements you have. Read more in the Guava User Guide article on
+   * <a href="https://github.com/google/guava/wiki/CollectionUtilitiesExplained#comparators">{@code
+   * Comparators}</a>.
+   *
+   * @param a first value to compare, returned if greater than or equal to b.
+   * @param b second value to compare.
+   * @throws ClassCastException if the parameters are not <i>mutually comparable</i> using the given
+   *     comparator.
+   * @since 30.0
+   */
+  @ParametricNullness
+  public static <T extends @Nullable Object> T max(
+      @ParametricNullness T a, @ParametricNullness T b, Comparator<T> comparator) {
+    return (comparator.compare(a, b) >= 0) ? a : b;
   }
 }

@@ -18,13 +18,15 @@ package page.foliage.guava.common.graph;
 
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 
-import page.foliage.guava.common.collect.AbstractIterator;
-import page.foliage.guava.common.collect.UnmodifiableIterator;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.collect.AbstractIterator;
+import page.foliage.guava.common.collect.UnmodifiableIterator;
 
 /**
  * A class to represent the set of edges connecting an (implicit) origin node to a target node.
@@ -35,6 +37,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author James Sexton
  * @param <E> Edge parameter type
  */
+@ElementTypesAreNonnullByDefault
 abstract class MultiEdgesConnecting<E> extends AbstractSet<E> {
 
   private final Map<E, ?> outEdgeToNode;
@@ -47,9 +50,10 @@ abstract class MultiEdgesConnecting<E> extends AbstractSet<E> {
 
   @Override
   public UnmodifiableIterator<E> iterator() {
-    final Iterator<? extends Entry<E, ?>> entries = outEdgeToNode.entrySet().iterator();
+    Iterator<? extends Entry<E, ?>> entries = outEdgeToNode.entrySet().iterator();
     return new AbstractIterator<E>() {
       @Override
+      @CheckForNull
       protected E computeNext() {
         while (entries.hasNext()) {
           Entry<E, ?> entry = entries.next();
@@ -63,7 +67,7 @@ abstract class MultiEdgesConnecting<E> extends AbstractSet<E> {
   }
 
   @Override
-  public boolean contains(@NullableDecl Object edge) {
+  public boolean contains(@CheckForNull Object edge) {
     return targetNode.equals(outEdgeToNode.get(edge));
   }
 }

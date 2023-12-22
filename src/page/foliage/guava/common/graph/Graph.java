@@ -16,9 +16,14 @@
 
 package page.foliage.guava.common.graph;
 
-import page.foliage.guava.common.annotations.Beta;
+import java.util.Collection;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import com.google.errorprone.annotations.DoNotMock;
+
+import page.foliage.guava.common.annotations.Beta;
 
 /**
  * An interface for <a
@@ -100,6 +105,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 20.0
  */
 @Beta
+@DoNotMock("Use GraphBuilder to create a real instance")
+@ElementTypesAreNonnullByDefault
 public interface Graph<N> extends BaseGraph<N> {
   //
   // Graph-level accessors
@@ -137,12 +144,24 @@ public interface Graph<N> extends BaseGraph<N> {
   @Override
   ElementOrder<N> nodeOrder();
 
+  /**
+   * Returns an {@link ElementOrder} that specifies the order of iteration for the elements of
+   * {@link #edges()}, {@link #adjacentNodes(Object)}, {@link #predecessors(Object)}, {@link
+   * #successors(Object)} and {@link #incidentEdges(Object)}.
+   *
+   * @since 29.0
+   */
+  @Override
+  ElementOrder<N> incidentEdgeOrder();
+
   //
   // Element-level accessors
   //
 
   /**
    * Returns the nodes which have an incident edge in common with {@code node} in this graph.
+   *
+   * <p>This is equal to the union of {@link #predecessors(Object)} and {@link #successors(Object)}.
    *
    * @throws IllegalArgumentException if {@code node} is not an element of this graph
    */
@@ -176,6 +195,8 @@ public interface Graph<N> extends BaseGraph<N> {
 
   /**
    * Returns the edges in this graph whose endpoints include {@code node}.
+   *
+   * <p>This is equal to the union of incoming and outgoing edges.
    *
    * @throws IllegalArgumentException if {@code node} is not an element of this graph
    * @since 24.0
@@ -222,7 +243,7 @@ public interface Graph<N> extends BaseGraph<N> {
   int outDegree(N node);
 
   /**
-   * Returns true if there is an edge directly connecting {@code nodeU} to {@code nodeV}. This is
+   * Returns true if there is an edge that directly connects {@code nodeU} to {@code nodeV}. This is
    * equivalent to {@code nodes().contains(nodeU) && successors(nodeU).contains(nodeV)}.
    *
    * <p>In an undirected graph, this is equal to {@code hasEdgeConnecting(nodeV, nodeU)}.
@@ -231,6 +252,22 @@ public interface Graph<N> extends BaseGraph<N> {
    */
   @Override
   boolean hasEdgeConnecting(N nodeU, N nodeV);
+
+  /**
+   * Returns true if there is an edge that directly connects {@code endpoints} (in the order, if
+   * any, specified by {@code endpoints}). This is equivalent to {@code
+   * edges().contains(endpoints)}.
+   *
+   * <p>Unlike the other {@code EndpointPair}-accepting methods, this method does not throw if the
+   * endpoints are unordered and the graph is directed; it simply returns {@code false}. This is for
+   * consistency with the behavior of {@link Collection#contains(Object)} (which does not generally
+   * throw if the object cannot be present in the collection), and the desire to have this method's
+   * behavior be compatible with {@code edges().contains(endpoints)}.
+   *
+   * @since 27.1
+   */
+  @Override
+  boolean hasEdgeConnecting(EndpointPair<N> endpoints);
 
   //
   // Graph identity
@@ -256,7 +293,7 @@ public interface Graph<N> extends BaseGraph<N> {
    * <p>A reference implementation of this is provided by {@link AbstractGraph#equals(Object)}.
    */
   @Override
-  boolean equals(@NullableDecl Object object);
+  boolean equals(@CheckForNull Object object);
 
   /**
    * Returns the hash code for this graph. The hash code of a graph is defined as the hash code of

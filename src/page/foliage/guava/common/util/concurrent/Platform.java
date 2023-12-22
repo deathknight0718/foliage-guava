@@ -14,15 +14,27 @@
 
 package page.foliage.guava.common.util.concurrent;
 
+import static java.lang.Thread.currentThread;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.CheckForNull;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /** Methods factored out so that they can be emulated differently in GWT. */
 @GwtCompatible(emulated = true)
+@ElementTypesAreNonnullByDefault
 final class Platform {
   static boolean isInstanceOfThrowableClass(
-      @NullableDecl Throwable t, Class<? extends Throwable> expectedClass) {
+      @CheckForNull Throwable t, Class<? extends Throwable> expectedClass) {
     return expectedClass.isInstance(t);
+  }
+
+  static void restoreInterruptIfIsInterruptedException(Throwable t) {
+    checkNotNull(t); // to satisfy NullPointerTester
+    if (t instanceof InterruptedException) {
+      currentThread().interrupt();
+    }
   }
 
   private Platform() {}

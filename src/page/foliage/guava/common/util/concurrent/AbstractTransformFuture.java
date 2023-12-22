@@ -17,21 +17,29 @@ package page.foliage.guava.common.util.concurrent;
 import static page.foliage.guava.common.base.Preconditions.checkNotNull;
 import static page.foliage.guava.common.util.concurrent.Futures.getDone;
 import static page.foliage.guava.common.util.concurrent.MoreExecutors.rejectionPropagatingExecutor;
+import static page.foliage.guava.common.util.concurrent.Platform.restoreInterruptIfIsInterruptedException;
 
-import page.foliage.guava.common.annotations.GwtCompatible;
-import page.foliage.guava.common.base.Function;
-import com.google.errorprone.annotations.ForOverride;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.ForOverride;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
+import page.foliage.guava.common.base.Function;
 
 /** Implementations of {@code Futures.transform*}. */
 @GwtCompatible
-abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.TrustedFuture<O>
-    implements Runnable {
-  static <I, O> ListenableFuture<O> create(
+@ElementTypesAreNonnullByDefault
+@SuppressWarnings("nullness") // TODO(b/147136275): Remove once our checker understands & and |.
+abstract class AbstractTransformFuture<
+        I extends @Nullable Object, O extends @Nullable Object, F, T extends @Nullable Object>
+    extends FluentFuture.TrustedFuture<O> implements Runnable {
+  static <I extends @Nullable Object, O extends @Nullable Object> ListenableFuture<O> create(
       ListenableFuture<I> input,
       AsyncFunction<? super I, ? extends O> function,
       Executor executor) {
@@ -41,7 +49,7 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     return output;
   }
 
-  static <I, O> ListenableFuture<O> create(
+  static <I extends @Nullable Object, O extends @Nullable Object> ListenableFuture<O> create(
       ListenableFuture<I> input, Function<? super I, ? extends O> function, Executor executor) {
     checkNotNull(function);
     TransformFuture<I, O> output = new TransformFuture<>(input, function);
@@ -53,8 +61,8 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
    * In certain circumstances, this field might theoretically not be visible to an afterDone() call
    * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
    */
-  @NullableDecl ListenableFuture<? extends I> inputFuture;
-  @NullableDecl F function;
+  @CheckForNull ListenableFuture<? extends I> inputFuture;
+  @CheckForNull F function;
 
   AbstractTransformFuture(ListenableFuture<? extends I> inputFuture, F function) {
     this.inputFuture = checkNotNull(inputFuture);
@@ -70,6 +78,13 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     }
     inputFuture = null;
 
+    if (localInputFuture.isCancelled()) {
+      @SuppressWarnings("unchecked")
+      boolean unused =
+          setFuture((ListenableFuture<O>) localInputFuture); // Respects cancellation cause setting
+      return;
+    }
+
     /*
      * Any of the setException() calls below can fail if the output Future is cancelled between now
      * and then. This means that we're silently swallowing an exception -- maybe even an Error. But
@@ -78,11 +93,12 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
      *
      * Contrast this to the situation we have if setResult() throws, a situation described below.
      */
-
     I sourceResult;
     try {
       sourceResult = getDone(localInputFuture);
     } catch (CancellationException e) {
+      // TODO(user): verify future behavior - unify logic with getFutureValue in AbstractFuture. This
+      // code should be unreachable with correctly implemented Futures.
       // Cancel this future and return.
       // At this point, inputFuture is cancelled and outputFuture doesn't exist, so the value of
       // mayInterruptIfRunning is irrelevant.
@@ -109,11 +125,8 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     T transformResult;
     try {
       transformResult = doTransform(localFunction, sourceResult);
-    } catch (UndeclaredThrowableException e) {
-      // Set the cause of the exception as this future's exception.
-      setException(e.getCause());
-      return;
     } catch (Throwable t) {
+      restoreInterruptIfIsInterruptedException(t);
       // This exception is irrelevant in this thread, but useful for the client.
       setException(t);
       return;
@@ -162,12 +175,12 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
 
   /** Template method for subtypes to actually run the transform. */
   @ForOverride
-  @NullableDecl
-  abstract T doTransform(F function, @NullableDecl I result) throws Exception;
+  @ParametricNullness
+  abstract T doTransform(F function, @ParametricNullness I result) throws Exception;
 
   /** Template method for subtypes to actually set the result. */
   @ForOverride
-  abstract void setResult(@NullableDecl T result);
+  abstract void setResult(@ParametricNullness T result);
 
   @Override
   protected final void afterDone() {
@@ -177,6 +190,7 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
   }
 
   @Override
+  @CheckForNull
   protected String pendingToString() {
     ListenableFuture<? extends I> localInputFuture = inputFuture;
     F localFunction = function;
@@ -197,7 +211,8 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
    * An {@link AbstractTransformFuture} that delegates to an {@link AsyncFunction} and {@link
    * #setFuture(ListenableFuture)}.
    */
-  private static final class AsyncTransformFuture<I, O>
+  private static final class AsyncTransformFuture<
+          I extends @Nullable Object, O extends @Nullable Object>
       extends AbstractTransformFuture<
           I, O, AsyncFunction<? super I, ? extends O>, ListenableFuture<? extends O>> {
     AsyncTransformFuture(
@@ -207,12 +222,14 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
 
     @Override
     ListenableFuture<? extends O> doTransform(
-        AsyncFunction<? super I, ? extends O> function, @NullableDecl I input) throws Exception {
+        AsyncFunction<? super I, ? extends O> function, @ParametricNullness I input)
+        throws Exception {
       ListenableFuture<? extends O> outputFuture = function.apply(input);
       checkNotNull(
           outputFuture,
           "AsyncFunction.apply returned null instead of a Future. "
-              + "Did you mean to return immediateFuture(null)?");
+              + "Did you mean to return immediateFuture(null)? %s",
+          function);
       return outputFuture;
     }
 
@@ -226,7 +243,7 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
    * An {@link AbstractTransformFuture} that delegates to a {@link Function} and {@link
    * #set(Object)}.
    */
-  private static final class TransformFuture<I, O>
+  private static final class TransformFuture<I extends @Nullable Object, O extends @Nullable Object>
       extends AbstractTransformFuture<I, O, Function<? super I, ? extends O>, O> {
     TransformFuture(
         ListenableFuture<? extends I> inputFuture, Function<? super I, ? extends O> function) {
@@ -234,14 +251,13 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
     }
 
     @Override
-    @NullableDecl
-    O doTransform(Function<? super I, ? extends O> function, @NullableDecl I input) {
+    @ParametricNullness
+    O doTransform(Function<? super I, ? extends O> function, @ParametricNullness I input) {
       return function.apply(input);
-      // TODO(lukes): move the UndeclaredThrowable catch block here?
     }
 
     @Override
-    void setResult(@NullableDecl O result) {
+    void setResult(@ParametricNullness O result) {
       set(result);
     }
   }

@@ -14,9 +14,11 @@
 
 package page.foliage.guava.common.util.concurrent;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtCompatible;
 import java.util.concurrent.ScheduledFuture;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import page.foliage.guava.common.annotations.GwtCompatible;
 
 /**
  * Helper interface to implement both {@link ListenableFuture} and {@link ScheduledFuture}.
@@ -24,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author Anthony Zana
  * @since 15.0
  */
-@Beta
 @GwtCompatible
-public interface ListenableScheduledFuture<V> extends ScheduledFuture<V>, ListenableFuture<V> {}
+@ElementTypesAreNonnullByDefault
+public interface ListenableScheduledFuture<V extends @Nullable Object>
+    extends ScheduledFuture<V>, ListenableFuture<V> {}

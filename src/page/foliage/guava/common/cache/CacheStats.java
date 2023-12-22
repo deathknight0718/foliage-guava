@@ -15,12 +15,16 @@
 package page.foliage.guava.common.cache;
 
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
+import static page.foliage.guava.common.math.LongMath.saturatedAdd;
+import static page.foliage.guava.common.math.LongMath.saturatedSubtract;
+
+import java.util.concurrent.Callable;
+
+import javax.annotation.CheckForNull;
 
 import page.foliage.guava.common.annotations.GwtCompatible;
 import page.foliage.guava.common.base.MoreObjects;
 import page.foliage.guava.common.base.Objects;
-import java.util.concurrent.Callable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Statistics about the performance of a {@link Cache}. Instances of this class are immutable.
@@ -55,12 +59,16 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 10.0
  */
 @GwtCompatible
+@ElementTypesAreNonnullByDefault
 public final class CacheStats {
   private final long hitCount;
   private final long missCount;
   private final long loadSuccessCount;
   private final long loadExceptionCount;
+
+  @SuppressWarnings("GoodTime") // should be a java.time.Duration
   private final long totalLoadTime;
+
   private final long evictionCount;
 
   /**
@@ -69,6 +77,7 @@ public final class CacheStats {
    * <p>Five parameters of the same type in a row is a bad thing, but this class is not constructed
    * by end users and is too fine-grained for a builder.
    */
+  @SuppressWarnings("GoodTime") // should accept a java.time.Duration
   public CacheStats(
       long hitCount,
       long missCount,
@@ -94,9 +103,13 @@ public final class CacheStats {
   /**
    * Returns the number of times {@link Cache} lookup methods have returned either a cached or
    * uncached value. This is defined as {@code hitCount + missCount}.
+   *
+   * <p><b>Note:</b> the values of the metrics are undefined in case of overflow (though it is
+   * guaranteed not to throw an exception). If you require specific handling, we recommend
+   * implementing your own stats collector.
    */
   public long requestCount() {
-    return hitCount + missCount;
+    return saturatedAdd(hitCount, missCount);
   }
 
   /** Returns the number of times {@link Cache} lookup methods have returned a cached value. */
@@ -140,11 +153,15 @@ public final class CacheStats {
 
   /**
    * Returns the total number of times that {@link Cache} lookup methods attempted to load new
-   * values. This includes both successful load operations, as well as those that threw exceptions.
-   * This is defined as {@code loadSuccessCount + loadExceptionCount}.
+   * values. This includes both successful load operations and those that threw exceptions. This is
+   * defined as {@code loadSuccessCount + loadExceptionCount}.
+   *
+   * <p><b>Note:</b> the values of the metrics are undefined in case of overflow (though it is
+   * guaranteed not to throw an exception). If you require specific handling, we recommend
+   * implementing your own stats collector.
    */
   public long loadCount() {
-    return loadSuccessCount + loadExceptionCount;
+    return saturatedAdd(loadSuccessCount, loadExceptionCount);
   }
 
   /**
@@ -179,9 +196,13 @@ public final class CacheStats {
    * Returns the ratio of cache loading attempts which threw exceptions. This is defined as {@code
    * loadExceptionCount / (loadSuccessCount + loadExceptionCount)}, or {@code 0.0} when {@code
    * loadSuccessCount + loadExceptionCount == 0}.
+   *
+   * <p><b>Note:</b> the values of the metrics are undefined in case of overflow (though it is
+   * guaranteed not to throw an exception). If you require specific handling, we recommend
+   * implementing your own stats collector.
    */
   public double loadExceptionRate() {
-    long totalLoadCount = loadSuccessCount + loadExceptionCount;
+    long totalLoadCount = saturatedAdd(loadSuccessCount, loadExceptionCount);
     return (totalLoadCount == 0) ? 0.0 : (double) loadExceptionCount / totalLoadCount;
   }
 
@@ -190,6 +211,7 @@ public final class CacheStats {
    * used to calculate the miss penalty. This value is increased every time {@code loadSuccessCount}
    * or {@code loadExceptionCount} is incremented.
    */
+  @SuppressWarnings("GoodTime") // should return a java.time.Duration
   public long totalLoadTime() {
     return totalLoadTime;
   }
@@ -197,9 +219,13 @@ public final class CacheStats {
   /**
    * Returns the average time spent loading new values. This is defined as {@code totalLoadTime /
    * (loadSuccessCount + loadExceptionCount)}.
+   *
+   * <p><b>Note:</b> the values of the metrics are undefined in case of overflow (though it is
+   * guaranteed not to throw an exception). If you require specific handling, we recommend
+   * implementing your own stats collector.
    */
   public double averageLoadPenalty() {
-    long totalLoadCount = loadSuccessCount + loadExceptionCount;
+    long totalLoadCount = saturatedAdd(loadSuccessCount, loadExceptionCount);
     return (totalLoadCount == 0) ? 0.0 : (double) totalLoadTime / totalLoadCount;
   }
 
@@ -218,28 +244,32 @@ public final class CacheStats {
    */
   public CacheStats minus(CacheStats other) {
     return new CacheStats(
-        Math.max(0, hitCount - other.hitCount),
-        Math.max(0, missCount - other.missCount),
-        Math.max(0, loadSuccessCount - other.loadSuccessCount),
-        Math.max(0, loadExceptionCount - other.loadExceptionCount),
-        Math.max(0, totalLoadTime - other.totalLoadTime),
-        Math.max(0, evictionCount - other.evictionCount));
+        Math.max(0, saturatedSubtract(hitCount, other.hitCount)),
+        Math.max(0, saturatedSubtract(missCount, other.missCount)),
+        Math.max(0, saturatedSubtract(loadSuccessCount, other.loadSuccessCount)),
+        Math.max(0, saturatedSubtract(loadExceptionCount, other.loadExceptionCount)),
+        Math.max(0, saturatedSubtract(totalLoadTime, other.totalLoadTime)),
+        Math.max(0, saturatedSubtract(evictionCount, other.evictionCount)));
   }
 
   /**
    * Returns a new {@code CacheStats} representing the sum of this {@code CacheStats} and {@code
    * other}.
    *
+   * <p><b>Note:</b> the values of the metrics are undefined in case of overflow (though it is
+   * guaranteed not to throw an exception). If you require specific handling, we recommend
+   * implementing your own stats collector.
+   *
    * @since 11.0
    */
   public CacheStats plus(CacheStats other) {
     return new CacheStats(
-        hitCount + other.hitCount,
-        missCount + other.missCount,
-        loadSuccessCount + other.loadSuccessCount,
-        loadExceptionCount + other.loadExceptionCount,
-        totalLoadTime + other.totalLoadTime,
-        evictionCount + other.evictionCount);
+        saturatedAdd(hitCount, other.hitCount),
+        saturatedAdd(missCount, other.missCount),
+        saturatedAdd(loadSuccessCount, other.loadSuccessCount),
+        saturatedAdd(loadExceptionCount, other.loadExceptionCount),
+        saturatedAdd(totalLoadTime, other.totalLoadTime),
+        saturatedAdd(evictionCount, other.evictionCount));
   }
 
   @Override
@@ -249,7 +279,7 @@ public final class CacheStats {
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@CheckForNull Object object) {
     if (object instanceof CacheStats) {
       CacheStats other = (CacheStats) object;
       return hitCount == other.hitCount

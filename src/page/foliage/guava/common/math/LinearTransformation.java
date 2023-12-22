@@ -14,13 +14,16 @@
 
 package page.foliage.guava.common.math;
 
+import static java.lang.Double.NaN;
 import static page.foliage.guava.common.base.Preconditions.checkArgument;
 import static page.foliage.guava.common.math.DoubleUtils.isFinite;
-import static java.lang.Double.NaN;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
+import javax.annotation.CheckForNull;
+
 import com.google.errorprone.annotations.concurrent.LazyInit;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * The representation of a linear transformation between real numbers {@code x} and {@code y}.
@@ -33,8 +36,9 @@ import com.google.errorprone.annotations.concurrent.LazyInit;
  * @author Pete Gillin
  * @since 20.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 public abstract class LinearTransformation {
 
   /**
@@ -161,7 +165,7 @@ public abstract class LinearTransformation {
     final double slope;
     final double yIntercept;
 
-    @LazyInit LinearTransformation inverse;
+    @CheckForNull @LazyInit LinearTransformation inverse;
 
     RegularLinearTransformation(double slope, double yIntercept) {
       this.slope = slope;
@@ -219,7 +223,7 @@ public abstract class LinearTransformation {
 
     final double x;
 
-    @LazyInit LinearTransformation inverse;
+    @CheckForNull @LazyInit LinearTransformation inverse;
 
     VerticalLinearTransformation(double x) {
       this.x = x;

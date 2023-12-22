@@ -14,12 +14,17 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import page.foliage.guava.common.base.Preconditions;
+import static page.foliage.guava.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.CheckForNull;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+import page.foliage.guava.common.base.Preconditions;
 
 /**
  * A {@link Reader} that concatenates multiple readers.
@@ -27,10 +32,12 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Bin Zhu
  * @since 1.0
  */
+@J2ktIncompatible
 @GwtIncompatible
+@ElementTypesAreNonnullByDefault
 class MultiReader extends Reader {
   private final Iterator<? extends CharSource> it;
-  @NullableDecl private Reader current;
+  @CheckForNull private Reader current;
 
   MultiReader(Iterator<? extends CharSource> readers) throws IOException {
     this.it = readers;
@@ -46,7 +53,8 @@ class MultiReader extends Reader {
   }
 
   @Override
-  public int read(@NullableDecl char cbuf[], int off, int len) throws IOException {
+  public int read(char[] cbuf, int off, int len) throws IOException {
+    checkNotNull(cbuf);
     if (current == null) {
       return -1;
     }

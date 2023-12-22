@@ -18,7 +18,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
+import page.foliage.guava.common.annotations.J2ktIncompatible;
+
 /** Forwarding wrapper around a {@code Lock}. */
+@J2ktIncompatible
+@ElementTypesAreNonnullByDefault
 abstract class ForwardingLock implements Lock {
   abstract Lock delegate();
 

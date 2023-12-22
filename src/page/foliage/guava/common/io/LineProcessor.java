@@ -14,10 +14,14 @@
 
 package page.foliage.guava.common.io;
 
-import page.foliage.guava.common.annotations.Beta;
-import page.foliage.guava.common.annotations.GwtIncompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 
 /**
  * A callback to be used with the streaming {@code readLines} methods.
@@ -28,9 +32,10 @@ import java.io.IOException;
  * @author Miles Barr
  * @since 1.0
  */
-@Beta
+@J2ktIncompatible
 @GwtIncompatible
-public interface LineProcessor<T> {
+@ElementTypesAreNonnullByDefault
+public interface LineProcessor<T extends @Nullable Object> {
 
   /**
    * This method will be called once for each line.
@@ -42,5 +47,6 @@ public interface LineProcessor<T> {
   boolean processLine(String line) throws IOException;
 
   /** Return the result of processing all the lines. */
+  @ParametricNullness
   T getResult();
 }

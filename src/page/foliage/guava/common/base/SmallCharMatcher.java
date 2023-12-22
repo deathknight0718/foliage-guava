@@ -14,10 +14,12 @@
 
 package page.foliage.guava.common.base;
 
+import java.util.BitSet;
+
 import page.foliage.guava.common.annotations.GwtIncompatible;
+import page.foliage.guava.common.annotations.J2ktIncompatible;
 import page.foliage.guava.common.annotations.VisibleForTesting;
 import page.foliage.guava.common.base.CharMatcher.NamedFastMatcher;
-import java.util.BitSet;
 
 /**
  * An immutable version of CharMatcher for smallish sets of characters that uses a hash table with
@@ -25,7 +27,9 @@ import java.util.BitSet;
  *
  * @author Christopher Swenson
  */
+@J2ktIncompatible
 @GwtIncompatible // no precomputation is done in GWT
+@ElementTypesAreNonnullByDefault
 final class SmallCharMatcher extends NamedFastMatcher {
   static final int MAX_SIZE = 1023;
   private final char[] table;

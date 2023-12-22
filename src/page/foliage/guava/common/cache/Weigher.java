@@ -24,6 +24,7 @@ import page.foliage.guava.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 @FunctionalInterface
+@ElementTypesAreNonnullByDefault
 public interface Weigher<K, V> {
 
   /**

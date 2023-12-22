@@ -14,8 +14,9 @@
 
 package page.foliage.guava.common.base;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import page.foliage.guava.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 /**
  * Legacy version of {@link java.util.function.Supplier java.util.function.Supplier}. Semantically,
@@ -37,14 +38,15 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
  */
 @GwtCompatible
 @FunctionalInterface
-public interface Supplier<T> extends java.util.function.Supplier<T> {
+@ElementTypesAreNonnullByDefault
+public interface Supplier<T extends @Nullable Object> extends java.util.function.Supplier<T> {
   /**
    * Retrieves an instance of the appropriate type. The returned object may or may not be a new
    * instance, depending on the implementation.
    *
    * @return an instance of the appropriate type
    */
-  @CanIgnoreReturnValue
   @Override
+  @ParametricNullness
   T get();
 }
